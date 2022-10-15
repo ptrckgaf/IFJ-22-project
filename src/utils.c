@@ -42,3 +42,8 @@ void DynamicStringFree(DynamicString *string){
 bool DynamicStringCompare(DynamicString *string, const char *string2){
     return strcmp(string->value, string2);
 }
+
+void DynamicStringClean(DynamicString *string){
+    string->length = 0;
+    string->value[0] = '\0';
+}
