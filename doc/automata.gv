@@ -1,0 +1,119 @@
+digraph G {
+    node [shape=circle, width=1, height=1]
+    {
+        node [shape=doublecircle]
+        VARIABLE_ID
+        STRING_END
+        IDENTIFIER
+        LEFT_PARENTHESE
+        RIGHT_PARENTHESE
+        NUMBER_DECIMAL
+        NUMBER_EXPONENTIAL
+        MULTIPLICATION,
+        DIVISION,
+        PLUS,
+        MINUS,
+        GREATER,
+        LESS,
+        GREATER_EQUAL,
+        LESS_EQUAL,
+        ASSIGN,
+        COMPARE2,
+        NEG_COMPARE2
+    }
+
+    {
+        node[width = 3, height = 3];
+        START
+    }
+
+    subgraph{
+        SLASH,
+        COMMENT,
+        COMMENT_TEXT,
+        COMMENT_BLOCK,
+        COMMENT_BLOCK_END,
+        COMMENT_BLOCK_TEXT
+    }
+    subgraph{
+        LEFT_PARENTHESE,
+        RIGHT_PARENTHESE,
+        STRING_START,
+        NUMBER,
+        NUMBER_DOT,
+        NUMBER_DECIMAL,
+        NUMBER_E,
+        NUMBER_E_SIGN,
+        NUMBER_EXPONENTIAL
+        VARIABLE_DOLLAR,
+        VARIABLE_ID
+    }
+    subgraph{
+        MULTIPLICATION,
+        DIVISION,
+        PLUS,
+        MINUS,
+        GREATER,
+        LESS,
+        GREATER_EQUAL,
+        LESS_EQUAL,
+        ASSIGN,
+        COMPARE1,
+        COMPARE2,
+        EXCLAMATION_MARK,
+        NEG_COMPARE1,
+        NEG_COMPARE2
+    }
+    START -> IDENTIFIER[label="a-z\nA-Z\n_"];
+    START -> QUESTION_MARK[label="?"]
+    START -> LEFT_PARENTHESE[label="("];
+    START -> RIGHT_PARENTHESE[label=")"];
+    START -> STRING_START[label="\""];
+    START -> NUMBER[label="0-9"];
+    START -> START[label="whitespace \t"]
+    IDENTIFIER -> IDENTIFIER[label="a-z\nA-Z\n0-9\n_"];
+    QUESTION_MARK -> IDENTIFIER[label="a-z\nA-Z\n_"];
+    NUMBER -> NUMBER_DOT[label="."];
+    NUMBER_DOT -> NUMBER_DECIMAL[label="0-9"];
+    NUMBER -> NUMBER_E[label="Ee"];
+    NUMBER_DECIMAL -> NUMBER_E[label="eE"];
+    NUMBER_E -> NUMBER_E_SIGN[label="+-"];
+    NUMBER_E -> NUMBER_EXPONENTIAL[label="0-9"]
+    NUMBER_E_SIGN -> NUMBER_EXPONENTIAL[label="0-9"];
+    NUMBER_EXPONENTIAL -> NUMBER_EXPONENTIAL[label="0-9"];
+    NUMBER -> NUMBER[label="0-9"];
+    NUMBER_DECIMAL -> NUMBER_DECIMAL[label="0-9"];
+
+    STRING_START -> STRING[label="a-z\nA-Z\n_"];
+    STRING -> STRING_ESC[label="/"];
+    STRING -> STRING_END[label="\""];
+
+    START -> VARIABLE_DOLLAR;
+    VARIABLE_DOLLAR -> VARIABLE_ID;
+    START -> SLASH[label="  /"];
+    SLASH -> COMMENT[label="  /"];
+    COMMENT -> COMMENT_TEXT[label="&#931;"];
+    COMMENT_TEXT -> COMMENT_TEXT[label="&#931; - EOL"];
+    COMMENT_TEXT -> START[label="EOL"];
+    SLASH -> COMMENT_BLOCK[label="*"];
+    COMMENT_BLOCK -> COMMENT_BLOCK_TEXT[label="&#931; - EOL"];
+    COMMENT_BLOCK_TEXT -> COMMENT_BLOCK_TEXT[label="&#931; - {EOL, *, /}"];
+    COMMENT_BLOCK_TEXT -> COMMENT_BLOCK_END[label=" *"];
+    COMMENT_BLOCK_END -> COMMENT_BLOCK_TEXT[label="&#931; - /"];
+    COMMENT_BLOCK_END -> START[label=" /"];
+    START -> MULTIPLICATION[label="*"];
+    START -> DIVISION[label="*"];
+    START -> PLUS[label="+"];
+    START -> MINUS[label="-"];
+    START -> GREATER[label=">"];
+    START -> LESS[label="<"];
+    GREATER -> GREATER_EQUAL[label="="];
+    LESS -> LESS_EQUAL[label="="];
+    START -> ASSIGN[label="="];
+    ASSIGN -> COMPARE1[label="="];
+    COMPARE1 -> COMPARE2[label="="];
+    START ->EXCLAMATION_MARK[label="!"];
+    EXCLAMATION_MARK -> NEG_COMPARE1[label="="];
+    NEG_COMPARE1 -> NEG_COMPARE2[label="="];
+
+}
