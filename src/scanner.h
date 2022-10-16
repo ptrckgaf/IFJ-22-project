@@ -29,21 +29,61 @@ typedef enum{
 }AutomataState;
 
 typedef enum{
-    FUN_ID_TOKEN,
-    VAR_ID_TOKEN,
-    L_PAR_TOKEN,
-    R_PAR_TOKEN,
-    STRING_TOKEN,
-    EOF_TOKEN,
-    EOL_TOKEN,
+    TOKEN_FUN_ID,
+    TOKEN_VAR_ID,
+
+    TOKEN_L_PAR,
+    TOKEN_R_PAR,
+    TOKEN_L_BRACKET,
+    TOKEN_R_BRACKET,
+    TOKEN_EOF,
+    TOKEN_EOL,
+    TOKEN_COMMA,
+    TOKEN_SEMICOLON,
+
+    TOKEN_MUL,
+    TOKEN_DIV,
+    TOKEN_PLUS,
+    TOKEN_MINUS,
+    TOKEN_GREATER,
+    TOKEN_GREATER_EQ,
+    TOKEN_LESS,
+    TOKEN_LESS_EQ,
+    TOKEN_ASSIGN,
+    TOKEN_COMPARE,
+    TOKEN_NEG_COMPARE,
+
+    TOKEN_INT,
+    TOKEN_DOUBLE,
+    TOKEN_STRING
 }TokenType;
 
-union{
-    int value_int;
-    DynamicString value_str;
-}TokenValue;
+typedef enum{
+    VALUE_INT,
+    VALUE_STRING,
+    VALUE_DOUBLE,
+    VALUE_NULL
+}TokenValueType;
+
+typedef enum{
+    WHILE_KEYWORD,
+    IF_KEYWORD
+}Keyword;
+
 
 typedef struct{
     TokenType type;
-    TokenValue value;
+    TokenValueType valueType;
+
+    union{
+        int value_int;
+        double value_double;
+        DynamicString value_str;
+    }value;
+
 }Token;
+
+//todo add comments
+Token * TokenInit(TokenType tokenType,TokenValueType valueType, DynamicString *value);
+
+void TokenFree(Token *token);

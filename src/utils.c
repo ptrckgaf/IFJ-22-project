@@ -1,6 +1,6 @@
 #include "utils.h"
 
-static int ERROR_CODE;
+int ERROR_CODE = 0;
 
 void DynamicStringInit(DynamicString *string){
     string->length = 0;

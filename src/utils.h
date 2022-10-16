@@ -19,11 +19,15 @@
 #define LEX_ERROR 8;
 #define INT_ERR 99;
 
+extern int ERROR_CODE;
+
 typedef struct DynamicString{
     char *value;
     unsigned int length;
     unsigned int capacity;  //memory allocated
 }DynamicString;
+
+
 /**
  * Dynamic string initialization
  * @param string
