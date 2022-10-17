@@ -4,15 +4,35 @@
 int main(int argc, char **argv){
     DynamicString *stringPtr = DynamicStringInit();
     DynamicString *stringPtr2 = DynamicStringInit();
-    for (int i = 0; i < 1020; ++i) {
-        DynamicStringAddChar(stringPtr, 'q');
+
+    for (int i = 0; i < 5; ++i) {
+        DynamicStringAddChar(stringPtr, 'v');
     }
+
     DynamicStringCopy(stringPtr, stringPtr2);
-    Token *token = TokenInit(TOKEN_INT, VALUE_STRING, stringPtr);
-    printf("%s\n", token->value.stringPtr->value);
+    DynamicStringAddChar(stringPtr2, 'a');
+
+    Token *token = TokenInit(TOKEN_STRING, VALUE_STRING, stringPtr);
+    Token *token2 = TokenInit(TOKEN_VAR_ID, VALUE_STRING, stringPtr2);
+
+    Stack stack;
+    Stack *stackPtr = &stack;
+    StackInit(stackPtr);
+
+    StackPush(stackPtr, token);
+    StackPush(stackPtr, token2);
+//    StackFree(stackPtr);
+
+    printf("tokens:");
+    StackPrint(stackPtr);
+    Token *token3= StackPop(stackPtr);
+    token3= StackPop(stackPtr);
+    token3= StackPop(stackPtr);
+
 
     DynamicStringFree(stringPtr);
     DynamicStringFree(stringPtr2);
     TokenFree(token);
+    TokenFree(token2);
     return 0;
 }
