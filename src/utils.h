@@ -32,7 +32,7 @@ typedef struct DynamicString{
  * Dynamic string initialization
  * @param string
  */
-void DynamicStringInit(DynamicString *string);
+DynamicString* DynamicStringInit();
 
 /**
  * Increases string's capacity

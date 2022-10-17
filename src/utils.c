@@ -2,13 +2,15 @@
 
 int ERROR_CODE = 0;
 
-void DynamicStringInit(DynamicString *string){
+DynamicString* DynamicStringInit(){
+    DynamicString *string = malloc(sizeof(DynamicString));
     string->length = 0;
     string->capacity = 8;
     string->value = malloc(string->capacity);
     if (!string->value){
         ERROR_CODE = INT_ERR;
     }
+    return string;
 }
 
 void DynamicStringResize(DynamicString *string, unsigned int new_capacity){
@@ -37,6 +39,7 @@ void DynamicStringFree(DynamicString *string){
     free(string->value);
     string->capacity = 0;
     string->length = 0;
+    free(string);
 }
 
 bool DynamicStringCompare(DynamicString *string, const char *string2){

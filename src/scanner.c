@@ -1,7 +1,5 @@
 #include "scanner.h"
 
-
-
 Token * TokenInit(TokenType tokenType,TokenValueType valueType, DynamicString *string){
     Token *tokenPtr = malloc(sizeof(Token));
     char **endPtr = NULL;
@@ -20,12 +18,14 @@ Token * TokenInit(TokenType tokenType,TokenValueType valueType, DynamicString *s
             break;
 
         case VALUE_STRING:
-            DynamicStringCopy(string, &tokenPtr->value.value_str);
+            tokenPtr->value.value_str = DynamicStringInit();
+            DynamicStringCopy(string, tokenPtr->value.value_str);
             break;
 
         case VALUE_NULL:
             tokenPtr->value.value_int = 0;
     }
+    tokenPtr->valueType = valueType;
 
     tokenPtr->type = tokenType;
 
@@ -34,7 +34,7 @@ Token * TokenInit(TokenType tokenType,TokenValueType valueType, DynamicString *s
 
 void TokenFree(Token *token){
     if (token->valueType == VALUE_STRING){
-        DynamicStringFree(&token->value.value_str);
+        DynamicStringFree(token->value.value_str);
     }
     free(token);
 }
