@@ -76,9 +76,9 @@ typedef struct{
     TokenValueType valueType;
 
     union{
-        int value_int;
-        double value_double;
-        DynamicString *value_str;
+        int integer;
+        double decimal;
+        DynamicString *stringPtr;
     }value;
 
 }Token;

@@ -4,13 +4,13 @@
 int main(int argc, char **argv){
     DynamicString *stringPtr = DynamicStringInit();
     DynamicString *stringPtr2 = DynamicStringInit();
-    for (int i = 0; i < 100; ++i) {
-        DynamicStringAddChar(stringPtr, 'a');
+    for (int i = 0; i < 1020; ++i) {
+        DynamicStringAddChar(stringPtr, 'q');
     }
     DynamicStringCopy(stringPtr, stringPtr2);
     Token *token = TokenInit(TOKEN_INT, VALUE_STRING, stringPtr);
-    printf("%s\n", token->value.value_str->value);
-//    printf("%s\n %d\n", stringPtr->value, stringPtr->length);
+    printf("%s\n", token->value.stringPtr->value);
+
     DynamicStringFree(stringPtr);
     DynamicStringFree(stringPtr2);
     TokenFree(token);
