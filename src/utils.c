@@ -177,3 +177,17 @@ void StackFree(Stack *stack){
     }
     stack->top = NULL;
 }
+
+
+ASTstruct *createNode(int type, char *value, ASTstruct *leftNode, ASTstruct *rightNode)
+{
+    ASTstruct *tree = malloc(sizeof(struct ASTstruct));
+    if (tree == NULL) exit(1);
+    
+    tree->type = type;
+    tree->value = value;
+    tree->leftNode = leftNode;
+    tree->rightNode = rightNode;
+
+    return tree;
+}
