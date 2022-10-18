@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <error.h>
 
 /*
  * error codes definition
@@ -96,6 +97,15 @@ typedef struct{
     NodePtr top;
 }Stack;
 
+
+typedef struct ASTstruct
+{
+    int type;
+    char *value;
+
+    struct ASTstruct *leftNode;
+    struct ASTstruct *rightNode;
+} ASTstruct;
 
 /**
  * Dynamic string initialization
