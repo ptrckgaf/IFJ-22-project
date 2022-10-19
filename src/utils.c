@@ -182,7 +182,10 @@ void StackFree(Stack *stack){
 ASTstruct *createNode(int type, char *value, ASTstruct *leftNode, ASTstruct *rightNode)
 {
     ASTstruct *tree = malloc(sizeof(struct ASTstruct));
-    if (tree == NULL) exit(1);
+    if (tree == NULL){
+        ERROR_CODE = INT_ERR;
+        return NULL;
+    }
     
     tree->type = type;
     tree->value = value;
