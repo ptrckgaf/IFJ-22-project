@@ -19,7 +19,9 @@ digraph G {
         LESS_EQUAL,
         ASSIGN,
         COMPARE2,
-        NEG_COMPARE2
+        NEG_COMPARE2,
+        NUMBER,
+        DOT
     }
 
     {
@@ -53,6 +55,7 @@ digraph G {
         DIVISION,
         PLUS,
         MINUS,
+        DOT,
         GREATER,
         LESS,
         GREATER_EQUAL,
@@ -84,12 +87,15 @@ digraph G {
     NUMBER -> NUMBER[label="0-9"];
     NUMBER_DECIMAL -> NUMBER_DECIMAL[label="0-9"];
 
-    STRING_START -> STRING[label="a-z\nA-Z\n_"];
+    STRING_START -> STRING[label=">31 - {"}];
+    STRING_START -> STRING_END[label="/""];
     STRING -> STRING_ESC[label="/"];
     STRING -> STRING_END[label="\""];
+    STRING -> STRING[label=">31 - {"}"];
 
-    START -> VARIABLE_DOLLAR;
-    VARIABLE_DOLLAR -> VARIABLE_ID;
+    START -> VARIABLE_DOLLAR[label="$"];
+    VARIABLE_DOLLAR -> VARIABLE_ID[label="a-z\nA-Z\n_"];
+    VARIABLE_ID -> VARIABLE_ID[label="a-z\nA-Z\n0-9\n_"];
     START -> SLASH[label="  /"];
     SLASH -> COMMENT[label="  /"];
     COMMENT -> COMMENT_TEXT[label="&#931;"];
@@ -97,16 +103,17 @@ digraph G {
     COMMENT_TEXT -> START[label="EOL"];
     SLASH -> COMMENT_BLOCK[label="*"];
     COMMENT_BLOCK -> COMMENT_BLOCK_TEXT[label="&#931; - EOL"];
-    COMMENT_BLOCK_TEXT -> COMMENT_BLOCK_TEXT[label="&#931; - {EOL, *, /}"];
+    COMMENT_BLOCK_TEXT -> COMMENT_BLOCK_TEXT[label="&#931; - {*}"];
     COMMENT_BLOCK_TEXT -> COMMENT_BLOCK_END[label=" *"];
     COMMENT_BLOCK_END -> COMMENT_BLOCK_TEXT[label="&#931; - /"];
     COMMENT_BLOCK_END -> START[label=" /"];
+    SLASH -> DIVISION[label= "&#931; - {/, *}"];
     START -> MULTIPLICATION[label="*"];
-    START -> DIVISION[label="*"];
     START -> PLUS[label="+"];
     START -> MINUS[label="-"];
     START -> GREATER[label=">"];
     START -> LESS[label="<"];
+    START -> DOT[label="."];
     GREATER -> GREATER_EQUAL[label="="];
     LESS -> LESS_EQUAL[label="="];
     START -> ASSIGN[label="="];
@@ -115,5 +122,4 @@ digraph G {
     START ->EXCLAMATION_MARK[label="!"];
     EXCLAMATION_MARK -> NEG_COMPARE1[label="="];
     NEG_COMPARE1 -> NEG_COMPARE2[label="="];
-
 }
