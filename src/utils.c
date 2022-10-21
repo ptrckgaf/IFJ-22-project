@@ -182,7 +182,7 @@ void StackFree(Stack *stack){
 ASTstruct *createNode(int type, char *value, ASTstruct *leftNode, ASTstruct *rightNode)
 {
     ASTstruct *tree = malloc(sizeof(struct ASTstruct));
-    if (tree == NULL) exit(1);
+    if (tree == NULL) return NULL;
     
     tree->type = type;
     tree->value = value;
@@ -190,4 +190,31 @@ ASTstruct *createNode(int type, char *value, ASTstruct *leftNode, ASTstruct *rig
     tree->rightNode = rightNode;
 
     return tree;
+}
+
+Token *getToken(Stack *s)
+{
+    if (stackEmpty(s)) return NULL;
+
+    Token *tmp = (Token *)StackTop(s);
+    StackPop(s);
+
+    return tmp;
+}
+
+void ungetToken(Stack *s)
+{
+    s->top++;
+}
+
+void expectToken(int type)
+{
+    if (stackEmpty(&stack))
+    {
+        fprintf(stderr, "Syntax error!");
+    }
+    if (!(getToken(&stack)->type == type))
+    {
+        fprintf(stderr, "Syntax error!");
+    }
 }
