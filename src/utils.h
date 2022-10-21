@@ -242,6 +242,7 @@ void StackFree(Stack *stack);
 TokenValueType getValueType(TokenType tokenType);
 
 
+extern Stack stack;
 
 
 #endif //IFJ_22_PROJEKT_UTILS_H

@@ -219,3 +219,30 @@ ASTstruct *createNode(int type, char *value, ASTstruct *leftNode, ASTstruct *rig
 
     return tree;
 }
+
+Token *getToken(Stack *s)
+{
+    if (stackEmpty(s)) return NULL;
+
+    Token *tmp = (Token *)StackTop(s);
+    StackPop(s);
+
+    return tmp;
+}
+
+void ungetToken(Stack *s)
+{
+    s->top++;
+}
+
+void expectToken(int type)
+{
+    if (stackEmpty(&stack))
+    {
+        fprintf(stderr, "Syntax error!");
+    }
+    if (!(getToken(&stack)->type == type))
+    {
+        fprintf(stderr, "Syntax error!");
+    }
+}
