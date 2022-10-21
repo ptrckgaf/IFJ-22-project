@@ -18,51 +18,57 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
             if (input =='='){return ASSIGN;}
             if (input =='/'){return SLASH;}
             if (input =='"'){return STRING_START;}
-            if (isnumber(input)){return NUMBER;}
+            if (isdigit(input)){return NUMBER;}
             if (input == '!'){return EXCLAMATION_MARK;}
-
+            if (input == '.'){return DOT;}
+            if (input == '{'){return LEFT_BRACKET;}
+            if (input == '}'){return RIGHT_BRACKET;}
+            if (input == ','){return COMMA;}
+            if (input == ':'){return COLON;}
+            if (input == ';'){return SEMICOLON;}
             return ERROR;
 
         case IDENTIFIER:
-            if (isnumber(input) || isalpha(input) || input == '_'){return IDENTIFIER;}
+            if (isdigit(input) || isalpha(input) || input == '_'){return IDENTIFIER;}
             return ERROR;
 
         case QUESTION_MARK:
-            if (isnumber(input) || isalpha(input) || input == '_'){return IDENTIFIER;}
+            if (isdigit(input) || isalpha(input) || input == '_'){return IDENTIFIER;}
+            if (input == '>'){return END;}
             return ERROR;
 
         case STRING_START:
             if (input == '"'){return STRING_END;}
-            if (input > 31){return IDENTIFIER;}
+            if (input > 31){return STRING;}
             //TODO escaping sequences
             return ERROR;
 
         case NUMBER:
-            if (isnumber(input)){return NUMBER;}
+            if (isdigit(input)){return NUMBER;}
             if (input == '.'){return NUMBER_DOT;}
             if (input == 'e' || input == 'E'){return NUMBER_E;}
             return ERROR;
 
         case NUMBER_DOT:
-            if (isnumber(input)){return NUMBER_DECIMAL;}
+            if (isdigit(input)){return NUMBER_DECIMAL;}
             return ERROR;
 
         case NUMBER_DECIMAL:
-            if (isnumber(input)){return NUMBER_DECIMAL;}
+            if (isdigit(input)){return NUMBER_DECIMAL;}
             if (input == 'e' || input == 'E'){return NUMBER_E;}
             return ERROR;
 
         case NUMBER_E:
-            if (isnumber(input)){return NUMBER_EXPONENTIAL;}
+            if (isdigit(input)){return NUMBER_EXPONENTIAL;}
             if (input == '+' || input == '-'){return NUMBER_E_SIGN;}
             return ERROR;
 
         case NUMBER_E_SIGN:
-            if (isnumber(input)){return NUMBER_EXPONENTIAL;}
+            if (isdigit(input)){return NUMBER_EXPONENTIAL;}
             return ERROR;
 
         case NUMBER_EXPONENTIAL:
-            if (isnumber(input)){return NUMBER_EXPONENTIAL;}
+            if (isdigit(input)){return NUMBER_EXPONENTIAL;}
             return ERROR;
 
         case STRING:
@@ -82,7 +88,7 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
             return ERROR;
 
         case VARIABLE_ID:
-            if (isnumber(input) || isalpha(input) || input == '_'){return VARIABLE_ID;}
+            if (isdigit(input) || isalpha(input) || input == '_'){return VARIABLE_ID;}
             return ERROR;
 
         case SLASH:
@@ -99,8 +105,8 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
             return COMMENT_TEXT;
 
         case COMMENT_BLOCK:
-            if (input == '*'){return COMMENT_BLOCK_TEXT;}
-            return ERROR;
+            if (input == '*'){return COMMENT_BLOCK_END;}
+            return COMMENT_BLOCK_TEXT;
 
         case COMMENT_BLOCK_TEXT:
             if (input == '*'){return COMMENT_BLOCK_END;}
@@ -112,6 +118,19 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
 
         case LESS:
             if (input == '='){return LESS_EQUAL;}
+            if (input == '?'){return PROLOG_START;}
+            return ERROR;
+
+        case PROLOG_START:
+            if (input == 'p'){return PROLOG_1;}
+            return ERROR;
+
+        case PROLOG_1:
+            if (input == 'h'){return PROLOG_2;}
+            return ERROR;
+
+        case PROLOG_2:
+            if (input == 'p'){return PROLOG_3;}
             return ERROR;
 
         case GREATER:
@@ -140,4 +159,71 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
 
 }
 
+bool isStateFinal(AutomatonState state){
+    switch (state) {
+        case VARIABLE_ID:
+        case STRING_END:
+        case IDENTIFIER:
+        case LEFT_PARENTHESE:
+        case RIGHT_PARENTHESE:
+        case NUMBER_DECIMAL:
+        case NUMBER_EXPONENTIAL:
+        case MULTIPLICATION:
+        case DIVISION:
+        case PLUS:
+        case MINUS:
+        case GREATER:
+        case LESS:
+        case GREATER_EQUAL:
+        case LESS_EQUAL:
+        case ASSIGN:
+        case COMPARE2:
+        case NEG_COMPARE2:
+        case NUMBER:
+        case DOT:
+        case END:
+        case PROLOG_3:
+        case LEFT_BRACKET:
+        case RIGHT_BRACKET:
+        case SEMICOLON:
+        case COLON:
+        case COMMA:
+            return true;
+        default:
+            return false;
+    }
+}
+
+TokenType getToken(AutomatonState state){
+    switch (state) {
+        case IDENTIFIER:return TOKEN_ID; //todo identifier processing
+        case VARIABLE_ID: return TOKEN_VAR_ID;
+        case LEFT_PARENTHESE: return TOKEN_L_PAR;
+        case RIGHT_PARENTHESE:return TOKEN_R_PAR;
+        case LEFT_BRACKET:return TOKEN_L_BRACKET;
+        case RIGHT_BRACKET:return TOKEN_R_BRACKET;
+        case COMMA:return TOKEN_COMMA;
+        case SEMICOLON:return TOKEN_SEMICOLON;
+        case COLON:return TOKEN_COLON;
+        case MULTIPLICATION:return TOKEN_MUL;
+        case DIVISION:return TOKEN_DIV;
+        case PLUS:return TOKEN_PLUS;
+        case MINUS:return TOKEN_MINUS;
+        case GREATER:return TOKEN_GREATER;
+        case GREATER_EQUAL:return TOKEN_GREATER_EQ;
+        case LESS:return TOKEN_LESS;
+        case LESS_EQUAL:return TOKEN_LESS_EQ;
+        case ASSIGN:return TOKEN_ASSIGN;
+        case COMPARE2:return TOKEN_COMPARE;
+        case NEG_COMPARE2:return TOKEN_NEG_COMPARE;
+        case NUMBER:return TOKEN_INT;
+        case NUMBER_EXPONENTIAL:case NUMBER_DECIMAL:return TOKEN_DOUBLE;
+        case STRING_END:return TOKEN_STRING;
+        case PROLOG_3:return TOKEN_PROLOG;
+        case END:return TOKEN_END;
+        default:
+            //todo remove debug print
+            printf("something went wrong");
+    }
+}
 

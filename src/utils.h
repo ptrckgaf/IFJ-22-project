@@ -26,8 +26,10 @@ extern int ERROR_CODE;
  *  token types definition
  */
 typedef enum{
+    TOKEN_ID,
     TOKEN_FUN_ID,
     TOKEN_VAR_ID,
+    TOKEN_TYPE_ID,
 
     TOKEN_L_PAR,
     TOKEN_R_PAR,
@@ -37,6 +39,7 @@ typedef enum{
     TOKEN_EOL,
     TOKEN_COMMA,
     TOKEN_SEMICOLON,
+    TOKEN_COLON,
 
     TOKEN_MUL,
     TOKEN_DIV,
@@ -52,7 +55,10 @@ typedef enum{
 
     TOKEN_INT,
     TOKEN_DOUBLE,
-    TOKEN_STRING
+    TOKEN_STRING,
+
+    TOKEN_PROLOG,
+    TOKEN_END,
 }TokenType;
 
 /*
@@ -139,9 +145,18 @@ void DynamicStringFree(DynamicString *string);
 void DynamicStringAddChar(DynamicString *string, char ch);
 
 /**
+ * Removes last character from string
+ * Does nothing if string is empty
+ * @param string
+ */
+void DynamicStringRemoveChar(DynamicString *string);
+
+/**
  * Cleans dynamic string value
  * @param string
  */
+
+
 void DynamicStringClean(DynamicString *string);
 
 /**
@@ -160,7 +175,7 @@ bool DynamicStringCompare(DynamicString *string, const char *string2);
  * @param value
  * @return
  */
-Token * TokenInit(TokenType tokenType,TokenValueType valueType, DynamicString *value);
+Token * TokenInit(TokenType tokenType, DynamicString *value);
 
 /**
  * Prints token value to stdout
@@ -219,6 +234,12 @@ void StackPrint(Stack *stack);
  * @param stack
  */
 void StackFree(Stack *stack);
+
+/**
+ * returns type of token value(str, int, null)
+ * @return
+ */
+TokenValueType getValueType(TokenType tokenType);
 
 
 

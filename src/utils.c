@@ -35,6 +35,12 @@ void DynamicStringAddChar(DynamicString *string, char ch){
     string->value[++string->length] = '\0';
 }
 
+void DynamicStringRemoveChar(DynamicString *string){
+    if (string->length > 0){
+        string->value[--string->length] = '\0';
+    }
+}
+
 void DynamicStringFree(DynamicString *string){
     free(string->value);
     string->capacity = 0;
@@ -47,11 +53,30 @@ bool DynamicStringCompare(DynamicString *string, const char *string2){
 }
 
 void DynamicStringClean(DynamicString *string){
+    string->capacity = 8;
+    DynamicStringResize(string, string->capacity);
     string->length = 0;
     string->value[0] = '\0';
 }
 
-Token * TokenInit(TokenType tokenType,TokenValueType valueType, DynamicString *string){
+TokenValueType getValueType(TokenType tokenType){
+    switch (tokenType) {
+        case TOKEN_TYPE_ID:
+        case TOKEN_VAR_ID:
+        case TOKEN_FUN_ID:
+        case TOKEN_ID:
+        case TOKEN_STRING:
+            return VALUE_STRING;
+        case TOKEN_INT:
+            return VALUE_INT;
+        case TOKEN_DOUBLE:
+            return VALUE_DOUBLE;
+        default:
+            return VALUE_NULL;
+    }
+}
+
+Token * TokenInit(TokenType tokenType, DynamicString *string){
     Token *tokenPtr = malloc(sizeof(Token));
     char **endPtr = NULL;
     if (!tokenPtr){
@@ -59,7 +84,7 @@ Token * TokenInit(TokenType tokenType,TokenValueType valueType, DynamicString *s
         return NULL;
     }
 
-    switch (valueType) {
+    switch (tokenPtr->valueType = getValueType(tokenType)) {
         case VALUE_INT:
             tokenPtr->value.integer = strtol(string->value, endPtr, 10);
             break;
@@ -77,7 +102,6 @@ Token * TokenInit(TokenType tokenType,TokenValueType valueType, DynamicString *s
             tokenPtr->value.integer = 0;
             break;
     }
-    tokenPtr->valueType = valueType;
 
     tokenPtr->type = tokenType;
 
@@ -88,19 +112,19 @@ void TokenPrint(Token *token){
     if (token){
         switch (token->valueType) {
             case VALUE_STRING:
-                printf("{%s, %d}", token->value.stringPtr->value, token->type);
+                printf("{%s, %d}\n", token->value.stringPtr->value, token->type);
                 break;
 
             case VALUE_INT:
-                printf("{%d, %d}", token->value.integer, token->type);
+                printf("{%d, %d}\n", token->value.integer, token->type);
                 break;
 
             case VALUE_DOUBLE:
-                printf("{%f, %d}", token->value.decimal, token->type);
+                printf("{%f, %d}\n", token->value.decimal, token->type);
                 break;
 
             case VALUE_NULL:
-                printf("{NULL, %d}", token->type);
+                printf("{NULL, %d}\n", token->type);
                 break;
         }
     }
@@ -166,6 +190,7 @@ void StackPrint(Stack *stack){
     }
 }
 
+//todo use tokenfree
 void StackFree(Stack *stack){
     NodePtr current = stack->top;
     NodePtr previous = NULL;

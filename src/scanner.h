@@ -9,6 +9,11 @@ typedef enum{
     QUESTION_MARK,
     LEFT_PARENTHESE,
     RIGHT_PARENTHESE,
+    LEFT_BRACKET,
+    RIGHT_BRACKET,
+    COMMA,
+    SEMICOLON,
+    COLON,
 
     //States for processing numbers
     NUMBER,
@@ -42,6 +47,7 @@ typedef enum{
     PLUS,
     MINUS,
     GREATER,
+    DOT,
     LESS,
     GREATER_EQUAL,
     LESS_EQUAL,
@@ -50,8 +56,24 @@ typedef enum{
     COMPARE2,
     EXCLAMATION_MARK,
     NEG_COMPARE1,
-    NEG_COMPARE2
+    NEG_COMPARE2,
+
+    //prolog states
+    PROLOG_START,
+    PROLOG_1,
+    PROLOG_2,
+    PROLOG_3,
+
+    END
 }AutomatonState;
 
 AutomatonState AutomatonNext(AutomatonState current, char input);
 
+bool isStateFinal(AutomatonState state);
+
+/**
+ * Function gets token type from corresponding automaton state
+ * @param state
+ * @return
+ */
+TokenType getToken(AutomatonState state);

@@ -1,78 +1,88 @@
 digraph G {
-    node [shape=circle, width=1, height=1]
-    {
-        node [shape=doublecircle]
-        VARIABLE_ID
-        STRING_END
-        IDENTIFIER
-        LEFT_PARENTHESE
-        RIGHT_PARENTHESE
-        NUMBER_DECIMAL
-        NUMBER_EXPONENTIAL
-        MULTIPLICATION,
-        DIVISION,
-        PLUS,
-        MINUS,
-        GREATER,
-        LESS,
-        GREATER_EQUAL,
-        LESS_EQUAL,
-        ASSIGN,
-        COMPARE2,
-        NEG_COMPARE2,
-        NUMBER,
-        DOT
-    }
+node [shape=circle, width=1, height=1]
+{
+node [shape=doublecircle]
+VARIABLE_ID
+STRING_END
+IDENTIFIER
+LEFT_PARENTHESE
+RIGHT_PARENTHESE
+NUMBER_DECIMAL
+NUMBER_EXPONENTIAL
+MULTIPLICATION,
+DIVISION,
+PLUS,
+MINUS,
+GREATER,
+LESS,
+GREATER_EQUAL,
+LESS_EQUAL,
+ASSIGN,
+COMPARE2,
+NEG_COMPARE2,
+NUMBER,
+DOT,
+END,
+PROLOG_3
+LEFT_BRACKET,
+RIGHT_BRACKET,
+COMMA,
+SEMILCOLON,
+COLON
+}
 
-    {
-        node[width = 3, height = 3];
-        START
-    }
+{
+node[width = 3, height = 3];
+START
+}
 
-    subgraph{
-        SLASH,
-        COMMENT,
-        COMMENT_TEXT,
-        COMMENT_BLOCK,
-        COMMENT_BLOCK_END,
-        COMMENT_BLOCK_TEXT
-    }
-    subgraph{
-        LEFT_PARENTHESE,
-        RIGHT_PARENTHESE,
-        STRING_START,
-        NUMBER,
-        NUMBER_DOT,
-        NUMBER_DECIMAL,
-        NUMBER_E,
-        NUMBER_E_SIGN,
-        NUMBER_EXPONENTIAL
-        VARIABLE_DOLLAR,
-        VARIABLE_ID
-    }
-    subgraph{
-        MULTIPLICATION,
-        DIVISION,
-        PLUS,
-        MINUS,
-        DOT,
-        GREATER,
-        LESS,
-        GREATER_EQUAL,
-        LESS_EQUAL,
-        ASSIGN,
-        COMPARE1,
-        COMPARE2,
-        EXCLAMATION_MARK,
-        NEG_COMPARE1,
-        NEG_COMPARE2
-    }
-    START -> IDENTIFIER[label="a-z\nA-Z\n_"];
-    START -> QUESTION_MARK[label="?"]
-    START -> LEFT_PARENTHESE[label="("];
-    START -> RIGHT_PARENTHESE[label=")"];
-    START -> STRING_START[label="\""];
+subgraph{
+SLASH,
+COMMENT,
+COMMENT_TEXT,
+COMMENT_BLOCK,
+COMMENT_BLOCK_END,
+COMMENT_BLOCK_TEXT
+}
+subgraph{
+LEFT_PARENTHESE,
+RIGHT_PARENTHESE,
+STRING_START,
+NUMBER,
+NUMBER_DOT,
+NUMBER_DECIMAL,
+NUMBER_E,
+NUMBER_E_SIGN,
+NUMBER_EXPONENTIAL
+VARIABLE_DOLLAR,
+VARIABLE_ID
+}
+subgraph{
+MULTIPLICATION,
+DIVISION,
+PLUS,
+MINUS,
+DOT,
+GREATER,
+LESS,
+GREATER_EQUAL,
+LESS_EQUAL,
+ASSIGN,
+COMPARE1,
+COMPARE2,
+EXCLAMATION_MARK,
+NEG_COMPARE1,
+NEG_COMPARE2
+}
+START -> IDENTIFIER[label="a-z\nA-Z\n_"];
+START -> QUESTION_MARK[label="?"]
+START -> LEFT_PARENTHESE[label="("];
+START -> RIGHT_PARENTHESE[label=")"];
+START -> STRING_START[label="\""];
     START -> NUMBER[label="0-9"];
+    START -> COMMA[label=","];
+    START -> COLON[label=":"];
+    START -> SEMICOLON[label=";"]
     START -> START[label="whitespace \t"]
     IDENTIFIER -> IDENTIFIER[label="a-z\nA-Z\n0-9\n_"];
     QUESTION_MARK -> IDENTIFIER[label="a-z\nA-Z\n_"];
@@ -87,11 +97,11 @@ digraph G {
     NUMBER -> NUMBER[label="0-9"];
     NUMBER_DECIMAL -> NUMBER_DECIMAL[label="0-9"];
 
-    STRING_START -> STRING[label=">31 - {"}];
-    STRING_START -> STRING_END[label="/""];
+    STRING_START -> STRING[label=">31 - {\"}"];
+STRING_START -> STRING_END[label="\""];
     STRING -> STRING_ESC[label="/"];
     STRING -> STRING_END[label="\""];
-    STRING -> STRING[label=">31 - {"}"];
+STRING -> STRING[label=">31 - {\"}"];
 
     START -> VARIABLE_DOLLAR[label="$"];
     VARIABLE_DOLLAR -> VARIABLE_ID[label="a-z\nA-Z\n_"];
@@ -100,26 +110,37 @@ digraph G {
     SLASH -> COMMENT[label="  /"];
     COMMENT -> COMMENT_TEXT[label="&#931;"];
     COMMENT_TEXT -> COMMENT_TEXT[label="&#931; - EOL"];
-    COMMENT_TEXT -> START[label="EOL"];
-    SLASH -> COMMENT_BLOCK[label="*"];
-    COMMENT_BLOCK -> COMMENT_BLOCK_TEXT[label="&#931; - EOL"];
-    COMMENT_BLOCK_TEXT -> COMMENT_BLOCK_TEXT[label="&#931; - {*}"];
-    COMMENT_BLOCK_TEXT -> COMMENT_BLOCK_END[label=" *"];
-    COMMENT_BLOCK_END -> COMMENT_BLOCK_TEXT[label="&#931; - /"];
-    COMMENT_BLOCK_END -> START[label=" /"];
-    SLASH -> DIVISION[label= "&#931; - {/, *}"];
-    START -> MULTIPLICATION[label="*"];
-    START -> PLUS[label="+"];
-    START -> MINUS[label="-"];
-    START -> GREATER[label=">"];
-    START -> LESS[label="<"];
-    START -> DOT[label="."];
-    GREATER -> GREATER_EQUAL[label="="];
-    LESS -> LESS_EQUAL[label="="];
-    START -> ASSIGN[label="="];
-    ASSIGN -> COMPARE1[label="="];
-    COMPARE1 -> COMPARE2[label="="];
-    START ->EXCLAMATION_MARK[label="!"];
-    EXCLAMATION_MARK -> NEG_COMPARE1[label="="];
-    NEG_COMPARE1 -> NEG_COMPARE2[label="="];
+COMMENT_TEXT -> START[label="EOL"];
+SLASH -> COMMENT_BLOCK[label="*"];
+COMMENT_BLOCK -> COMMENT_BLOCK_TEXT[label="&#931; - {*}"];
+COMMENT_BLOCK -> COMMENT_BLOCK_END[label="*"];
+COMMENT_BLOCK_TEXT -> COMMENT_BLOCK_TEXT[label="&#931; - {*}"];
+COMMENT_BLOCK_TEXT -> COMMENT_BLOCK_END[label=" *"];
+COMMENT_BLOCK_END -> COMMENT_BLOCK_TEXT[label="&#931; - /"];
+COMMENT_BLOCK_END -> START[label=" /"];
+SLASH -> DIVISION[label= "&#931; - {/, *}"];
+START -> MULTIPLICATION[label="*"];
+START -> PLUS[label="+"];
+START -> MINUS[label="-"];
+START -> GREATER[label=">"];
+START -> LESS[label="<"];
+START -> DOT[label="."];
+GREATER -> GREATER_EQUAL[label="="];
+LESS -> LESS_EQUAL[label="="];
+LESS -> PROLOG_START[label="?"];
+PROLOG_START -> PROLOG_1[label="p"];
+PROLOG_1 -> PROLOG_2[label="h"];
+PROLOG_2 -> PROLOG_3[label="p"];
+
+QUESTION_MARK -> END[label=">"];
+
+START -> ASSIGN[label="="];
+ASSIGN -> COMPARE1[label="="];
+COMPARE1 -> COMPARE2[label="="];
+START ->EXCLAMATION_MARK[label="!"];
+EXCLAMATION_MARK -> NEG_COMPARE1[label="="];
+NEG_COMPARE1 -> NEG_COMPARE2[label="="];
+
+START -> LEFT_BRACKET[label="{"];
+START -> RIGHT_BRACKET[label="}"]
 }
