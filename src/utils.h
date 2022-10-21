@@ -221,6 +221,7 @@ void StackPrint(Stack *stack);
 void StackFree(Stack *stack);
 
 
+extern Stack stack;
 
 
 #endif //IFJ_22_PROJEKT_UTILS_H
