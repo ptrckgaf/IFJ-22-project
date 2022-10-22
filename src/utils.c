@@ -228,7 +228,7 @@ void expectToken(int type, Stack *stack)
     {
         fprintf(stderr, "Syntax error!");
     }
-    if (StackTop(stack)->type != type)
+    if (StackPop(stack)->type != type)
     {
         fprintf(stderr, "Syntax error!");
     }
