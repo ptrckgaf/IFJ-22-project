@@ -77,3 +77,5 @@ bool isStateFinal(AutomatonState state);
  * @return
  */
 TokenType getToken(AutomatonState state);
+
+Stack *scanner(FILE *source);

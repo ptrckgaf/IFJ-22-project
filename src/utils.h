@@ -72,8 +72,16 @@ typedef enum{
 }TokenValueType;
 
 typedef enum{
-    WHILE_KEYWORD,
-    IF_KEYWORD
+    KEYWORD_ELSE,
+    KEYWORD_FLOAT,
+    KEYWORD_FUNCTION,
+    KEYWORD_IF,
+    KEYWORD_INT,
+    KEYWORD_NULL,
+    KEYWORD_RETURN,
+    KEYWORD_STRING,
+    KEYWORD_VOID,
+    KEYWORD_WHILE
 }Keyword;
 
 typedef struct DynamicString{
@@ -193,7 +201,7 @@ void TokenFree(Token *token);
  * Initializes stack
  * @param stack
  */
-void StackInit(Stack *stack);
+Stack *StackInit();
 
 /**
  * Adds token on top of the stack
@@ -241,8 +249,6 @@ void StackFree(Stack *stack);
  */
 TokenValueType getValueType(TokenType tokenType);
 
-
-extern Stack stack;
 
 
 #endif //IFJ_22_PROJEKT_UTILS_H

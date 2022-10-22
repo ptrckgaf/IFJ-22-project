@@ -137,8 +137,10 @@ void TokenFree(Token *token){
     free(token);
 }
 
-void StackInit(Stack *stack){
+Stack *StackInit(){
+    Stack *stack = malloc(sizeof(Stack));
     stack->top = NULL;
+    return stack;
 }
 
 Token* StackPop(Stack *stack){
@@ -220,28 +222,13 @@ ASTstruct *createNode(int type, char *value, ASTstruct *leftNode, ASTstruct *rig
     return tree;
 }
 
-Token *getToken(Stack *s)
+void expectToken(int type, Stack *stack)
 {
-    if (stackEmpty(s)) return NULL;
-
-    Token *tmp = (Token *)StackTop(s);
-    StackPop(s);
-
-    return tmp;
-}
-
-void ungetToken(Stack *s)
-{
-    s->top++;
-}
-
-void expectToken(int type)
-{
-    if (stackEmpty(&stack))
+    if (StackTop(stack))
     {
         fprintf(stderr, "Syntax error!");
     }
-    if (!(getToken(&stack)->type == type))
+    if (StackTop(stack)->type != type)
     {
         fprintf(stderr, "Syntax error!");
     }

@@ -1,4 +1,8 @@
 <?php
 declare(strict_types=1);
-write();
-// hello there!!!
+
+function bar(string $param) : string { return foo($param);
+}
+function foo(string $param):string {
+return bar($param); }
+

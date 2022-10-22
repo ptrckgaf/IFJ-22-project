@@ -227,3 +227,51 @@ TokenType getToken(AutomatonState state){
     }
 }
 
+Stack *scanner(FILE *source){
+    //resources initialization
+    Stack *stackPtr = StackInit();
+
+    DynamicString *bufferPtr = DynamicStringInit();
+
+    AutomatonState current = START;
+    AutomatonState next;
+
+    DynamicString *tokenValuePtr;
+    TokenType tokenType;
+
+    char input;
+
+    //scanner main loop
+    while (true){
+        input = fgetc(source);
+        if (input == EOF){
+            break;
+        }
+
+        next = AutomatonNext(current, input);
+        if (isStateFinal(next) || isStateFinal(current)){
+            DynamicStringAddChar(bufferPtr, input);
+        }
+
+        if (next == ERROR){
+            if (isStateFinal(current)){
+                ungetc(input, source);
+                DynamicStringRemoveChar(bufferPtr);
+                tokenType = getToken(current);
+
+                //Initializes dynamic string in new memory location and copies there bufferPtr content
+                tokenValuePtr = DynamicStringInit();
+                DynamicStringCopy(bufferPtr, tokenValuePtr);
+
+                StackPush(stackPtr, TokenInit(tokenType, tokenValuePtr));
+                DynamicStringClean(bufferPtr);
+                current = START;
+            } else{
+                return NULL;
+            }
+        } else{
+            current = next;
+        }
+    }
+    return stackPtr;
+}
