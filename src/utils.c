@@ -151,80 +151,44 @@ void TokenFree(Token *token){
 }
 
 Stack *StackInit(){
-    Stack *stack = malloc(sizeof(Stack));
-    stack->top = NULL;
+    Stack *stack = malloc(sizeof(stack));
+    stack->size = 128;
+    stack->value = calloc(stack->size, stack->size * sizeof(Token*));
+    stack->top = 0;
+    stack->size = 128;
     return stack;
 }
 
-//todo return copy of token
-Token* StackPop(Stack *stack){
-    if (stack->top){
-        Token *token = stack->top->data;
-        stack->top = stack->top->previous;
-        return token;
-    } else{
+bool StackIsEmpty(Stack *stack){
+    return stack->top == 0;
+}
+
+Token *StackTop(Stack *stack){
+    if (StackIsEmpty(stack)){
         return NULL;
     }
-}
-
-void StackRemoveTop(Stack *stack){
-    if (stack->top){
-        Token *token = stack->top->data;
-        NodePtr tmp = stack->top;
-        stack->top = stack->top->previous;
-        TokenFree(tmp->data);
-        free(tmp);
-    }
-}
-
-Token* StackTop(Stack *stack){
-    return stack->top->data;
-}
-
-unsigned int StackSize(Stack *stack){
-    NodePtr current = stack->top;
-    unsigned int size = 0;
-
-    while (current){
-        size++;
-        current = current->previous;
-    }
-    return size;
+    return stack->value[stack->top - 1];
 }
 
 void StackPush(Stack *stack, Token *token){
-    NodePtr node = malloc(sizeof(struct Node));
-    if (!node){
-        ERROR_CODE = INT_ERR;
+    if (stack->top == stack->size){
+        stack->size *= 2;
+        stack->value = realloc(stack->value, stack->size * sizeof(Token*));
     }
-
-    node->data = token;
-    node->previous = stack->top;
-    stack->top = node;
+    stack->value[stack->top++] = token;
 }
 
 void StackPrint(Stack *stack){
-    if (stack){
-        NodePtr current = stack->top;
-
-        while (current) {
-            TokenPrint(current->data);
-            current = current->previous;
-        }
+    for (int i = 0; i < stack->top; ++i) {
+        TokenPrint(stack->value[i]);
     }
 }
 
 void StackFree(Stack *stack){
-    NodePtr current = stack->top;
-    NodePtr previous = NULL;
-    
-    while (current){
-        previous = current->previous;
-        TokenFree(current->data);
-        free(current);
-        current = previous;
+    for (int i = 0; i < stack->top; ++i) {
+        TokenFree(stack->value[i]);
     }
-    stack->top = NULL;
+    free(stack->value);
     free(stack);
 }
 
@@ -244,14 +208,14 @@ ASTstruct *createNode(int type, char *value, ASTstruct *leftNode, ASTstruct *rig
     return tree;
 }
 
-void expectToken(int type, Stack *stack)
-{
-    if (StackTop(stack))
-    {
-        fprintf(stderr, "Syntax error!");
-    }
-    if (StackPop(stack)->type != type)
-    {
-        fprintf(stderr, "Syntax error!");
-    }
-}
+//void expectToken(int type, Stack *stack)
+//{
+//    if (StackTop(stack))
+//    {
+//        fprintf(stderr, "Syntax error!");
+//    }
+//    if (StackPop(stack)->type != type)
+//    {
+//        fprintf(stderr, "Syntax error!");
+//    }
+//}

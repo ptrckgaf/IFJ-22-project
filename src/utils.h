@@ -101,13 +101,10 @@ typedef struct{
 
 }Token;
 
-typedef struct Node{
-    Token *data;
-    struct Node *previous;
-}* NodePtr;
-
 typedef struct{
-    NodePtr top;
+    Token **value;
+    int top;
+    int size;
 }Stack;
 
 
@@ -208,6 +205,12 @@ void TokenFree(Token *token);
  * @param stack
  */
 Stack *StackInit();
+/**
+ * Checks if stack is empty
+ * @param stack
+ * @return
+ */
+bool StackIsEmpty(Stack *stack);
 
 /**
  * Adds token on top of the stack
