@@ -179,7 +179,7 @@ void StackPush(Stack *stack, Token *token){
 }
 
 void StackPrint(Stack *stack){
-    for (int i = stack->top; i > 0; --i) {
+    for (int i = stack->top; i >= 0; --i) {
         TokenPrint(stack->value[i]);
     }
 }
