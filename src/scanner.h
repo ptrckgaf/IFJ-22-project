@@ -72,6 +72,13 @@ AutomatonState AutomatonNext(AutomatonState current, char input);
 bool isStateFinal(AutomatonState state);
 
 /**
+ * Returns 1 if we should read chars in state, 0 if shouldn't
+ * @param state
+ * @return
+ */
+bool isRead(AutomatonState state);
+
+/**
  * Function gets token type from corresponding automaton state
  * @param state
  * @return

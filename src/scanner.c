@@ -194,6 +194,23 @@ bool isStateFinal(AutomatonState state){
     }
 }
 
+bool isRead(AutomatonState state){
+    switch (state) {
+        case STRING:
+        case IDENTIFIER:
+        case VARIABLE_ID:
+        case NUMBER_EXPONENTIAL:
+        case NUMBER_DECIMAL:
+        case NUMBER:
+        case NUMBER_E:
+        case NUMBER_E_SIGN:
+        case NUMBER_DOT:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
 TokenType getToken(AutomatonState state){
     switch (state) {
         case IDENTIFIER:return TOKEN_ID; //todo identifier processing
@@ -249,7 +266,7 @@ Stack *scanner(FILE *source){
         }
 
         next = AutomatonNext(current, input);
-        if (isStateFinal(next) || isStateFinal(current)){
+        if (isRead(current) || isRead(next)){
             DynamicStringAddChar(bufferPtr, input);
         }
 
@@ -267,11 +284,15 @@ Stack *scanner(FILE *source){
                 DynamicStringClean(bufferPtr);
                 current = START;
             } else{
+                //if lexical error occurred, clean resources
+                StackFree(stackPtr);
+                DynamicStringFree(bufferPtr);
                 return NULL;
             }
         } else{
             current = next;
         }
     }
+    DynamicStringFree(bufferPtr);
     return stackPtr;
 }

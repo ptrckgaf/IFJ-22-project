@@ -5,7 +5,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "errors.h"
 
 /*
  * error codes definition
@@ -17,7 +16,7 @@
 #define UNDEF_VAR_ERR 5;
 #define TERM_ERR 6;
 #define TYPE_ERR 7;
-#define LEX_ERROR 8;
+#define SEM_ERR 8;
 #define INT_ERR 99;
 
 extern int ERROR_CODE;
@@ -186,6 +185,13 @@ bool DynamicStringCompare(DynamicString *string, const char *string2);
 Token * TokenInit(TokenType tokenType, DynamicString *value);
 
 /**
+ * Deep copies token
+ * @param src
+ * @return
+ */
+Token *TokenCopy(Token *src);
+
+/**
  * Prints token value to stdout
  * @param token
  */
@@ -211,11 +217,17 @@ Stack *StackInit();
 void StackPush(Stack *stack, Token *token);
 
 /**
- * Removes top element from the stack and returns its value
+ * Removes top element from stack and returns its value
  * @param stack
  * @return
  */
 Token* StackPop(Stack *stack);
+
+/**
+ * Removes top element from stack
+ * @param stack
+ */
+void StackRemoveTop(Stack *stack);
 
 /**
  * Returns top element
@@ -242,6 +254,13 @@ void StackPrint(Stack *stack);
  * @param stack
  */
 void StackFree(Stack *stack);
+
+/**
+ * Returns flipped stack
+ * @param stack
+ * @return
+ */
+void StackFlip(Stack *stack);
 
 /**
  * returns type of token value(str, int, null)

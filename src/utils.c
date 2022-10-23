@@ -87,25 +87,38 @@ Token * TokenInit(TokenType tokenType, DynamicString *string){
     switch (tokenPtr->valueType = getValueType(tokenType)) {
         case VALUE_INT:
             tokenPtr->value.integer = strtol(string->value, endPtr, 10);
+            DynamicStringFree(string);
             break;
 
         case VALUE_DOUBLE:
             tokenPtr->value.decimal = strtod(string->value, endPtr);
+            DynamicStringFree(string);
             break;
 
         case VALUE_STRING:
             tokenPtr->value.stringPtr = DynamicStringInit();
             DynamicStringCopy(string, tokenPtr->value.stringPtr);
+            DynamicStringFree(string);
             break;
 
         case VALUE_NULL:
             tokenPtr->value.integer = 0;
+            DynamicStringFree(string);
             break;
     }
 
     tokenPtr->type = tokenType;
 
     return tokenPtr;
+}
+
+
+//todo fix
+Token *TokenCopy(Token *src){
+    if (src->valueType == VALUE_STRING){
+        Token *new = TokenInit(src->type, src->value.stringPtr);
+        return new;
+    }
 }
 
 void TokenPrint(Token *token){
@@ -143,15 +156,24 @@ Stack *StackInit(){
     return stack;
 }
 
+//todo return copy of token
 Token* StackPop(Stack *stack){
+    if (stack->top){
+        Token *token = stack->top->data;
+        stack->top = stack->top->previous;
+        return token;
+    } else{
+        return NULL;
+    }
+}
+
+void StackRemoveTop(Stack *stack){
     if (stack->top){
         Token *token = stack->top->data;
         NodePtr tmp = stack->top;
         stack->top = stack->top->previous;
+        TokenFree(tmp->data);
         free(tmp);
-        return token;
-    } else{
-        return NULL;
     }
 }
 
@@ -192,19 +214,19 @@ void StackPrint(Stack *stack){
     }
 }
 
-//todo use tokenfree
 void StackFree(Stack *stack){
     NodePtr current = stack->top;
     NodePtr previous = NULL;
     
     while (current){
         previous = current->previous;
+        TokenFree(current->data);
         free(current);
         current = previous;
     }
     stack->top = NULL;
+    free(stack);
 }
-
 
 ASTstruct *createNode(int type, char *value, ASTstruct *leftNode, ASTstruct *rightNode)
 {
