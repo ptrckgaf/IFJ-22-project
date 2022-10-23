@@ -30,6 +30,17 @@ typedef enum{
     TOKEN_VAR_ID,
     TOKEN_TYPE_ID,
 
+    TOKEN_KEYWORD_ELSE,
+    TOKEN_KEYWORD_FLOAT,
+    TOKEN_KEYWORD_FUNCTION,
+    TOKEN_KEYWORD_IF,
+    TOKEN_KEYWORD_INT,
+    TOKEN_KEYWORD_NULL,
+    TOKEN_KEYWORD_RETURN,
+    TOKEN_KEYWORD_STRING,
+    TOKEN_KEYWORD_VOID,
+    TOKEN_KEYWORD_WHILE,
+
     TOKEN_L_PAR,
     TOKEN_R_PAR,
     TOKEN_L_BRACKET,
@@ -69,19 +80,6 @@ typedef enum{
     VALUE_DOUBLE,
     VALUE_NULL
 }TokenValueType;
-
-typedef enum{
-    KEYWORD_ELSE,
-    KEYWORD_FLOAT,
-    KEYWORD_FUNCTION,
-    KEYWORD_IF,
-    KEYWORD_INT,
-    KEYWORD_NULL,
-    KEYWORD_RETURN,
-    KEYWORD_STRING,
-    KEYWORD_VOID,
-    KEYWORD_WHILE
-}Keyword;
 
 typedef struct DynamicString{
     char *value;

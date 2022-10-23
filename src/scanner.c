@@ -213,35 +213,50 @@ bool isRead(AutomatonState state){
 
 TokenType getToken(AutomatonState state){
     switch (state) {
-        case IDENTIFIER:return TOKEN_ID; //todo identifier processing
-        case VARIABLE_ID: return TOKEN_VAR_ID;
-        case LEFT_PARENTHESE: return TOKEN_L_PAR;
-        case RIGHT_PARENTHESE:return TOKEN_R_PAR;
-        case LEFT_BRACKET:return TOKEN_L_BRACKET;
-        case RIGHT_BRACKET:return TOKEN_R_BRACKET;
-        case COMMA:return TOKEN_COMMA;
-        case SEMICOLON:return TOKEN_SEMICOLON;
-        case COLON:return TOKEN_COLON;
-        case MULTIPLICATION:return TOKEN_MUL;
-        case DIVISION:return TOKEN_DIV;
-        case PLUS:return TOKEN_PLUS;
-        case MINUS:return TOKEN_MINUS;
-        case GREATER:return TOKEN_GREATER;
-        case GREATER_EQUAL:return TOKEN_GREATER_EQ;
-        case LESS:return TOKEN_LESS;
-        case LESS_EQUAL:return TOKEN_LESS_EQ;
-        case ASSIGN:return TOKEN_ASSIGN;
-        case COMPARE2:return TOKEN_COMPARE;
-        case NEG_COMPARE2:return TOKEN_NEG_COMPARE;
-        case NUMBER:return TOKEN_INT;
-        case NUMBER_EXPONENTIAL:case NUMBER_DECIMAL:return TOKEN_DOUBLE;
-        case STRING_END:return TOKEN_STRING;
-        case PROLOG_3:return TOKEN_PROLOG;
-        case END:return TOKEN_END;
+        case IDENTIFIER:        return TOKEN_ID; //todo identifier processing
+        case VARIABLE_ID:       return TOKEN_VAR_ID;
+        case LEFT_PARENTHESE:   return TOKEN_L_PAR;
+        case RIGHT_PARENTHESE:  return TOKEN_R_PAR;
+        case LEFT_BRACKET:      return TOKEN_L_BRACKET;
+        case RIGHT_BRACKET:     return TOKEN_R_BRACKET;
+        case COMMA:             return TOKEN_COMMA;
+        case SEMICOLON:         return TOKEN_SEMICOLON;
+        case COLON:             return TOKEN_COLON;
+        case MULTIPLICATION:    return TOKEN_MUL;
+        case DIVISION:          return TOKEN_DIV;
+        case PLUS:              return TOKEN_PLUS;
+        case MINUS:             return TOKEN_MINUS;
+        case GREATER:           return TOKEN_GREATER;
+        case GREATER_EQUAL:     return TOKEN_GREATER_EQ;
+        case LESS:              return TOKEN_LESS;
+        case LESS_EQUAL:        return TOKEN_LESS_EQ;
+        case ASSIGN:            return TOKEN_ASSIGN;
+        case COMPARE2:          return TOKEN_COMPARE;
+        case NEG_COMPARE2:      return TOKEN_NEG_COMPARE;
+        case NUMBER:            return TOKEN_INT;
+        case NUMBER_EXPONENTIAL:
+        case NUMBER_DECIMAL:    return TOKEN_DOUBLE;
+        case STRING_END:        return TOKEN_STRING;
+        case PROLOG_3:          return TOKEN_PROLOG;
+        case END:               return TOKEN_END;
         default:
             //todo remove debug print
             printf("something went wrong");
     }
+}
+
+TokenType processIdentifier(DynamicString *identifier){
+    if (DynamicStringCompare(identifier, "else")){return TOKEN_KEYWORD_ELSE;}
+    if (DynamicStringCompare(identifier, "float")){return TOKEN_KEYWORD_FLOAT;}
+    if (DynamicStringCompare(identifier, "function")){return TOKEN_KEYWORD_FUNCTION;}
+    if (DynamicStringCompare(identifier, "if")){return TOKEN_KEYWORD_IF;}
+    if (DynamicStringCompare(identifier, "int")){return TOKEN_KEYWORD_INT;}
+    if (DynamicStringCompare(identifier, "null")){return TOKEN_KEYWORD_NULL;}
+    if (DynamicStringCompare(identifier, "return")){return TOKEN_KEYWORD_RETURN;}
+    if (DynamicStringCompare(identifier, "string")){return TOKEN_KEYWORD_STRING;}
+    if (DynamicStringCompare(identifier, "void")){return TOKEN_KEYWORD_VOID;}
+    if (DynamicStringCompare(identifier, "while")){return TOKEN_KEYWORD_WHILE;}
+    return TOKEN_ID;
 }
 
 Stack *scanner(FILE *source){
@@ -275,6 +290,9 @@ Stack *scanner(FILE *source){
                 ungetc(input, source);
                 DynamicStringRemoveChar(bufferPtr);
                 tokenType = getToken(current);
+                if (tokenType == TOKEN_ID){
+                    tokenType = processIdentifier(bufferPtr);
+                }
 
                 //Initializes dynamic string in new memory location and copies there bufferPtr content
                 tokenValuePtr = DynamicStringInit();
