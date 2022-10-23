@@ -179,7 +179,7 @@ void StackPush(Stack *stack, Token *token){
 }
 
 void StackPrint(Stack *stack){
-    for (int i = 0; i < stack->top; ++i) {
+    for (int i = stack->top; i > 0; --i) {
         TokenPrint(stack->value[i]);
     }
 }
@@ -190,6 +190,16 @@ void StackFree(Stack *stack){
     }
     free(stack->value);
     free(stack);
+}
+
+void StackFlip(Stack *stack){
+    Token *tmp;
+    int k = stack->top - 1;
+    for (int i = 0; i < (stack->top / 2); ++i) {
+        tmp = stack->value[i];
+        stack->value[i] = stack->value[k];
+        stack->value[k--] = tmp;
+    }
 }
 
 ASTstruct *createNode(int type, char *value, ASTstruct *leftNode, ASTstruct *rightNode)

@@ -7,6 +7,7 @@ int main(int argc, char **argv){
     if (stack == NULL){
         return LEX_ERR;
     }
+    StackFlip(stack);
     StackPrint(stack);
     StackFree(stack);
     fclose(source);
