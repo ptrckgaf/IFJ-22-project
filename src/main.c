@@ -8,7 +8,16 @@ int main(int argc, char **argv){
         return LEX_ERR;
     }
     StackFlip(stack);
-    StackPrint(stack);
+    //StackPrint(stack);
+
+
+    parser(stack);
+
+
+
+
+
+
     StackFree(stack);
     fclose(source);
 
