@@ -3,15 +3,15 @@
 
 int main(int argc, char **argv){
     FILE *source = fopen("debug.php", "r");
-    Stack *stack = scanner(source);
+    Stack *stack = scanner(source); //to read from standard input change source to stdin
     if (stack == NULL){
         return LEX_ERR;
     }
     StackFlip(stack);
-    //StackPrint(stack);
+    StackPrint(stack);
 
 
-    parser(stack);
+//    parser(stack);
 
 
 

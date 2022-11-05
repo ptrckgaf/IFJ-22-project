@@ -40,7 +40,7 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
         case STRING_START:
             if (input == '"'){return STRING_END;}
             if (input > 31){return STRING;}
-            //TODO escaping sequences
+            //TODO escape sequences
             return ERROR;
 
         case NUMBER:
@@ -256,6 +256,8 @@ TokenType processIdentifier(DynamicString *identifier){
     if (DynamicStringCompare(identifier, "string")){return TOKEN_KEYWORD_STRING;}
     if (DynamicStringCompare(identifier, "void")){return TOKEN_KEYWORD_VOID;}
     if (DynamicStringCompare(identifier, "while")){return TOKEN_KEYWORD_WHILE;}
+    if (DynamicStringCompare(identifier, "declare")){return TOKEN_DECLARE;}
+    if (DynamicStringCompare(identifier, "strict_types")){return TOKEN_STRICT_TYPES;}
     return TOKEN_ID;
 }
 
