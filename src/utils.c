@@ -178,6 +178,15 @@ void StackPush(Stack *stack, Token *token){
     stack->value[stack->top++] = token;
 }
 
+Token* StackPop(Stack *stack)
+{
+   if (stack->top != 0)
+   {
+		stack->top--;
+   }
+
+}
+
 void StackPrint(Stack *stack){
     for (int i = stack->top; i >= 0; --i) {
         TokenPrint(stack->value[i]);
@@ -202,7 +211,7 @@ void StackFlip(Stack *stack){
     }
 }
 
-ASTstruct *createNode(int type, char *value, ASTstruct *leftNode, ASTstruct *rightNode)
+ASTstruct *createNode(int type, DynamicString *value, ASTstruct *leftNode, ASTstruct *rightNode)
 {
     ASTstruct *tree = malloc(sizeof(struct ASTstruct));
     if (tree == NULL){
@@ -218,14 +227,34 @@ ASTstruct *createNode(int type, char *value, ASTstruct *leftNode, ASTstruct *rig
     return tree;
 }
 
-//void expectToken(int type, Stack *stack)
-//{
-//    if (StackTop(stack))
-//    {
-//        fprintf(stderr, "Syntax error!");
-//    }
-//    if (StackPop(stack)->type != type)
-//    {
-//        fprintf(stderr, "Syntax error!");
-//    }
-//}
+
+Token *loadToken(Stack *stack)
+{
+	if (StackIsEmpty(stack))
+	{
+		return NULL;
+	}
+
+	Token *temp = (Token *)StackTop(stack);
+	StackPop(stack);
+
+	return temp;
+}
+
+void unloadToken(Stack *stack)
+{
+    stack->top++;
+}
+
+
+void expectToken(int type, Stack *stack)
+{
+   if (StackIsEmpty(stack))
+   {
+       fprintf(stderr, "Syntax error!");
+   }
+   if (loadToken(stack)->type != type)
+   {
+       fprintf(stderr, "Syntax error!");
+   }
+}

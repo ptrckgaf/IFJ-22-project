@@ -105,7 +105,7 @@ typedef struct{
     int size;
 }Stack;
 
-
+// struktura pre AST
 typedef struct ASTstruct
 {
     int type;
@@ -114,6 +114,23 @@ typedef struct ASTstruct
     struct ASTstruct *leftNode;
     struct ASTstruct *rightNode;
 } ASTstruct;
+
+
+// typy uzlov v AST
+typedef enum{
+    SEQ,
+    PROLOG,
+    NODE_DEF_FUNC,
+    NODE_PARAMS_RETURNTYPE,
+    RETURN_TYPE_INT,
+    RETURN_TYPE_FLOAT,
+    RETURN_TYPE_STRING,
+    NODE_PARAM_ID_INT,
+    NODE_PARAM_ID_FLOAT,
+    NODE_PARAM_ID_STRING,
+    NODE_RETURN,
+
+} Nodes;
 
 /**
  * Dynamic string initialization
@@ -269,6 +286,22 @@ void StackFlip(Stack *stack);
  */
 TokenValueType getValueType(TokenType tokenType);
 
+
+
+int parser();
+ASTstruct *parse();
+ASTstruct *prolog();
+ASTstruct *program();
+
+// vytvori uzol v AST
+ASTstruct *createNode(int type, DynamicString *value, ASTstruct *leftNode, ASTstruct *rightNode);
+void expectToken(int type, Stack *stack);
+Token *loadToken(Stack *stack);
+void unloadToken(Stack *stack);
+ASTstruct *rt(Stack *stack);
+ASTstruct *getRT(Stack *stack);
+ASTstruct *params(Stack *stack);
+ASTstruct *stmt(Stack *stack);
 
 
 #endif //IFJ_22_PROJEKT_UTILS_H
