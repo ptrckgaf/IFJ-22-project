@@ -115,7 +115,7 @@ typedef struct{
 typedef struct ASTstruct
 {
     int type;
-    char *value;
+    DynamicString *value;
 
     struct ASTstruct *leftNode;
     struct ASTstruct *rightNode;
@@ -245,7 +245,7 @@ void StackPush(Stack *stack, Token *token);
  * @param stack
  * @return
  */
-Token* StackPop(Stack *stack);
+void StackPop(Stack *stack);
 
 /**
  * Removes top element from stack

@@ -241,7 +241,7 @@ TokenType getToken(AutomatonState state){
         case END:               return TOKEN_END;
         default:
             //todo remove debug print
-            printf("something went wrong");
+            printf("something went wrong"); 
     }
 }
 

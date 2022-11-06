@@ -72,7 +72,7 @@ ASTstruct *prolog(Stack *stack)
 
 ASTstruct *program(Stack *stack)
 {
-    char *func_name = NULL;
+    DynamicString *func_name = NULL;
     ASTstruct *parameters = NULL;
     ASTstruct *returntype = NULL;
     ASTstruct *func = NULL;
@@ -178,27 +178,41 @@ ASTstruct *params(Stack *stack)
     {
         case TOKEN_KEYWORD_INT:
             token = loadToken(stack);
-            expectToken(TOKEN_VAR_ID, stack);
-            value = token->value.stringPtr;
-            param = createNode(NODE_PARAM_ID_INT, value, NULL, NULL);
+            if (token->type == TOKEN_VAR_ID)
+            {
+                value = token->value.stringPtr;
+                param = createNode(NODE_PARAM_ID_INT, value, NULL, NULL);
+                break;
+            }
+            error_exit(SYN_ERR, "Syntax error! Identifier expected");
             break;
+            
 
         case TOKEN_KEYWORD_FLOAT:
             token = loadToken(stack);
-            expectToken(TOKEN_VAR_ID, stack);
-            value = token->value.stringPtr;
-            param = createNode(NODE_PARAM_ID_FLOAT, value, NULL, NULL);
+            if (token->type == TOKEN_VAR_ID)
+            {
+                value = token->value.stringPtr;
+                param = createNode(NODE_PARAM_ID_FLOAT, value, NULL, NULL);
+                break;
+            }
+            error_exit(SYN_ERR, "Syntax error! Identifier expected");
             break;
 
         case TOKEN_KEYWORD_STRING:
             token = loadToken(stack);
-            expectToken(TOKEN_VAR_ID, stack);
-            value = token->value.stringPtr;
-            param = createNode(NODE_PARAM_ID_STRING, value, NULL, NULL);
+            if (token->type == TOKEN_VAR_ID)
+            {
+                value = token->value.stringPtr;
+                param = createNode(NODE_PARAM_ID_STRING, value, NULL, NULL);
+                break;
+            }
+            error_exit(SYN_ERR, "Syntax error! Identifier expected");
             break;
 
         default:
-            error_exit(SYN_ERR, "Syntax error!");
+            unloadToken(stack);
+            return NULL;
             
     }
 
@@ -242,3 +256,6 @@ ASTstruct *stmt(Stack *stack)
 
     return root;
 }
+
+
+

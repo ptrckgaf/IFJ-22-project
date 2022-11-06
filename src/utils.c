@@ -119,6 +119,8 @@ Token *TokenCopy(Token *src){
         Token *new = TokenInit(src->type, src->value.stringPtr);
         return new;
     }
+
+    return NULL;
 }
 
 void TokenPrint(Token *token){
@@ -178,7 +180,7 @@ void StackPush(Stack *stack, Token *token){
     stack->value[stack->top++] = token;
 }
 
-Token* StackPop(Stack *stack)
+void StackPop(Stack *stack)
 {
    if (stack->top != 0)
    {
@@ -253,7 +255,7 @@ void expectToken(int type, Stack *stack)
    {
        error_exit(SYN_ERR, "Syntax error!");
    }
-   if (loadToken(stack)->type != type)
+   if ((int)loadToken(stack)->type != type)
    {
        error_exit(SYN_ERR, "Syntax error!");
    }
