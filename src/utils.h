@@ -9,15 +9,20 @@
 /*
  * error codes definition
  */
-#define LEX_ERR 1;
-#define SYN_ERR 2;
-#define UNDEF_FUNC_ERR 3;
-#define PARAMS_ERR 4;
-#define UNDEF_VAR_ERR 5;
-#define TERM_ERR 6;
-#define TYPE_ERR 7;
-#define SEM_ERR 8;
-#define INT_ERR 99;
+#define LEX_ERR 1
+#define SYN_ERR 2
+#define UNDEF_FUNC_ERR 3
+#define PARAMS_ERR 4
+#define UNDEF_VAR_ERR 5
+#define TERM_ERR 6
+#define TYPE_ERR 7
+#define SEM_ERR 8
+#define INT_ERR 99
+
+#define error_exit(ERROR, M)                                                   \
+    fprintf(stderr, "[ERROR:%d] (%s:%d): " M "\n", ERROR, __FILE__, __LINE__); \
+    exit(ERROR);
+
 
 extern int ERROR_CODE;
 

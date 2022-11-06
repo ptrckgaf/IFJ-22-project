@@ -251,10 +251,10 @@ void expectToken(int type, Stack *stack)
 {
    if (StackIsEmpty(stack))
    {
-       fprintf(stderr, "Syntax error!");
+       error_exit(SYN_ERR, "Syntax error!");
    }
    if (loadToken(stack)->type != type)
    {
-       fprintf(stderr, "Syntax error!");
+       error_exit(SYN_ERR, "Syntax error!");
    }
 }

@@ -11,7 +11,7 @@ int main(int argc, char **argv){
     StackPrint(stack);
 
 
-//    parser(stack);
+    parser(stack);
 
 
 

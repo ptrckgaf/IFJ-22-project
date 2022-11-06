@@ -14,7 +14,7 @@ ASTstruct *ast;
 
 int parser(Stack *stack)
 {
-    ast = parse(stack);
+    ast = parse(stack); 
 
 
   return 0;
@@ -44,14 +44,15 @@ ASTstruct *prolog(Stack *stack)
 
     if (token == NULL)
     {
-        fprintf(stderr, "Syntax error! Prolog missing.");
+        error_exit(SYN_ERR, "Syntax error! Prolog missing.");
+        
     }
 
     if (token->type == TOKEN_PROLOG)
     {
-        expectToken(TOKEN_ID, stack);
+        expectToken(TOKEN_DECLARE, stack);
         expectToken(TOKEN_L_PAR, stack);
-        expectToken(TOKEN_ID, stack);
+        expectToken(TOKEN_STRICT_TYPES, stack);
         expectToken(TOKEN_ASSIGN, stack);
         expectToken(TOKEN_INT, stack);
         expectToken(TOKEN_R_PAR, stack);
@@ -61,7 +62,7 @@ ASTstruct *prolog(Stack *stack)
     }
     else
     {
-        fprintf(stderr, "Syntax error! Prolog missing.");
+        error_exit(SYN_ERR, "Syntax error! Prolog missing.");
     }
 
 
@@ -91,7 +92,7 @@ ASTstruct *program(Stack *stack)
         }
         else
         {
-            fprintf(stderr, "Syntax error!");
+            error_exit(SYN_ERR, "Syntax error!");
         }
 
         expectToken(TOKEN_L_PAR, stack);
@@ -136,7 +137,7 @@ ASTstruct *rt(Stack *stack)
     }
     else
     {
-        fprintf(stderr, "Syntax error, ':' expected!");
+        unloadToken(stack);
         return NULL;
     }
 
@@ -162,8 +163,7 @@ ASTstruct *getRT(Stack *stack)
             break;
 
         default:
-            fprintf(stderr, "Syntax error!");
-            return NULL;
+            error_exit(SYN_ERR, "Syntax error!");
     }
 }
 
@@ -171,36 +171,37 @@ ASTstruct *getRT(Stack *stack)
 ASTstruct *params(Stack *stack)
 {
     ASTstruct *param = NULL;
+    DynamicString *value = NULL;
     token = loadToken(stack);
 
-    if (token->type == TOKEN_ID)
+    switch(token->type)
     {
-        DynamicString *value = token->value.stringPtr;
-        token = loadToken(stack);
-        switch (token->type)
-        {
-            case TOKEN_KEYWORD_INT:
-                param = createNode(NODE_PARAM_ID_INT, value, NULL, NULL);
-                break;
+        case TOKEN_KEYWORD_INT:
+            token = loadToken(stack);
+            expectToken(TOKEN_VAR_ID, stack);
+            value = token->value.stringPtr;
+            param = createNode(NODE_PARAM_ID_INT, value, NULL, NULL);
+            break;
 
-            case TOKEN_KEYWORD_FLOAT:
-                param = createNode(NODE_PARAM_ID_FLOAT, value, NULL, NULL);
-                break;
+        case TOKEN_KEYWORD_FLOAT:
+            token = loadToken(stack);
+            expectToken(TOKEN_VAR_ID, stack);
+            value = token->value.stringPtr;
+            param = createNode(NODE_PARAM_ID_FLOAT, value, NULL, NULL);
+            break;
 
-            case TOKEN_KEYWORD_STRING:
-                param = createNode(NODE_PARAM_ID_STRING, value, NULL, NULL);
-                break;
+        case TOKEN_KEYWORD_STRING:
+            token = loadToken(stack);
+            expectToken(TOKEN_VAR_ID, stack);
+            value = token->value.stringPtr;
+            param = createNode(NODE_PARAM_ID_STRING, value, NULL, NULL);
+            break;
 
-            default:
-                fprintf(stderr, "Syntax error!");
-                return NULL;
-        }
+        default:
+            error_exit(SYN_ERR, "Syntax error!");
+            
     }
-    else
-    {
-        unloadToken(stack);
-        return NULL;
-    }
+
     token = loadToken(stack);
 
     if (token->type == TOKEN_COMMA)
