@@ -72,50 +72,63 @@ ASTstruct *prolog(Stack *stack)
 
 ASTstruct *program(Stack *stack)
 {
-    DynamicString *func_name = NULL;
-    ASTstruct *parameters = NULL;
-    ASTstruct *returntype = NULL;
-    ASTstruct *func = NULL;
-    ASTstruct *root = NULL;
-    ASTstruct *params_returntype = NULL;
 
+    DynamicString *func_name = NULL;
+    ASTstruct *root = NULL;
     token = loadToken(stack);
-    if (token == NULL) return NULL;
+
+    if (token == NULL)
+        return NULL;
 
     if (token->type == TOKEN_KEYWORD_FUNCTION)
     {
-        token = loadToken(stack);
+        //call function_define
+    }
+    else
+    {
+        // call stmt
+    }
 
-        if (token->type == TOKEN_ID)
-        {
-            // get func_name from token value
-        }
-        else
-        {
-            error_exit(SYN_ERR, "Syntax error!");
-        }
+    return root;
+}
 
+
+ASTstruct *function_define(Stack *stack)
+{
+    ASTstruct *root = NULL;
+    ASTstruct *func = NULL;
+    ASTstruct *parameters = NULL;
+    ASTstruct *returntype = NULL;
+    ASTstruct *params_returntype = NULL;
+    DynamicString *func_name = NULL;
+
+    token = loadToken(stack);
+
+
+    if (token->type == TOKEN_ID)
+    {
+
+        func_name = token->value.stringPtr;
         expectToken(TOKEN_L_PAR, stack);
         parameters = params(stack);
         expectToken(TOKEN_R_PAR, stack);
-
+        expectToken(TOKEN_COLON, stack);
         returntype = rt(stack);
-        expectToken(TOKEN_L_BRACKET, stack);
 
-        if (parameters != NULL || returntype != NULL)
-        {
-            params_returntype = createNode(NODE_PARAMS_RETURNTYPE, NULL, parameters, returntype);
-        }
+        expectToken(TOKEN_L_BRACKET, stack);
+        params_returntype = createNode(NODE_PARAMS_RETURNTYPE, NULL, parameters, returntype);
 
         func = createNode(NODE_DEF_FUNC, NULL, params_returntype, stmt(stack));
         func->value = func_name;
         expectToken(TOKEN_R_BRACKET, stack);
 
         root = createNode(SEQ, NULL, program(stack), func);
-
+        
     }
 
+
     return root;
+    
 }
 
 
@@ -231,31 +244,6 @@ ASTstruct *params(Stack *stack)
 
 ASTstruct *stmt(Stack *stack)
 {
-
-    ASTstruct *root = NULL;
-
-
-    if (StackIsEmpty(stack))
-        return root;
-
-
-    token = loadToken(stack);
-
-    switch(token->type)
-    {
-        case TOKEN_KEYWORD_RETURN:
-            token = loadToken(stack);
-            root = createNode(SEQ, NULL, NULL, createNode(NODE_RETURN, NULL, NULL, NULL));
-            unloadToken(stack);
-        break;
-
-        default:
-            unloadToken(stack);
-            return NULL;
-    }
-
-    return root;
+    
+    //return root;
 }
-
-
-

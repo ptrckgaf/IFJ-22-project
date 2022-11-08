@@ -1,6 +1,6 @@
 prolog -> TOKEN_PROLOG TOKEN_DECLARE TOKEN_L_PAR TOKEN_STRICT_TYPES TOKEN_ASSIGN TOKEN_INT TOKEN_R_PAR TOKEN_SEMICOLON program
 
-program -> function_define stmt
+program -> function_define stmt program
 program -> eps
 
 function_define -> TOKEN_KEYWORD_FUNCTION TOKEN_ID TOKEN_L_PAR params TOKEN_R_PAR TOKEN_COLON returntype TOKEN_L_BRACKET stmt TOKEN_R_BRACKET program
