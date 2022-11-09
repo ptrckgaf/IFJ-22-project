@@ -9,13 +9,15 @@
 Token *token;
 ASTstruct *ast;
 
+char *displayNodes[] = {"SEQ", "PROLOG", "NODE_DEF_FUNC", "NODE_PARAMS_RETURNTYPE", "RETURN_TYPE_INT", "RETURN_TYPE_FLOAT", "RETURN_TYPE_STRING", "NODE_PARAM_ID_INT", "NODE_PARAM_ID_FLOAT", "NODE_PARAM_ID_STRING","NODE_RETURN"};
+
 
 // funkcia vykona syntakticku analyzu tokenov a vytvori AST
 
 int parser(Stack *stack)
 {
     ast = parse(stack); 
-
+    Print_tree(ast);
 
   return 0;
 }
@@ -82,7 +84,7 @@ ASTstruct *program(Stack *stack)
 
     if (token->type == TOKEN_KEYWORD_FUNCTION)
     {
-        //call function_define
+        root = createNode(SEQ, NULL, function_define(stack), stmt(stack));
     }
     else
     {
@@ -247,3 +249,71 @@ ASTstruct *stmt(Stack *stack)
     
     //return root;
 }
+
+
+
+void prt_ast(ASTstruct *t) {
+    if (t == NULL)
+        printf("NULL\n");
+    else {
+        printf("%s ", displayNodes[t->type]);
+        //if (t->type == nIdentifier || t->type == nLitInt || t->type == nLitFloat
+        //|| t->type == nLitString || t->type == nLitNone || t->type == nMulticomment) {
+        if (t->type == NODE_PARAM_ID_INT ||t->type == NODE_PARAM_ID_FLOAT ||t->type == NODE_PARAM_ID_STRING ){
+            printf("%s\n", (char*)t->value);
+        } else {
+            printf("\n");
+            prt_ast(t->leftNode);
+            prt_ast(t->rightNode);
+        }
+    }
+}
+
+
+void Print_tree2(ASTstruct* TempTree, char* sufix, char fromdir) {
+/* vykresli sktrukturu binarniho stromu */
+  if (TempTree != NULL) {
+    char* suf2 = (char*) malloc(strlen(sufix) + 4);
+    strcpy(suf2, sufix);
+    
+    if (fromdir == 'L') {
+      suf2 = strcat(suf2, "  |");
+      printf("%s\n", suf2);
+    } else
+      suf2 = strcat(suf2, "   ");
+    
+    Print_tree2(TempTree->rightNode, suf2, 'R');
+    if (TempTree->value)
+      printf("%s  +-[ (%d) %s \"%s\" ]\n", sufix, TempTree->type,  displayNodes[TempTree->type], (char*)TempTree->value);
+    else
+      printf("%s  +-[ (%d) %s ]\n", sufix, TempTree->type,  displayNodes[TempTree->type]);
+    
+    strcpy(suf2, sufix);
+    
+    if (fromdir == 'R')
+      suf2 = strcat(suf2, "  |");    
+    else
+      suf2 = strcat(suf2, "   ");
+
+    Print_tree2(TempTree->leftNode, suf2, 'L');
+
+    if (fromdir == 'R')
+      printf("%s\n", suf2);
+
+    free(suf2);
+  }
+}
+
+void Print_tree(ASTstruct* TempTree) {
+  printf("===========================================\n");
+  printf("Struktura binarniho stromu:\n");
+  printf("\n");
+
+  if (TempTree != NULL)
+     Print_tree2(TempTree, "", 'X');
+  else
+     printf("Strom je prazdny...\n");
+
+  printf("\n");
+  printf("===========================================\n");
+} 

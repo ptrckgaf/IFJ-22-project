@@ -308,6 +308,10 @@ ASTstruct *rt(Stack *stack);
 ASTstruct *getRT(Stack *stack);
 ASTstruct *params(Stack *stack);
 ASTstruct *stmt(Stack *stack);
+ASTstruct *function_define(Stack *stack);
+void Print_tree(ASTstruct* TempTree);
+void Print_tree2(ASTstruct* TempTree, char* sufix, char fromdir);
+void prt_ast(ASTstruct *t);
 
 
 #endif //IFJ_22_PROJEKT_UTILS_H
