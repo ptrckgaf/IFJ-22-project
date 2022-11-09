@@ -125,8 +125,8 @@ typedef struct ASTstruct
 // typy uzlov v AST
 typedef enum{
     SEQ,
-    PROLOG,
-    NODE_DEF_FUNC,
+    NODE_PROLOG,
+    NODE_FUNC_DEF,
     NODE_PARAMS_RETURNTYPE,
     RETURN_TYPE_INT,
     RETURN_TYPE_FLOAT,

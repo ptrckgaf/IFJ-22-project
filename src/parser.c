@@ -9,7 +9,7 @@
 Token *token;
 ASTstruct *ast;
 
-char *displayNodes[] = {"SEQ", "PROLOG", "NODE_DEF_FUNC", "NODE_PARAMS_RETURNTYPE", "RETURN_TYPE_INT", "RETURN_TYPE_FLOAT", "RETURN_TYPE_STRING", "NODE_PARAM_ID_INT", "NODE_PARAM_ID_FLOAT", "NODE_PARAM_ID_STRING","NODE_RETURN"};
+char *displayNodes[] = {"SEQ", "NODE_PROLOG", "NODE_FUNC_DEF", "NODE_PARAMS_RETURNTYPE", "RETURN_TYPE_INT", "RETURN_TYPE_FLOAT", "RETURN_TYPE_STRING", "NODE_PARAM_ID_INT", "NODE_PARAM_ID_FLOAT", "NODE_PARAM_ID_STRING","NODE_RETURN"};
 
 
 // funkcia vykona syntakticku analyzu tokenov a vytvori AST
@@ -40,14 +40,11 @@ ASTstruct *parse(Stack *stack)
 ASTstruct *prolog(Stack *stack)
 {
     ASTstruct *root = NULL;
-
-    // zobere token z vrchola zasobniku
     token = loadToken(stack);
 
     if (token == NULL)
     {
         error_exit(SYN_ERR, "Syntax error! Prolog missing.");
-        
     }
 
     if (token->type == TOKEN_PROLOG)
@@ -60,13 +57,15 @@ ASTstruct *prolog(Stack *stack)
         expectToken(TOKEN_R_PAR, stack);
         expectToken(TOKEN_SEMICOLON, stack);
 
-        root = createNode(SEQ, NULL, program(stack), createNode(PROLOG, NULL, NULL, NULL));
+
+        root = createNode(SEQ, NULL, program(stack), createNode(NODE_PROLOG, NULL, NULL, NULL));
+
+
     }
     else
     {
         error_exit(SYN_ERR, "Syntax error! Prolog missing.");
     }
-
 
     return root;
 }
@@ -74,21 +73,35 @@ ASTstruct *prolog(Stack *stack)
 
 ASTstruct *program(Stack *stack)
 {
-
-    DynamicString *func_name = NULL;
     ASTstruct *root = NULL;
+
     token = loadToken(stack);
 
-    if (token == NULL)
-        return NULL;
+    switch(token->type)
+    {
+        case TOKEN_KEYWORD_FUNCTION:
+            root = createNode(SEQ, NULL, function_define(stack), NULL);
+            break;
 
-    if (token->type == TOKEN_KEYWORD_FUNCTION)
-    {
-        root = createNode(SEQ, NULL, function_define(stack), stmt(stack));
-    }
-    else
-    {
-        // call stmt
+        case TOKEN_KEYWORD_IF:
+            root = createNode(SEQ, NULL, stmt(stack), NULL);
+            break;
+
+        case TOKEN_KEYWORD_WHILE:
+            root = createNode(SEQ, NULL, stmt(stack), NULL);
+            break;
+
+        case TOKEN_VAR_ID:
+            root = createNode(SEQ, NULL, stmt(stack), NULL);
+            break;
+
+        case TOKEN_ID:
+            root = createNode(SEQ, NULL, stmt(stack), NULL);
+            break;
+
+        default:
+            unloadToken(stack);
+            return NULL;
     }
 
     return root;
@@ -98,95 +111,46 @@ ASTstruct *program(Stack *stack)
 ASTstruct *function_define(Stack *stack)
 {
     ASTstruct *root = NULL;
-    ASTstruct *func = NULL;
     ASTstruct *parameters = NULL;
     ASTstruct *returntype = NULL;
     ASTstruct *params_returntype = NULL;
-    DynamicString *func_name = NULL;
+    ASTstruct *func = NULL;
 
     token = loadToken(stack);
 
 
     if (token->type == TOKEN_ID)
     {
-
-        func_name = token->value.stringPtr;
         expectToken(TOKEN_L_PAR, stack);
         parameters = params(stack);
         expectToken(TOKEN_R_PAR, stack);
         expectToken(TOKEN_COLON, stack);
         returntype = rt(stack);
-
         expectToken(TOKEN_L_BRACKET, stack);
-        params_returntype = createNode(NODE_PARAMS_RETURNTYPE, NULL, parameters, returntype);
+        if (parameters != NULL || returntype != NULL)
+            params_returntype = createNode(NODE_PARAMS_RETURNTYPE, NULL, parameters, returntype);
+        
+        func = createNode(NODE_FUNC_DEF, NULL, params_returntype, stmt(stack));
 
-        func = createNode(NODE_DEF_FUNC, NULL, params_returntype, stmt(stack));
-        func->value = func_name;
         expectToken(TOKEN_R_BRACKET, stack);
 
-        root = createNode(SEQ, NULL, program(stack), func);
-        
-    }
-
-
-    return root;
-    
-}
-
-
-ASTstruct *rt(Stack *stack)
-{
-    ASTstruct *returntype = NULL;
-    ASTstruct *returntypeNode = NULL;
-    token = loadToken(stack);
-
-    if (token->type == TOKEN_COLON)
-    {
-        returntype = getRT(stack);
-        if (returntype != NULL)
-        {
-            returntypeNode = createNode(SEQ, NULL, returntype, NULL);
-        }
- 
-        return returntypeNode;
+        root = createNode(SEQ, NULL, function_define(stack), func);
     }
     else
     {
-        unloadToken(stack);
-        return NULL;
+        error_exit(SYN_ERR, "Syntax error! Function identifier expected.")
     }
 
-}
-
-
-ASTstruct *getRT(Stack *stack)
-{
-    token = loadToken(stack);
-
-    switch(token->type)
-    {
-        case TOKEN_KEYWORD_INT:
-            return createNode(RETURN_TYPE_INT, NULL, NULL, NULL);
-            break;
-
-        case TOKEN_KEYWORD_FLOAT:
-            return createNode(RETURN_TYPE_FLOAT, NULL, NULL, NULL);
-            break;
-
-        case TOKEN_KEYWORD_STRING:
-            return createNode(RETURN_TYPE_STRING, NULL, NULL, NULL);
-            break;
-
-        default:
-            error_exit(SYN_ERR, "Syntax error!");
-    }
+    return root;
 }
 
 
 ASTstruct *params(Stack *stack)
 {
-    ASTstruct *param = NULL;
+    ASTstruct *root = NULL;
     DynamicString *value = NULL;
+    ASTstruct *param = NULL;
+
     token = loadToken(stack);
 
     switch(token->type)
@@ -195,44 +159,38 @@ ASTstruct *params(Stack *stack)
             token = loadToken(stack);
             if (token->type == TOKEN_VAR_ID)
             {
-                value = token->value.stringPtr;
-                param = createNode(NODE_PARAM_ID_INT, value, NULL, NULL);
+                param = createNode(NODE_PARAM_ID_INT, token->value.integer, NULL, NULL); // TO FIX
                 break;
             }
-            error_exit(SYN_ERR, "Syntax error! Identifier expected");
+            error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
             break;
-            
 
         case TOKEN_KEYWORD_FLOAT:
             token = loadToken(stack);
             if (token->type == TOKEN_VAR_ID)
             {
-                value = token->value.stringPtr;
-                param = createNode(NODE_PARAM_ID_FLOAT, value, NULL, NULL);
+                param = createNode(NODE_PARAM_ID_FLOAT, token->value.decimal, NULL, NULL); // TO FIX
                 break;
             }
-            error_exit(SYN_ERR, "Syntax error! Identifier expected");
+            error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
             break;
 
         case TOKEN_KEYWORD_STRING:
             token = loadToken(stack);
             if (token->type == TOKEN_VAR_ID)
             {
-                value = token->value.stringPtr;
-                param = createNode(NODE_PARAM_ID_STRING, value, NULL, NULL);
+                param = createNode(NODE_PARAM_ID_STRING, token->value.stringPtr, NULL, NULL); // TO FIX
                 break;
             }
-            error_exit(SYN_ERR, "Syntax error! Identifier expected");
+            error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
             break;
 
         default:
             unloadToken(stack);
             return NULL;
-            
     }
 
     token = loadToken(stack);
-
     if (token->type == TOKEN_COMMA)
     {
         return createNode(SEQ, NULL, params(stack), param);
@@ -244,12 +202,9 @@ ASTstruct *params(Stack *stack)
     }
 }
 
-ASTstruct *stmt(Stack *stack)
-{
-    
-    //return root;
-}
 
+
+/**** PRINT AST ******/
 
 
 void prt_ast(ASTstruct *t) {
@@ -317,3 +272,6 @@ void Print_tree(ASTstruct* TempTree) {
   printf("\n");
   printf("===========================================\n");
 } 
+
+
+/**** PRINT AST ******/
