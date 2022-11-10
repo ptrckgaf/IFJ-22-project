@@ -131,10 +131,15 @@ typedef enum{
     RETURN_TYPE_INT,
     RETURN_TYPE_FLOAT,
     RETURN_TYPE_STRING,
+    RETURN_TYPE_VOID,
     NODE_PARAM_ID_INT,
     NODE_PARAM_ID_FLOAT,
     NODE_PARAM_ID_STRING,
     NODE_RETURN,
+    NODE_INT,
+    NODE_FLOAT,
+    NODE_STRING,
+    NODE_VAR_ID
 
 } Nodes;
 
@@ -305,9 +310,11 @@ void expectToken(int type, Stack *stack);
 Token *loadToken(Stack *stack);
 void unloadToken(Stack *stack);
 ASTstruct *rt(Stack *stack);
-ASTstruct *getRT(Stack *stack);
 ASTstruct *params(Stack *stack);
 ASTstruct *stmt(Stack *stack);
+ASTstruct *expr(Stack *stack);
+ASTstruct *expr3(Stack *stack);
+ASTstruct *term(Stack *stack);
 ASTstruct *function_define(Stack *stack);
 void Print_tree(ASTstruct* TempTree);
 void Print_tree2(ASTstruct* TempTree, char* sufix, char fromdir);

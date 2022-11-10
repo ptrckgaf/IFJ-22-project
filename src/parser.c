@@ -9,7 +9,7 @@
 Token *token;
 ASTstruct *ast;
 
-char *displayNodes[] = {"SEQ", "NODE_PROLOG", "NODE_FUNC_DEF", "NODE_PARAMS_RETURNTYPE", "RETURN_TYPE_INT", "RETURN_TYPE_FLOAT", "RETURN_TYPE_STRING", "NODE_PARAM_ID_INT", "NODE_PARAM_ID_FLOAT", "NODE_PARAM_ID_STRING","NODE_RETURN"};
+char *displayNodes[] = {"SEQ", "NODE_PROLOG", "NODE_FUNC_DEF", "NODE_PARAMS_RETURNTYPE", "RETURN_TYPE_INT", "RETURN_TYPE_FLOAT", "RETURN_TYPE_STRING", "RETURN_TYPE_VOID",  "NODE_PARAM_ID_INT", "NODE_PARAM_ID_FLOAT", "NODE_PARAM_ID_STRING","NODE_RETURN", "NODE_INT", "NODE_FLOAT", "NODE_STRING", "NODE_VAR_ID"};
 
 
 // funkcia vykona syntakticku analyzu tokenov a vytvori AST
@@ -76,6 +76,8 @@ ASTstruct *program(Stack *stack)
     ASTstruct *root = NULL;
 
     token = loadToken(stack);
+    if (token == NULL)
+        return NULL;
 
     switch(token->type)
     {
@@ -117,6 +119,8 @@ ASTstruct *function_define(Stack *stack)
     ASTstruct *func = NULL;
 
     token = loadToken(stack);
+    if (token == NULL)
+        return NULL;
 
 
     if (token->type == TOKEN_ID)
@@ -127,14 +131,13 @@ ASTstruct *function_define(Stack *stack)
         expectToken(TOKEN_COLON, stack);
         returntype = rt(stack);
         expectToken(TOKEN_L_BRACKET, stack);
-        if (parameters != NULL || returntype != NULL)
-            params_returntype = createNode(NODE_PARAMS_RETURNTYPE, NULL, parameters, returntype);
+        params_returntype = createNode(NODE_PARAMS_RETURNTYPE, NULL, parameters, returntype);
         
         func = createNode(NODE_FUNC_DEF, NULL, params_returntype, stmt(stack));
 
         expectToken(TOKEN_R_BRACKET, stack);
 
-        root = createNode(SEQ, NULL, function_define(stack), func);
+        root = createNode(SEQ, NULL, program(stack), func);
     }
     else
     {
@@ -147,11 +150,11 @@ ASTstruct *function_define(Stack *stack)
 
 ASTstruct *params(Stack *stack)
 {
-    ASTstruct *root = NULL;
-    DynamicString *value = NULL;
     ASTstruct *param = NULL;
 
     token = loadToken(stack);
+    if (token == NULL)
+        return NULL;
 
     switch(token->type)
     {
@@ -159,7 +162,7 @@ ASTstruct *params(Stack *stack)
             token = loadToken(stack);
             if (token->type == TOKEN_VAR_ID)
             {
-                param = createNode(NODE_PARAM_ID_INT, token->value.integer, NULL, NULL); // TO FIX
+                param = createNode(NODE_PARAM_ID_INT, NULL, NULL, NULL); // TO FIX
                 break;
             }
             error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
@@ -169,7 +172,7 @@ ASTstruct *params(Stack *stack)
             token = loadToken(stack);
             if (token->type == TOKEN_VAR_ID)
             {
-                param = createNode(NODE_PARAM_ID_FLOAT, token->value.decimal, NULL, NULL); // TO FIX
+                param = createNode(NODE_PARAM_ID_FLOAT, NULL, NULL, NULL); // TO FIX
                 break;
             }
             error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
@@ -179,7 +182,7 @@ ASTstruct *params(Stack *stack)
             token = loadToken(stack);
             if (token->type == TOKEN_VAR_ID)
             {
-                param = createNode(NODE_PARAM_ID_STRING, token->value.stringPtr, NULL, NULL); // TO FIX
+                param = createNode(NODE_PARAM_ID_STRING, NULL, NULL, NULL); // TO FIX
                 break;
             }
             error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
@@ -191,15 +194,160 @@ ASTstruct *params(Stack *stack)
     }
 
     token = loadToken(stack);
+    // viac parametrov
     if (token->type == TOKEN_COMMA)
     {
         return createNode(SEQ, NULL, params(stack), param);
     }
+    // jeden parameter
     else
     {
         unloadToken(stack);
         return createNode(SEQ, NULL, NULL, param);
     }
+}
+
+
+
+ASTstruct *rt(Stack *stack)
+{
+    token = loadToken(stack);
+    if (token == NULL)
+        return NULL;
+
+    switch(token->type)
+    {
+        case TOKEN_KEYWORD_INT:
+            return createNode(RETURN_TYPE_INT, NULL, NULL, NULL);
+            break;
+
+        case TOKEN_KEYWORD_FLOAT:
+            return createNode(RETURN_TYPE_FLOAT, NULL, NULL, NULL);
+            break;
+
+        case TOKEN_KEYWORD_STRING:
+            return createNode(RETURN_TYPE_STRING, NULL, NULL, NULL);
+            break;
+
+        case TOKEN_KEYWORD_VOID:
+            return createNode(RETURN_TYPE_VOID, NULL, NULL, NULL);
+            break;
+
+        default:
+            error_exit(SYN_ERR, "Syntax error! Invalid returntype.");
+    }
+
+}
+
+
+ASTstruct *stmt(Stack *stack)
+{
+    ASTstruct *root = NULL;
+    token = loadToken(stack);
+    if (token == NULL)
+        return NULL;
+
+    switch(token->type)
+    {
+        case TOKEN_KEYWORD_RETURN:
+            root = createNode(SEQ, NULL, NULL, createNode(NODE_RETURN, NULL, expr(stack), NULL));
+            expectToken(TOKEN_SEMICOLON, stack);
+            break;
+
+        default:
+            unloadToken(stack);
+            return NULL;
+            
+    }
+
+    return root;
+}
+
+
+ASTstruct *expr(Stack *stack)
+{
+    ASTstruct *root = NULL;
+    token = loadToken(stack);
+    if (token == NULL)
+        return NULL;
+
+    switch(token->type)
+    {
+        case TOKEN_ID:
+            root = createNode(SEQ, NULL, expr3(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            break;
+
+        default:
+            unloadToken(stack);
+            return NULL;
+    }
+}
+
+
+ASTstruct *expr3(Stack *stack)
+{
+    ASTstruct *root = NULL;
+    token = loadToken(stack);
+    if (token == NULL)
+        return NULL;
+
+    if (token->type == TOKEN_L_PAR)
+    {
+        root = createNode(SEQ, NULL, term(stack), NULL);
+    }
+    else
+    {
+        error_exit(SYN_ERR, "Syntax error! '(' expected.");
+    }
+
+    
+
+    token = loadToken(stack);
+    // viac argumentov
+    if (token->type == TOKEN_COMMA)
+    {
+        return createNode(SEQ, NULL, expr3(stack), root);
+    }
+    // jeden argument
+    else
+    {
+        unloadToken(stack);
+        return createNode(SEQ, NULL, NULL, root);
+    }
+
+}
+
+
+ASTstruct *term(Stack *stack)
+{
+
+    token = loadToken(stack);
+    if (token == NULL)
+        return NULL;
+
+    switch(token->type)
+    {
+        case TOKEN_INT:
+            return createNode(NODE_INT, NULL, NULL, NULL);
+            break;
+
+        case TOKEN_DOUBLE:
+            return createNode(NODE_FLOAT, NULL, NULL, NULL);
+            break;
+
+        case TOKEN_STRING:
+            return createNode(NODE_STRING, NULL, NULL, NULL);
+            break;
+
+        case TOKEN_VAR_ID:
+            return createNode(NODE_VAR_ID, NULL, NULL, NULL);
+            break;
+
+        default:
+            error_exit(SYN_ERR, "Syntax error! Term has to be INT, FLOAT, STRING, IDENTIFIER.");
+    }
+
 }
 
 

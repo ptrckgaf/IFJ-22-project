@@ -63,5 +63,4 @@ expr2 -> TOKEN_COMPARE expr
 expr2 -> TOKEN_NEG_COMPARE expr
 expr2 -> eps
 
-expr3 -> eps
 expr3 -> TOKEN_L_PAR term arg_comma TOKEN_R_PAR
