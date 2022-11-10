@@ -9,7 +9,22 @@
 Token *token;
 ASTstruct *ast;
 
-char *displayNodes[] = {"SEQ", "NODE_PROLOG", "NODE_FUNC_DEF", "NODE_PARAMS_RETURNTYPE", "RETURN_TYPE_INT", "RETURN_TYPE_FLOAT", "RETURN_TYPE_STRING", "RETURN_TYPE_VOID",  "NODE_PARAM_ID_INT", "NODE_PARAM_ID_FLOAT", "NODE_PARAM_ID_STRING","NODE_RETURN", "NODE_INT", "NODE_FLOAT", "NODE_STRING", "NODE_VAR_ID"};
+char *displayNodes[] = {"SEQ",
+                        "NODE_PROLOG",
+                        "NODE_FUNC_DEF",
+                        "NODE_PARAMS_RETURNTYPE",
+                        "RETURN_TYPE_INT",
+                        "RETURN_TYPE_FLOAT",
+                        "RETURN_TYPE_STRING",
+                        "RETURN_TYPE_VOID",
+                        "NODE_PARAM_ID_INT",
+                        "NODE_PARAM_ID_FLOAT",
+                        "NODE_PARAM_ID_STRING",
+                        "NODE_RETURN",
+                        "NODE_INT",
+                        "NODE_FLOAT",
+                        "NODE_STRING",
+                        "NODE_VAR_ID"};
 
 
 // funkcia vykona syntakticku analyzu tokenov a vytvori AST
@@ -276,7 +291,7 @@ ASTstruct *expr(Stack *stack)
         case TOKEN_ID:
             root = createNode(SEQ, NULL, expr3(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
-            break;
+            return root;
 
         default:
             unloadToken(stack);
