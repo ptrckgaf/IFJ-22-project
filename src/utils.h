@@ -139,7 +139,9 @@ typedef enum{
     NODE_INT,
     NODE_FLOAT,
     NODE_STRING,
-    NODE_VAR_ID
+    NODE_VAR_ID,
+    NODE_IF,
+    NODE_ELSE
 
 } Nodes;
 

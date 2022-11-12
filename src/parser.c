@@ -24,7 +24,9 @@ char *displayNodes[] = {"SEQ",
                         "NODE_INT",
                         "NODE_FLOAT",
                         "NODE_STRING",
-                        "NODE_VAR_ID"};
+                        "NODE_VAR_ID",
+                        "NODE_IF",
+                        "NODE_ELSE",};
 
 
 // funkcia vykona syntakticku analyzu tokenov a vytvori AST
@@ -94,31 +96,13 @@ ASTstruct *program(Stack *stack)
     if (token == NULL)
         return NULL;
 
-    switch(token->type)
+    if (token->type == TOKEN_KEYWORD_FUNCTION)
     {
-        case TOKEN_KEYWORD_FUNCTION:
-            root = createNode(SEQ, NULL, function_define(stack), NULL);
-            break;
-
-        case TOKEN_KEYWORD_IF:
-            root = createNode(SEQ, NULL, stmt(stack), NULL);
-            break;
-
-        case TOKEN_KEYWORD_WHILE:
-            root = createNode(SEQ, NULL, stmt(stack), NULL);
-            break;
-
-        case TOKEN_VAR_ID:
-            root = createNode(SEQ, NULL, stmt(stack), NULL);
-            break;
-
-        case TOKEN_ID:
-            root = createNode(SEQ, NULL, stmt(stack), NULL);
-            break;
-
-        default:
-            unloadToken(stack);
-            return NULL;
+        root = createNode(SEQ, NULL, function_define(stack), NULL);
+    }
+    else
+    {
+        root = createNode(SEQ, NULL, stmt(stack), NULL);
     }
 
     return root;
@@ -258,6 +242,11 @@ ASTstruct *rt(Stack *stack)
 ASTstruct *stmt(Stack *stack)
 {
     ASTstruct *root = NULL;
+    ASTstruct *if_cond = NULL;
+    ASTstruct *if_body = NULL;
+    ASTstruct *else_body = NULL;
+    ASTstruct *node_if = NULL;
+    ASTstruct *node_else = NULL;
     token = loadToken(stack);
     if (token == NULL)
         return NULL;
@@ -268,6 +257,27 @@ ASTstruct *stmt(Stack *stack)
             root = createNode(SEQ, NULL, NULL, createNode(NODE_RETURN, NULL, expr(stack), NULL));
             expectToken(TOKEN_SEMICOLON, stack);
             break;
+
+        case TOKEN_KEYWORD_IF:
+            expectToken(TOKEN_L_PAR, stack);
+            if_cond = createNode(SEQ, NULL, NULL, expr(stack));
+            if (if_cond->rightNode == NULL)
+            {
+                error_exit(SYN_ERR, "Syntax error! Condition expected after 'if'.");
+            }
+            expectToken(TOKEN_R_PAR, stack);
+            expectToken(TOKEN_L_BRACKET, stack);
+            if_body = stmt(stack);
+            expectToken(TOKEN_R_BRACKET, stack);
+            expectToken(TOKEN_KEYWORD_ELSE, stack);
+            expectToken(TOKEN_L_BRACKET, stack);
+            else_body = stmt(stack);
+            expectToken(TOKEN_R_BRACKET, stack);
+            node_else = createNode(NODE_ELSE, NULL, else_body, if_body);
+            node_if = createNode(NODE_IF, NULL, if_cond, node_else);
+            root = createNode(SEQ, NULL, stmt(stack), node_if);
+            break;
+
 
         default:
             unloadToken(stack);
