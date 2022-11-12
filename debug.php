@@ -9,4 +9,15 @@ return bar($param); }
 
 
 
+//if ($a===$b)
+//{
+//    return foo($param);
+//}
+//else
+//{
+//    return bar($param);
+//}
+
+
+
 

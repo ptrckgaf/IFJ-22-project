@@ -100,11 +100,12 @@ ASTstruct *program(Stack *stack)
 
     if (token->type == TOKEN_KEYWORD_FUNCTION)
     {
-        root = createNode(SEQ, NULL, function_define(stack), NULL);
+        root = function_define(stack);
     }
     else
     {
-        root = createNode(SEQ, NULL, stmt(stack), NULL);
+        unloadToken(stack);
+        root = stmt(stack);
     }
 
     return root;
