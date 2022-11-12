@@ -27,7 +27,8 @@ char *displayNodes[] = {"SEQ",
                         "NODE_VAR_ID",
                         "NODE_IF",
                         "NODE_ELSE",
-                        "NODE_WHILE"};
+                        "NODE_WHILE",
+                        "NODE_VAR_ASSIGNMENT"};
 
 
 // funkcia vykona syntakticku analyzu tokenov a vytvori AST
@@ -251,6 +252,8 @@ ASTstruct *stmt(Stack *stack)
     ASTstruct *while_cond = NULL;
     ASTstruct *while_body = NULL;
     ASTstruct *while_node = NULL;
+    ASTstruct *identif_node = NULL;
+    ASTstruct *node_var_assignment = NULL;
 
     token = loadToken(stack);
     if (token == NULL)
@@ -296,6 +299,18 @@ ASTstruct *stmt(Stack *stack)
             expectToken(TOKEN_R_BRACKET, stack);
             while_node = createNode(NODE_WHILE, NULL, while_cond, while_body);
             root = createNode(SEQ, NULL, stmt(stack), while_node);
+            break;
+
+        case TOKEN_VAR_ID:
+            expectToken(TOKEN_ASSIGN, stack);
+            identif_node = createNode(NODE_VAR_ID, token->value.stringPtr, NULL, NULL);
+            node_var_assignment = createNode(NODE_VAR_ASSIGNMENT, NULL, identif_node, expr(stack));
+            if (root->rightNode == NULL)
+            {
+                error_exit(SYN_ERR, "Syntax error! 'R-value' expected in variable assignment.");
+            }
+            expectToken(TOKEN_SEMICOLON, stack);
+            root = createNode(SEQ, NULL, stmt(stack), node_var_assignment);
             break;
 
 
