@@ -26,7 +26,8 @@ char *displayNodes[] = {"SEQ",
                         "NODE_STRING",
                         "NODE_VAR_ID",
                         "NODE_IF",
-                        "NODE_ELSE",};
+                        "NODE_ELSE",
+                        "NODE_WHILE"};
 
 
 // funkcia vykona syntakticku analyzu tokenov a vytvori AST
@@ -247,6 +248,10 @@ ASTstruct *stmt(Stack *stack)
     ASTstruct *else_body = NULL;
     ASTstruct *node_if = NULL;
     ASTstruct *node_else = NULL;
+    ASTstruct *while_cond = NULL;
+    ASTstruct *while_body = NULL;
+    ASTstruct *while_node = NULL;
+
     token = loadToken(stack);
     if (token == NULL)
         return NULL;
@@ -276,6 +281,21 @@ ASTstruct *stmt(Stack *stack)
             node_else = createNode(NODE_ELSE, NULL, else_body, if_body);
             node_if = createNode(NODE_IF, NULL, if_cond, node_else);
             root = createNode(SEQ, NULL, stmt(stack), node_if);
+            break;
+
+        case TOKEN_KEYWORD_WHILE:
+            expectToken(TOKEN_L_PAR, stack);
+            while_cond = createNode(SEQ, NULL, NULL, expr(stack));
+            if (if_cond->rightNode == NULL)
+            {
+                error_exit(SYN_ERR, "Syntax error! Condition expected after 'while'.");
+            }
+            expectToken(TOKEN_R_PAR, stack);
+            expectToken(TOKEN_L_BRACKET, stack);
+            while_body = stmt(stack);
+            expectToken(TOKEN_R_BRACKET, stack);
+            while_node = createNode(NODE_WHILE, NULL, while_cond, while_body);
+            root = createNode(SEQ, NULL, stmt(stack), while_node);
             break;
 
 

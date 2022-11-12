@@ -141,7 +141,8 @@ typedef enum{
     NODE_STRING,
     NODE_VAR_ID,
     NODE_IF,
-    NODE_ELSE
+    NODE_ELSE,
+    NODE_WHILE
 
 } Nodes;
 
