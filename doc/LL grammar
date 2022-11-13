@@ -1,50 +1,51 @@
-prolog -> TOKEN_PROLOG TOKEN_DECLARE TOKEN_L_PAR TOKEN_STRICT_TYPES TOKEN_ASSIGN TOKEN_INT TOKEN_R_PAR TOKEN_SEMICOLON program
+<prolog> -> TOKEN_PROLOG TOKEN_DECLARE TOKEN_L_PAR TOKEN_STRICT_TYPES TOKEN_ASSIGN TOKEN_INT TOKEN_R_PAR TOKEN_SEMICOLON <prog>
 
-program -> function_define stmt program
-program -> eps
+<prog> -> function_define stmt <prog>
+<prog> -> eps
 
-function_define -> TOKEN_KEYWORD_FUNCTION TOKEN_ID TOKEN_L_PAR params TOKEN_R_PAR TOKEN_COLON returntype TOKEN_L_BRACKET stmt TOKEN_R_BRACKET program
-function_define -> eps
+<func_def> -> TOKEN_KEYWORD_FUNCTION TOKEN_FUNC_ID TOKEN_L_PAR <params> TOKEN_R_PAR TOKEN_COLON <returntype> TOKEN_L_BRACKET <stmt> TOKEN_R_BRACKET <prog>
+<func_def> -> eps
 
-params -> type TOKEN_VAR_ID params2
-params -> eps
-params2 -> COMMA params
-params2 -> eps
+<params> -> <type> TOKEN_VAR_ID <params2>
+<params> -> eps
+<params2> -> COMMA <params>
+<params2> -> eps
 
-type -> TOKEN_KEYWORD_INT
-type -> TOKEN_KEYWORD_FLOAT
-type -> TOKEN_KEYWORD_STRING
+<type> -> TOKEN_KEYWORD_INT
+<type> -> TOKEN_KEYWORD_FLOAT
+<type> -> TOKEN_KEYWORD_STRING
 
 arg_comma -> TOKEN_COMMA term arg_comma
 arg_comma -> eps
 
-returntype -> type
-returntype -> TOKEN_KEYWORD_VOID
-returntype -> eps // not sure ci musi byt returntype
+<returntype> -> <type>
+<returntype> -> TOKEN_KEYWORD_VOID
+<returntype> -> eps
 
-term -> TOKEN_INT
-term -> TOKEN_FLOAT
-term -> TOKEN_STRING
-term -> TOKEN_VAR_ID
+<term> -> TOKEN_INT
+<term> -> TOKEN_FLOAT
+<term> -> TOKEN_STRING
+<term> -> TOKEN_VAR_ID
 
-stmt -> TOKEN_KEYWORD_IF TOKEN_L_PAR expr TOKEN_R_PAR TOKEN_L_BRACKET stmt TOKEN_R_BRACKET ELSE TOKEN_L_BRACKET stmt TOKEN_R_BRACKET stmt
-stmt -> TOKEN_KEYWORD_WHILE TOKEN_L_PAR expr TOKEN_R_PAR TOKEN_L_BRACKET stmt TOKEN_R_BRACKET stmt
-stmt -> TOKEN_VAR_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON stmt
-stmt -> TOKEN_KEYWORD_RETURN expr TOKEN_SEMICOLON
-stmt -> eps
+<stmt> -> TOKEN_KEYWORD_IF TOKEN_L_PAR <expr> TOKEN_R_PAR TOKEN_L_BRACKET <stmt> TOKEN_R_BRACKET ELSE TOKEN_L_BRACKET <stmt> TOKEN_R_BRACKET <stmt>
+<stmt> -> TOKEN_KEYWORD_WHILE TOKEN_L_PAR <expr> TOKEN_R_PAR TOKEN_L_BRACKET <stmt> TOKEN_R_BRACKET <stmt>
+<stmt> -> TOKEN_VAR_ID TOKEN_ASSIGN <expr> TOKEN_SEMICOLON <stmt>
+<stmt> -> TOKEN_FUNC_ID TOKEN_L_PAR <term> TOKEN_R_PAR TOKEN_SEMICOLON <stmt>
+<stmt> -> TOKEN_KEYWORD_RETURN <expr> TOKEN_SEMICOLON
+<stmt> -> eps
 
 str_arg -> TOKEN_STRING
 str_arg -> TOKEN_VAR_ID
 
-expr -> TOKEN_ID expr3 TOKEN_SEMICOLON
-expr -> term expr2
-expr -> TOKEN_L_PAR expr TOKEN_R_PAR
-expr -> TOKEN_READS TOKEN_L_PAR TOKEN_R_PAR // spytat sa
-expr -> TOKEN_READI TOKEN_L_PAR TOKEN_R_PAR
-expr -> TOKEN_READF TOKEN_L_PAR TOKEN_R_PAR
-expr -> TOKEN_WRITE TOKEN_L_PAR term arg_comma TOKEN_R_PAR
-expr -> TOKEN_STRLEN TOKEN_L_PAR str_arg TOKEN_R_PAR
-expr -> TOKEN_SUBSTRING TOKEN_L_PAR str_arg TOKEN_R_PAR
+<expr> -> TOKEN_ID <expr3> TOKEN_SEMICOLON
+<expr> -> term expr2
+<expr> -> TOKEN_L_PAR <expr> TOKEN_R_PAR
+<expr> -> TOKEN_READS TOKEN_L_PAR TOKEN_R_PAR
+<expr> -> TOKEN_READI TOKEN_L_PAR TOKEN_R_PAR
+<expr> -> TOKEN_READF TOKEN_L_PAR TOKEN_R_PAR
+<expr> -> TOKEN_WRITE TOKEN_L_PAR term arg_comma TOKEN_R_PAR
+<expr> -> TOKEN_STRLEN TOKEN_L_PAR str_arg TOKEN_R_PAR
+<expr> -> TOKEN_SUBSTRING TOKEN_L_PAR str_arg TOKEN_R_PAR
 
 expr2 -> TOKEN_PLUS expr
 expr2 -> TOKEN_MINUS expr
