@@ -374,6 +374,73 @@ ASTstruct *expr(Stack *stack)
             break;
 
         case TOKEN_WRITE:
+            break;
+
+        case TOKEN_STRLEN:
+            root = createNode(preced_table[token->type].node_type, NULL, NULL, NULL);
+            expectToken(TOKEN_L_PAR, stack);
+            token = loadToken(stack);
+            if (token->type == TOKEN_STRING || token->type == TOKEN_VAR_ID)
+            {
+                root->value = token->value.stringPtr;
+            }
+            else if(token->type == TOKEN_INT || token->type == TOKEN_FLOAT)
+            {
+                error_exit(SEM_ERR, "Semantic error! STRLEN must have string as parameter");
+            }
+            else
+            {
+                error_exit(SYN_ERR, "Syntax error! STRLEN must have string as parameter");
+            }
+            expectToken(TOKEN_L_PAR, stack);
+            break;
+
+        case TOKEN_SUBSTRING:
+            root = createNode(preced_table[token->type].node_type, NULL, NULL, NULL);
+            expectToken(TOKEN_L_PAR, stack);
+            token = loadToken(stack);
+            if (token->type == TOKEN_STRING || token->type == TOKEN_VAR_ID)
+            {
+                root->leftNode = createNode(SEQ, NULL, NULL, createNode(preced_table[token->type].node_type, token->value.stringPtr, NULL, NULL));
+            }
+            else if (token->type == TOKEN_INT || token->type == TOKEN_FLOAT)
+            {
+                error_exit(SEM_ERR, "Semantic error! SUBSTRING must have string as first parameter");
+            }
+            else
+            {
+                error_exit(SYN_ERR, "Syntax error! SUBSTRING must have string as first parameter")
+            }
+            expectToken(TOKEN_COMMA, stack);
+            token = loadToken(stack);
+            if (token->type == TOKEN_INT || token->type == TOKEN_VAR_ID)
+            {
+                root->leftNode->leftNode = createNode(SEQ, NULL, NULL, createNode(preced_table[token->type].node_type, token->value.stringPtr, NULL, NULL));
+            }
+            else if (token->type == TOKEN_STRING || token->type == TOKEN_FLOAT)
+            {
+                error_exit(SEM_ERR, "Semantic error! SUBSTRING must have int as second parameter");
+            }
+            else
+            {
+                error_exit(SYN_ERR, "Syntax error! SUBSTRING must have int as second parameter");
+            }
+            expectToken(TOKEN_COMMA, stack);
+            token = loadToken(stack);
+            if (token->type == TOKEN_INT || token->type == TOKEN_VAR_ID)
+            {
+                root->leftNode->leftNode = createNode(SEQ, NULL, NULL, createNode(preced_table[token->type].node_type, token->value.stringPtr, NULL, NULL));
+            }
+            else if (token->type == TOKEN_STRING || token->type == TOKEN_FLOAT)
+            {
+                error_exit(SEM_ERR, "Semantic error! SUBSTRING must have int as third parameter");
+            }
+            else
+            {
+                error_exit(SYN_ERR, "Syntax error! SUBSTRING must have int as third parameter");
+            }
+            expectToken(TOKEN_R_PAR, stack);
+            break;
 
         default:
             unloadToken(stack);
