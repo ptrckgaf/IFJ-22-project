@@ -31,6 +31,11 @@ char *displayNodes[] = {"SEQ",
                         "NODE_VAR_ASSIGNMENT"};
 
 
+precedence_table preced_table[] = {
+
+};
+
+
 // funkcia vykona syntakticku analyzu tokenov a vytvori AST
 
 int parser(Stack *stack)
@@ -328,6 +333,7 @@ ASTstruct *stmt(Stack *stack)
 ASTstruct *expr(Stack *stack)
 {
     ASTstruct *root = NULL;
+    bool is_loaded = false;
     token = loadToken(stack);
     if (token == NULL)
         return NULL;
@@ -335,14 +341,67 @@ ASTstruct *expr(Stack *stack)
     switch(token->type)
     {
         case TOKEN_ID:
-            root = createNode(SEQ, NULL, expr3(stack), NULL);
+            root = createNode(SEQ, NULL, expr3(stack), NULL); //probably wrong
+            expectToken(TOKEN_SEMICOLON, stack);
+            break;
+
+        case TOKEN_VAR_ID:
+            root = createNode(NODE_VAR_ID, token->value.stringPtr, NULL, NULL);
+            unloadToken(stack);
+            break;
+
+        case TOKEN_L_PAR:
+            root = expr(stack);
             expectToken(TOKEN_R_PAR, stack);
-            return root;
+            token = loadToken(stack);
+            is_loaded = true;
+            break;
+
+        case TOKEN_INT:
+        case TOKEN_FLOAT:
+        case TOKEN_STRING:
+            root = createNode(preced_table[token->type].node_type, token->value); // TO FIX
+            token = loadToken(stack);
+            is_loaded = true;
+            break;
+
+        // TODO builtin functions
 
         default:
             unloadToken(stack);
             return NULL;
     }
+
+    return root;
+}
+
+ASTstruct *expr2(Stack *stack)
+{
+    ASTstruct *root = NULL;
+    token = loadToken(stack);
+    if (token == NULL)
+        return NULL;
+
+
+    switch(token->type)
+    {
+        case TOKEN_PLUS:
+        case TOKEN_MINUS:
+        case TOKEN_MUL:
+        case TOKEN_DIV:
+        case TOKEN_GREATER:
+        case TOKEN_GREATER_EQ:
+        case TOKEN_LESS:
+        case TOKEN_LESS_EQ:
+        case TOKEN_COMPARE:
+        case TOKEN_NEG_COMPARE:
+            root = expr(stack);
+            break;
+
+        default:
+            unloadToken(stack);
+    }
+    return root;
 }
 
 
@@ -368,15 +427,18 @@ ASTstruct *expr3(Stack *stack)
     // viac argumentov
     if (token->type == TOKEN_COMMA)
     {
-        return createNode(SEQ, NULL, expr3(stack), root);
+        root = createNode(SEQ, NULL, expr3(stack), root);
+        expectToken(TOKEN_R_PAR, stack);
     }
     // jeden argument
     else
     {
         unloadToken(stack);
-        return createNode(SEQ, NULL, NULL, root);
+        root = createNode(SEQ, NULL, NULL, root);
+        expectToken(TOKEN_R_PAR, stack);
     }
 
+    return root;
 }
 
 

@@ -147,6 +147,14 @@ typedef enum{
 
 } Nodes;
 
+typedef struct
+{
+    int token_type;
+    int preced_value;
+    int node_type;
+} precedence_table;
+extern precedence_table preced_table[];
+
 /**
  * Dynamic string initialization
  * @param string
