@@ -360,12 +360,20 @@ ASTstruct *expr(Stack *stack)
         case TOKEN_INT:
         case TOKEN_FLOAT:
         case TOKEN_STRING:
-            root = createNode(preced_table[token->type].node_type, token->value); // TO FIX
+            root = createNode(preced_table[token->type].node_type, token->value.stringPtr, NULL, NULL);
             token = loadToken(stack);
             is_loaded = true;
             break;
 
-        // TODO builtin functions
+        case TOKEN_READS:
+        case TOKEN_READI:
+        case TOKEN_READF:
+            root = createNode(preced_table[token->type].node_type, token->value.stringPtr, NULL, NULL);
+            expectToken(TOKEN_L_PAR, stack);
+            expectToken(TOKEN_R_PAR, stack);
+            break;
+
+        case TOKEN_WRITE:
 
         default:
             unloadToken(stack);
