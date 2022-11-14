@@ -85,6 +85,7 @@ typedef enum{
     TOKEN_END,
 }TokenType;
 
+
 /*
  * token metadata, helps to store token value
  */
