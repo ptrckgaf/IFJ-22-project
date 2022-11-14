@@ -36,6 +36,7 @@ precedence_table preced_table[] = {
         {TOKEN_INT, -1, NODE_INT},
         {TOKEN_FLOAT, -1, NODE_FLOAT},
         {TOKEN_STRING, -1, NODE_STRING},
+        {TOKEN_SEMICOLON, -1, -1},
 
 };
 
@@ -272,13 +273,13 @@ ASTstruct *stmt(Stack *stack)
     switch(token->type)
     {
         case TOKEN_KEYWORD_RETURN:
-            root = createNode(SEQ, NULL, NULL, createNode(NODE_RETURN, NULL, expr(stack), NULL));
+            root = createNode(SEQ, NULL, NULL, createNode(NODE_RETURN, NULL, expr(stack,0), NULL));
             expectToken(TOKEN_SEMICOLON, stack);
             break;
 
         case TOKEN_KEYWORD_IF:
             expectToken(TOKEN_L_PAR, stack);
-            if_cond = createNode(SEQ, NULL, NULL, expr(stack));
+            if_cond = createNode(SEQ, NULL, NULL, expr(stack,0));
             if (if_cond->rightNode == NULL)
             {
                 error_exit(SYN_ERR, "Syntax error! Condition expected after 'if'.");
@@ -298,7 +299,7 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_KEYWORD_WHILE:
             expectToken(TOKEN_L_PAR, stack);
-            while_cond = createNode(SEQ, NULL, NULL, expr(stack));
+            while_cond = createNode(SEQ, NULL, NULL, expr(stack,0));
             if (if_cond->rightNode == NULL)
             {
                 error_exit(SYN_ERR, "Syntax error! Condition expected after 'while'.");
@@ -314,7 +315,7 @@ ASTstruct *stmt(Stack *stack)
         case TOKEN_VAR_ID:
             expectToken(TOKEN_ASSIGN, stack);
             identif_node = createNode(NODE_VAR_ID, token->value.stringPtr, NULL, NULL);
-            node_var_assignment = createNode(NODE_VAR_ASSIGNMENT, NULL, identif_node, expr(stack));
+            node_var_assignment = createNode(NODE_VAR_ASSIGNMENT, NULL, identif_node, expr(stack,0));
             if (node_var_assignment->rightNode == NULL)
             {
                 error_exit(SYN_ERR, "Syntax error! 'R-value' expected in variable assignment.");
@@ -334,17 +335,53 @@ ASTstruct *stmt(Stack *stack)
 }
 
 
-ASTstruct *expr(Stack *stack)
+ASTstruct *expr(Stack *stack, int preced)
+{
+    ASTstruct *root = NULL;
+    ASTstruct *help = NULL;
+    bool is_loaded = false;
+
+
+    token = loadToken(stack);
+    if (token == NULL) return NULL;
+
+    switch (token->type)
+    {
+        case TOKEN_INT:
+        case TOKEN_FLOAT:
+        case TOKEN_STRING:
+            root = createNode(NODE_INT, NULL, NULL, NULL);
+            //token = loadToken(stack);
+            //is_loaded = true;
+            break;
+
+        default:
+            unloadToken(stack);
+    }
+
+
+    // kontrola precedencie
+    /*while (token && preced_table[token->type].preced_value >= preced)
+    {
+        int op = token->type;
+        help = expr(stack, preced_table[op].preced_value + 1);
+        root = createNode(preced_table[op].node_type, NULL, root, help);
+        is_loaded = false;
+    }
+    if (is_loaded)
+    {
+        unloadToken(stack);
+    }*/
+
+    return root;
+}
+
+ASTstruct *expr2(Stack *stack, int preced)
 {
     return NULL;
 }
 
-ASTstruct *expr2(Stack *stack)
-{
-    return NULL;
-}
-
-ASTstruct *expr3(Stack *stack)
+ASTstruct *expr3(Stack *stack, int preced)
 {
     return NULL;
 }
