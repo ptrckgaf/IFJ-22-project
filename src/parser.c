@@ -32,6 +32,10 @@ char *displayNodes[] = {"SEQ",
 
 
 precedence_table preced_table[] = {
+        {TOKEN_VAR_ID, -1, NODE_VAR_ID},
+        {TOKEN_INT, -1, NODE_INT},
+        {TOKEN_FLOAT, -1, NODE_FLOAT},
+        {TOKEN_STRING, -1, NODE_STRING},
 
 };
 
@@ -169,7 +173,7 @@ ASTstruct *params(Stack *stack)
             token = loadToken(stack);
             if (token->type == TOKEN_VAR_ID)
             {
-                param = createNode(NODE_PARAM_ID_INT, NULL, NULL, NULL); // TO FIX
+                param = createNode(NODE_PARAM_ID_INT, token->value.stringPtr, NULL, NULL);
                 break;
             }
             error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
@@ -179,7 +183,7 @@ ASTstruct *params(Stack *stack)
             token = loadToken(stack);
             if (token->type == TOKEN_VAR_ID)
             {
-                param = createNode(NODE_PARAM_ID_FLOAT, NULL, NULL, NULL); // TO FIX
+                param = createNode(NODE_PARAM_ID_FLOAT, token->value.stringPtr, NULL, NULL);
                 break;
             }
             error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
@@ -189,7 +193,7 @@ ASTstruct *params(Stack *stack)
             token = loadToken(stack);
             if (token->type == TOKEN_VAR_ID)
             {
-                param = createNode(NODE_PARAM_ID_STRING, NULL, NULL, NULL); // TO FIX
+                param = createNode(NODE_PARAM_ID_STRING, token->value.stringPtr, NULL, NULL);
                 break;
             }
             error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
@@ -311,7 +315,7 @@ ASTstruct *stmt(Stack *stack)
             expectToken(TOKEN_ASSIGN, stack);
             identif_node = createNode(NODE_VAR_ID, token->value.stringPtr, NULL, NULL);
             node_var_assignment = createNode(NODE_VAR_ASSIGNMENT, NULL, identif_node, expr(stack));
-            if (root->rightNode == NULL)
+            if (node_var_assignment->rightNode == NULL)
             {
                 error_exit(SYN_ERR, "Syntax error! 'R-value' expected in variable assignment.");
             }
@@ -342,7 +346,6 @@ ASTstruct *expr(Stack *stack)
     {
         case TOKEN_ID:
             root = createNode(SEQ, NULL, expr3(stack), NULL); //probably wrong
-            expectToken(TOKEN_SEMICOLON, stack);
             break;
 
         case TOKEN_VAR_ID:
@@ -495,8 +498,6 @@ ASTstruct *expr3(Stack *stack)
     {
         error_exit(SYN_ERR, "Syntax error! '(' expected.");
     }
-
-    
 
     token = loadToken(stack);
     // viac argumentov
