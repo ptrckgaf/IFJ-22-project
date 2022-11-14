@@ -112,6 +112,54 @@ Token * TokenInit(TokenType tokenType, DynamicString *string){
     return tokenPtr;
 }
 
+char *displayTokenType[] = {
+        "TOKEN_ID",
+        "TOKEN_FUN_ID",
+        "TOKEN_VAR_ID",
+        "TOKEN_TYPE_ID",
+
+        "TOKEN_KEYWORD_ELSE",
+        "TOKEN_KEYWORD_FLOAT",
+        "TOKEN_KEYWORD_FUNCTION",
+        "TOKEN_KEYWORD_IF",
+        "TOKEN_KEYWORD_INT",
+        "TOKEN_KEYWORD_NULL",
+        "TOKEN_KEYWORD_RETURN",
+        "TOKEN_KEYWORD_STRING",
+        "TOKEN_KEYWORD_VOID",
+        "TOKEN_KEYWORD_WHILE",
+
+        "TOKEN_DECLARE",
+        "TOKEN_STRICT_TYPES",
+
+        "TOKEN_L_PAR",
+        "TOKEN_R_PAR",
+        "TOKEN_L_BRACKET",
+        "TOKEN_R_BRACKET",
+        "TOKEN_COMMA",
+        "TOKEN_SEMICOLON",
+        "TOKEN_COLON",
+
+        "TOKEN_MUL",
+        "TOKEN_DIV",
+        "TOKEN_PLUS",
+        "TOKEN_MINUS",
+        "TOKEN_GREATER",
+        "TOKEN_GREATER_EQ",
+        "TOKEN_LESS",
+        "TOKEN_LESS_EQ",
+        "TOKEN_ASSIGN",
+        "TOKEN_COMPARE",
+        "TOKEN_NEG_COMPARE",
+
+        "TOKEN_INT",
+        "TOKEN_DOUBLE",
+        "TOKEN_STRING",
+
+        "TOKEN_PROLOG",
+        "TOKEN_END",
+};
+
 
 //todo fix
 Token *TokenCopy(Token *src){
@@ -127,19 +175,19 @@ void TokenPrint(Token *token){
     if (token){
         switch (token->valueType) {
             case VALUE_STRING:
-                printf("{%s, %d}\n", token->value.stringPtr->value, token->type);
+                printf("{%s, %s}\n", token->value.stringPtr->value, displayTokenType[token->type]);
                 break;
 
             case VALUE_INT:
-                printf("{%d, %d}\n", token->value.integer, token->type);
+                printf("{%d, %s}\n", token->value.integer, displayTokenType[token->type]);
                 break;
 
             case VALUE_DOUBLE:
-                printf("{%f, %d}\n", token->value.decimal, token->type);
+                printf("{%f, %s}\n", token->value.decimal, displayTokenType[token->type]);
                 break;
 
             case VALUE_NULL:
-                printf("{NULL, %d}\n", token->type);
+                printf("{NULL, %s}\n", displayTokenType[token->type]);
                 break;
         }
     }
