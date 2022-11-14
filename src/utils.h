@@ -333,6 +333,7 @@ ASTstruct *rt(Stack *stack);
 ASTstruct *params(Stack *stack);
 ASTstruct *stmt(Stack *stack);
 ASTstruct *expr(Stack *stack);
+ASTstruct *expr2(Stack *stack);
 ASTstruct *expr3(Stack *stack);
 ASTstruct *term(Stack *stack);
 ASTstruct *function_define(Stack *stack);
