@@ -71,7 +71,6 @@ typedef enum{
 
     TOKEN_INT,
     TOKEN_FLOAT,
-    TOKEN_DOUBLE,
     TOKEN_STRING,
 
     TOKEN_READS,

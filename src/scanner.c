@@ -235,7 +235,7 @@ TokenType getToken(AutomatonState state){
         case NEG_COMPARE2:      return TOKEN_NEG_COMPARE;
         case NUMBER:            return TOKEN_INT;
         case NUMBER_EXPONENTIAL:
-        case NUMBER_DECIMAL:    return TOKEN_DOUBLE;
+        case NUMBER_DECIMAL:    return TOKEN_FLOAT;
         case STRING_END:        return TOKEN_STRING;
         case PROLOG_3:          return TOKEN_PROLOG;
         case END:               return TOKEN_END;

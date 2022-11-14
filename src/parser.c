@@ -363,7 +363,7 @@ ASTstruct *term(Stack *stack)
             return createNode(NODE_INT, NULL, NULL, NULL);
             break;
 
-        case TOKEN_DOUBLE:
+        case TOKEN_FLOAT:
             return createNode(NODE_FLOAT, NULL, NULL, NULL);
             break;
 

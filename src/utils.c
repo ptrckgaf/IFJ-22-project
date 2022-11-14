@@ -69,7 +69,7 @@ TokenValueType getValueType(TokenType tokenType){
             return VALUE_STRING;
         case TOKEN_INT:
             return VALUE_INT;
-        case TOKEN_DOUBLE:
+        case TOKEN_FLOAT:
             return VALUE_DOUBLE;
         default:
             return VALUE_NULL;
@@ -153,8 +153,15 @@ char *displayTokenType[] = {
         "TOKEN_NEG_COMPARE",
 
         "TOKEN_INT",
-        "TOKEN_DOUBLE",
+        "TOKEN_FLOAT",
         "TOKEN_STRING",
+
+        "TOKEN_READS",
+        "TOKEN_READI",
+        "TOKEN_READF",
+        "TOKEN_WRITE",
+        "TOKEN_STRLEN",
+        "TOKEN_SUBSTRING",
 
         "TOKEN_PROLOG",
         "TOKEN_END",
