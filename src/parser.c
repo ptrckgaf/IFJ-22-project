@@ -28,7 +28,11 @@ char *displayNodes[] = {"SEQ",
                         "IF",
                         "ELSE",
                         "WHILE",
-                        "VAR_ASSIGNMENT"};
+                        "VAR_ASSIGNMENT",
+                        "PLUS",
+                        "MINUS",
+                        "MUL",
+                        "DIV"};
 
 
 precedence_table preced_table[] = {
@@ -78,6 +82,12 @@ precedence_table preced_table[] = {
         {TOKEN_END, -1,-1}
 
 };
+
+// TODO literaly mozu byt typu NULL
+// TODO term moze byt int, float, string, var_id alebo null
+// TODO operator konkatenacie
+// TODO pred <?php a za ?> sa nemozu nachadzat white spaces
+// TODO volanie funkcie -> zoznam parametrov je zoznam termov oddelenych ciarkami, moze byt aj prazdny
 
 
 // funkcia vykona syntakticku analyzu tokenov a vytvori AST
@@ -244,6 +254,7 @@ ASTstruct *params(Stack *stack)
             return NULL;
     }
 
+    // zoznam parametrov funkcii pri definici funkcii oddelenych ciarkov (moze byt aj prazdny)
     token = loadToken(stack);
     // viac parametrov
     if (token->type == TOKEN_COMMA)
@@ -257,7 +268,6 @@ ASTstruct *params(Stack *stack)
         return createNode(SEQ, NULL, NULL, param);
     }
 }
-
 
 
 ASTstruct *rt(Stack *stack)
@@ -378,6 +388,7 @@ ASTstruct *expr(Stack *stack, int preced)
 {
     ASTstruct *root = NULL;
     ASTstruct *help = NULL;
+    DynamicString *value = NULL;
     bool is_loaded = false;
 
 
@@ -398,13 +409,29 @@ ASTstruct *expr(Stack *stack, int preced)
         case TOKEN_PLUS:
         case TOKEN_MUL:
         case TOKEN_DIV:
+        case TOKEN_LESS:
+        case TOKEN_LESS_EQ:
+        case TOKEN_GREATER:
+        case TOKEN_GREATER_EQ:
+        case TOKEN_COMPARE:
+        case TOKEN_NEG_COMPARE:
             root = expr(stack, preced);
             break;
+
+        case TOKEN_VAR_ID:
+            value = token->value.stringPtr;
+            root = createNode(NODE_VAR_ID, value, NULL, NULL);
+            unloadToken(stack);
+            break;
+
+        // TODO BUILTIN FUNCTIONS
 
         default:
             unloadToken(stack);
     }
 
+
+    // TODO kontrola dvoch po sebe iducich operatorov
 
     // kontrola precedencie
     while (token && preced_table[token->type].preced_value >= preced)
@@ -420,11 +447,6 @@ ASTstruct *expr(Stack *stack, int preced)
     }
 
     return root;
-}
-
-ASTstruct *expr2(Stack *stack, int preced)
-{
-    return NULL;
 }
 
 ASTstruct *expr3(Stack *stack, int preced)
@@ -463,8 +485,6 @@ ASTstruct *term(Stack *stack)
     }
 
 }
-
-
 
 /**** PRINT AST ******/
 
