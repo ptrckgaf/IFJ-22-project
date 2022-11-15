@@ -373,6 +373,28 @@ ASTstruct *stmt(Stack *stack)
             root = createNode(SEQ, NULL, stmt(stack), node_var_assignment);
             break;
 
+        case TOKEN_ID:
+            expectToken(TOKEN_L_PAR, stack);
+
+            break;
+
+        case TOKEN_READS:
+            break;
+
+        case TOKEN_READI:
+            break;
+
+        case TOKEN_READF:
+            break;
+
+        case TOKEN_WRITE:
+            break;
+
+        case TOKEN_STRLEN:
+            break;
+
+        case TOKEN_STRLEN:
+            break;
 
         default:
             unloadToken(stack);
@@ -383,6 +405,10 @@ ASTstruct *stmt(Stack *stack)
     return root;
 }
 
+ASTstruct *arg_comma(Stack *stack)
+{
+
+}
 
 ASTstruct *expr(Stack *stack, int preced)
 {

@@ -349,6 +349,7 @@ void unloadToken(Stack *stack);
 ASTstruct *rt(Stack *stack);
 ASTstruct *params(Stack *stack);
 ASTstruct *stmt(Stack *stack);
+ASTstruct *arg_comma(Stack *stack);
 ASTstruct *expr(Stack *stack, int preced);
 ASTstruct *expr2(Stack *stack, int preced);
 ASTstruct *expr3(Stack *stack, int preced);
