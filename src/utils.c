@@ -63,7 +63,6 @@ TokenValueType getValueType(TokenType tokenType){
     switch (tokenType) {
         case TOKEN_TYPE_ID:
         case TOKEN_VAR_ID:
-        case TOKEN_FUN_ID:
         case TOKEN_ID:
         case TOKEN_STRING:
             return VALUE_STRING;
@@ -114,7 +113,6 @@ Token * TokenInit(TokenType tokenType, DynamicString *string){
 
 char *displayTokenType[] = {
         "TOKEN_ID",
-        "TOKEN_FUN_ID",
         "TOKEN_VAR_ID",
         "TOKEN_TYPE_ID",
 

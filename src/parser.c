@@ -10,33 +10,72 @@ Token *token;
 ASTstruct *ast;
 
 char *displayNodes[] = {"SEQ",
-                        "NODE_PROLOG",
-                        "NODE_FUNC_DEF",
-                        "NODE_PARAMS_RETURNTYPE",
+                        "PROLOG",
+                        "FUNC_DEF",
+                        "PARAMS_RETURNTYPE",
                         "RETURN_TYPE_INT",
                         "RETURN_TYPE_FLOAT",
                         "RETURN_TYPE_STRING",
                         "RETURN_TYPE_VOID",
-                        "NODE_PARAM_ID_INT",
-                        "NODE_PARAM_ID_FLOAT",
-                        "NODE_PARAM_ID_STRING",
-                        "NODE_RETURN",
-                        "NODE_INT",
-                        "NODE_FLOAT",
-                        "NODE_STRING",
-                        "NODE_VAR_ID",
-                        "NODE_IF",
-                        "NODE_ELSE",
-                        "NODE_WHILE",
-                        "NODE_VAR_ASSIGNMENT"};
+                        "PARAM_ID_INT",
+                        "PARAM_ID_FLOAT",
+                        "PARAM_ID_STRING",
+                        "RETURN",
+                        "INT",
+                        "FLOAT",
+                        "STRING",
+                        "VAR_ID",
+                        "IF",
+                        "ELSE",
+                        "WHILE",
+                        "VAR_ASSIGNMENT"};
 
 
 precedence_table preced_table[] = {
+        {TOKEN_ID, -1, NODE_FUNC_ID},
         {TOKEN_VAR_ID, -1, NODE_VAR_ID},
-        {TOKEN_INT, -1, NODE_INT},
+        {TOKEN_TYPE_ID, -1, -1},
+        {TOKEN_KEYWORD_ELSE, -1, NODE_ELSE},
+        {TOKEN_KEYWORD_FLOAT, -1, RETURN_TYPE_FLOAT},
+        {TOKEN_KEYWORD_FUNCTION, -1, NODE_FUNC_DEF},
+        {TOKEN_KEYWORD_IF, -1, NODE_IF},
+        {TOKEN_KEYWORD_INT, -1, RETURN_TYPE_INT},
+        {TOKEN_KEYWORD_NULL, -1, -1},
+        {TOKEN_KEYWORD_RETURN, -1, NODE_RETURN},
+        {TOKEN_KEYWORD_STRING, -1, RETURN_TYPE_STRING},
+        {TOKEN_KEYWORD_VOID, -1, RETURN_TYPE_VOID},
+        {TOKEN_KEYWORD_WHILE, -1,NODE_WHILE},
+        {TOKEN_DECLARE, -1,-1},
+        {TOKEN_STRICT_TYPES, -1,-1},
+        {TOKEN_L_PAR, -1,-1},
+        {TOKEN_R_PAR, -1,-1},
+        {TOKEN_L_BRACKET, -1,-1},
+        {TOKEN_R_BRACKET, -1,-1},
+        {TOKEN_COMMA, -1,-1},
+        {TOKEN_SEMICOLON, -1,-1},
+        {TOKEN_COLON, -1,-1},
+        {TOKEN_MUL, 13,NODE_MUL},
+        {TOKEN_DIV,13 ,NODE_DIV},
+        {TOKEN_PLUS, 12,NODE_PLUS},
+        {TOKEN_MINUS, 12,NODE_MINUS},
+        {TOKEN_GREATER, 10,NODE_GREATER},
+        {TOKEN_GREATER_EQ, 10,NODE_GREATER_EQ},
+        {TOKEN_LESS, 10,NODE_LESS},
+        {TOKEN_LESS_EQ, 10,NODE_LESS_EQ},
+        {TOKEN_ASSIGN, -1,NODE_VAR_ASSIGNMENT},
+        {TOKEN_COMPARE, 9,NODE_COMPARE},
+        {TOKEN_NEG_COMPARE, 9,NODE_NEG_COMPARE},
+        {TOKEN_INT, -1,NODE_INT},
         {TOKEN_FLOAT, -1, NODE_FLOAT},
-        {TOKEN_STRING, -1, NODE_STRING},
-        {TOKEN_SEMICOLON, -1, -1},
+        {TOKEN_STRING, -1,NODE_STRING},
+        {TOKEN_READS, -1,NODE_READS},
+        {TOKEN_READI, -1,NODE_READI},
+        {TOKEN_READF, -1,NODE_READF},
+        {TOKEN_WRITE, -1,NODE_WRITE},
+        {TOKEN_STRLEN, -1,NODE_STRLEN},
+        {TOKEN_SUBSTRING, -1,NODE_SUBSTRING},
+        {TOKEN_PROLOG, -1,-1},
+        {TOKEN_END, -1,-1}
 
 };
 
@@ -315,7 +354,7 @@ ASTstruct *stmt(Stack *stack)
         case TOKEN_VAR_ID:
             expectToken(TOKEN_ASSIGN, stack);
             identif_node = createNode(NODE_VAR_ID, token->value.stringPtr, NULL, NULL);
-            node_var_assignment = createNode(NODE_VAR_ASSIGNMENT, NULL, identif_node, expr(stack,0));
+            node_var_assignment = createNode(NODE_VAR_ASSIGNMENT, NULL, identif_node, expr(stack,1));
             if (node_var_assignment->rightNode == NULL)
             {
                 error_exit(SYN_ERR, "Syntax error! 'R-value' expected in variable assignment.");
@@ -350,9 +389,16 @@ ASTstruct *expr(Stack *stack, int preced)
         case TOKEN_INT:
         case TOKEN_FLOAT:
         case TOKEN_STRING:
-            root = createNode(NODE_INT, NULL, NULL, NULL);
-            //token = loadToken(stack);
-            //is_loaded = true;
+            root = createNode(preced_table[token->type].node_type, NULL, NULL, NULL);
+            token = loadToken(stack);
+            is_loaded = true;
+            break;
+
+        case TOKEN_MINUS:
+        case TOKEN_PLUS:
+        case TOKEN_MUL:
+        case TOKEN_DIV:
+            root = expr(stack, preced);
             break;
 
         default:
@@ -361,7 +407,7 @@ ASTstruct *expr(Stack *stack, int preced)
 
 
     // kontrola precedencie
-    /*while (token && preced_table[token->type].preced_value >= preced)
+    while (token && preced_table[token->type].preced_value >= preced)
     {
         int op = token->type;
         help = expr(stack, preced_table[op].preced_value + 1);
@@ -371,7 +417,7 @@ ASTstruct *expr(Stack *stack, int preced)
     if (is_loaded)
     {
         unloadToken(stack);
-    }*/
+    }
 
     return root;
 }

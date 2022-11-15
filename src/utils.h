@@ -31,7 +31,6 @@ extern int ERROR_CODE;
  */
 typedef enum{
     TOKEN_ID,
-    TOKEN_FUN_ID,
     TOKEN_VAR_ID,
     TOKEN_TYPE_ID,
 
@@ -151,7 +150,25 @@ typedef enum{
     NODE_IF,
     NODE_ELSE,
     NODE_WHILE,
-    NODE_VAR_ASSIGNMENT
+    NODE_VAR_ASSIGNMENT,
+    NODE_PLUS,
+    NODE_MINUS,
+    NODE_MUL,
+    NODE_DIV,
+    NODE_GREATER,
+    NODE_LESS,
+    NODE_GREATER_EQ,
+    NODE_LESS_EQ,
+    NODE_COMPARE,
+    NODE_NEG_COMPARE,
+    NODE_READS,
+    NODE_READI,
+    NODE_READF,
+    NODE_WRITE,
+    NODE_STRLEN,
+    NODE_SUBSTRING,
+    NODE_END,
+    NODE_FUNC_ID
 
 } Nodes;
 
