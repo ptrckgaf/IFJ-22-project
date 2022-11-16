@@ -405,9 +405,41 @@ ASTstruct *stmt(Stack *stack)
     return root;
 }
 
-ASTstruct *arg_comma(Stack *stack)
+ASTstruct *func_args(Stack *stack)
 {
+    ASTstruct *root = NULL;
+    token = loadToken(stack);
+    while(token->type == TOKEN_VAR_ID || token->type == TOKEN_INT || token->type == TOKEN_FLOAT || token->type == TOKEN_STRING)
+    {
+        switch(token->type)
+        {
+            case TOKEN_VAR_ID:
+                root = createNode(SEQ, NULL, root, createNode(NODE_VAR_ID, token->value.stringPtr, NULL, NULL));
+                break;
 
+            case TOKEN_INT:
+                root = createNode(SEQ, NULL, root, createNode(NODE_INT, token->value.stringPtr, NULL, NULL));
+                break;
+
+            case TOKEN_FLOAT:
+                root = createNode(SEQ, NULL, root, createNode(NODE_FLOAT, token->value.stringPtr, NULL, NULL));
+                break;
+
+            case TOKEN_STRING:
+                root = createNode(SEQ, NULL, root, createNode(NODE_STRING, token->value.stringPtr, NULL, NULL));
+                break;
+
+            default:
+                break;
+        }
+        token = loadToken(stack);
+        if (token->type == TOKEN_COMMA)
+        {
+            token = loadToken(stack);
+        }
+    }
+    unloadToken(stack);
+    return root;
 }
 
 ASTstruct *expr(Stack *stack, int preced)
