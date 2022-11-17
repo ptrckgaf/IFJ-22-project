@@ -223,7 +223,7 @@ ASTstruct *params(Stack *stack)
             token = loadToken(stack);
             if (token->type == TOKEN_VAR_ID)
             {
-                param = createNode(NODE_PARAM_ID_INT, token->value.stringPtr, NULL, NULL);
+                param = createNode(NODE_PARAM_ID_INT, token, NULL, NULL);
                 break;
             }
             error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
@@ -233,7 +233,7 @@ ASTstruct *params(Stack *stack)
             token = loadToken(stack);
             if (token->type == TOKEN_VAR_ID)
             {
-                param = createNode(NODE_PARAM_ID_FLOAT, token->value.stringPtr, NULL, NULL);
+                param = createNode(NODE_PARAM_ID_FLOAT, token, NULL, NULL);
                 break;
             }
             error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
@@ -243,7 +243,7 @@ ASTstruct *params(Stack *stack)
             token = loadToken(stack);
             if (token->type == TOKEN_VAR_ID)
             {
-                param = createNode(NODE_PARAM_ID_STRING, token->value.stringPtr, NULL, NULL);
+                param = createNode(NODE_PARAM_ID_STRING, token, NULL, NULL);
                 break;
             }
             error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
@@ -364,7 +364,7 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_VAR_ID:
             expectToken(TOKEN_ASSIGN, stack);
-            identif_node = createNode(NODE_VAR_ID, token->value.stringPtr, NULL, NULL);
+            identif_node = createNode(NODE_VAR_ID, token, NULL, NULL);
             node_var_assignment = createNode(NODE_VAR_ASSIGNMENT, NULL, identif_node, expr(stack,0));
             if (node_var_assignment->rightNode == NULL)
             {
@@ -376,7 +376,7 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_ID:
             expectToken(TOKEN_L_PAR, stack);
-            func = createNode(NODE_FUNC_ID, token->value.stringPtr, func_args(stack), NULL);
+            func = createNode(NODE_FUNC_ID, token, func_args(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
             root = createNode(SEQ, NULL, stmt(stack), func);
@@ -418,19 +418,19 @@ ASTstruct *func_args(Stack *stack)
         switch(token->type)
         {
             case TOKEN_VAR_ID:
-                root = createNode(SEQ, NULL, root, createNode(NODE_VAR_ID, token->value.stringPtr, NULL, NULL));
+                root = createNode(SEQ, NULL, root, createNode(NODE_VAR_ID, token, NULL, NULL));
                 break;
 
             case TOKEN_INT:
-                root = createNode(SEQ, NULL, root, createNode(NODE_INT, token->value.stringPtr, NULL, NULL));
+                root = createNode(SEQ, NULL, root, createNode(NODE_INT, token, NULL, NULL));
                 break;
 
             case TOKEN_FLOAT:
-                root = createNode(SEQ, NULL, root, createNode(NODE_FLOAT, token->value.stringPtr, NULL, NULL));
+                root = createNode(SEQ, NULL, root, createNode(NODE_FLOAT, token, NULL, NULL));
                 break;
 
             case TOKEN_STRING:
-                root = createNode(SEQ, NULL, root, createNode(NODE_STRING, token->value.stringPtr, NULL, NULL));
+                root = createNode(SEQ, NULL, root, createNode(NODE_STRING, token, NULL, NULL));
                 break;
 
             default:
@@ -450,7 +450,7 @@ ASTstruct *expr(Stack *stack, int preced)
 {
     ASTstruct *root = NULL;
     ASTstruct *help = NULL;
-    DynamicString *value = NULL;
+    Token *value = NULL;
     bool is_loaded = false;
 
 
@@ -481,7 +481,7 @@ ASTstruct *expr(Stack *stack, int preced)
             break;
 
         case TOKEN_VAR_ID:
-            value = token->value.stringPtr;
+            value = token;
             root = createNode(NODE_VAR_ID, value, NULL, NULL);
             unloadToken(stack);
             break;
@@ -582,8 +582,21 @@ void Print_tree2(ASTstruct* TempTree, char* sufix, char fromdir) {
       suf2 = strcat(suf2, "   ");
     
     Print_tree2(TempTree->rightNode, suf2, 'R');
-    if (TempTree->value)
-      printf("%s  +-[ (%d) %s \"%s\" ]\n", sufix, TempTree->type,  displayNodes[TempTree->type], (char*)TempTree->value);
+    if (TempTree->value){
+        switch (TempTree->value->valueType) {
+            case VALUE_STRING:
+                printf("%s  +-[ (%d) %s \"%s\" ]\n", sufix, TempTree->type,  displayNodes[TempTree->type], (char*)TempTree->value->data.stringPtr->value);
+                break;
+            case VALUE_INT:
+                printf("%s  +-[ (%d) %s \"%d\" ]\n", sufix, TempTree->type,  displayNodes[TempTree->type], TempTree->value->data.integer);
+                break;
+            case VALUE_DOUBLE:
+                printf("%s  +-[ (%d) %s \"%f\" ]\n", sufix, TempTree->type,  displayNodes[TempTree->type], TempTree->value->data.decimal);
+                break;
+            case VALUE_NULL:
+                break;
+        }
+    }
     else
       printf("%s  +-[ (%d) %s ]\n", sufix, TempTree->type,  displayNodes[TempTree->type]);
     

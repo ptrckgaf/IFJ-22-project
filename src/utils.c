@@ -111,6 +111,35 @@ Token * TokenInit(TokenType tokenType, DynamicString *string){
     return tokenPtr;
 }
 
+Value *ValueInit(){
+    Value *val = malloc(sizeof(Value));
+    if (val == NULL){
+        error_exit(INT_ERR, "Malloc error")
+    }
+    val->valueType = VALUE_NULL;
+    val->data.stringPtr = NULL;
+    return val;
+}
+
+Value *TokenToValue(Token *token){
+    Value *value = ValueInit();
+    switch (token->valueType) {
+        case VALUE_STRING:
+            value->data.stringPtr = DynamicStringInit();
+            DynamicStringCopy(token->value.stringPtr, value->data.stringPtr);
+            break;
+        case VALUE_NULL:
+        case VALUE_INT:
+            value->data.integer = token->value.integer;
+            break;
+        case VALUE_DOUBLE:
+            value->data.decimal = token->value.decimal;
+            break;
+    }
+    value->valueType = token->valueType;
+    return value;
+}
+
 char *displayTokenType[] = {
         "TOKEN_ID",
         "TOKEN_VAR_ID",
@@ -267,7 +296,7 @@ void StackFlip(Stack *stack){
     }
 }
 
-ASTstruct *createNode(int type, DynamicString *value, ASTstruct *leftNode, ASTstruct *rightNode)
+ASTstruct *createNode(int type, Token *token, ASTstruct *leftNode, ASTstruct *rightNode)
 {
     ASTstruct *tree = malloc(sizeof(struct ASTstruct));
     if (tree == NULL){
@@ -276,7 +305,11 @@ ASTstruct *createNode(int type, DynamicString *value, ASTstruct *leftNode, ASTst
     }
     
     tree->type = type;
-    tree->value = value;
+    if (token != NULL){
+        tree->value = TokenToValue(token);
+    } else{
+        tree->value = NULL;
+    }
     tree->leftNode = leftNode;
     tree->rightNode = rightNode;
 

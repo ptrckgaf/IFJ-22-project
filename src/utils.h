@@ -113,10 +113,14 @@ typedef struct{
 
 }Token;
 
-//typedef struct{
-//    ValueType valueType;
-//
-//}Value;
+typedef struct{
+    ValueType valueType;
+    union{
+        int integer;
+        double decimal;
+        DynamicString *stringPtr;
+    }data;
+}Value;
 
 typedef struct{
     Token **value;
@@ -128,7 +132,7 @@ typedef struct{
 typedef struct ASTstruct
 {
     int type;
-    DynamicString *value;
+    Value *value;
 
     struct ASTstruct *leftNode;
     struct ASTstruct *rightNode;
@@ -340,6 +344,25 @@ void StackFlip(Stack *stack);
  */
 ValueType getValueType(TokenType tokenType);
 
+/**
+ * Value initializer
+ * @return
+ */
+Value *ValueInit();
+
+/**
+ * Converts token to value
+ * @param token
+ * @return
+ */
+Value *TokenToValue(Token *token);
+
+/**
+ * DEBUG FUNCTION converts value to string, max string length is 256
+ * @param value
+ */
+char* ValueToString(Value *value);
+
 
 
 int parser();
@@ -348,7 +371,7 @@ ASTstruct *prolog();
 ASTstruct *program();
 
 // vytvori uzol v AST
-ASTstruct *createNode(int type, DynamicString *value, ASTstruct *leftNode, ASTstruct *rightNode);
+ASTstruct *createNode(int type, Token *token, ASTstruct *leftNode, ASTstruct *rightNode);
 void expectToken(int type, Stack *stack);
 Token *loadToken(Stack *stack);
 void unloadToken(Stack *stack);
