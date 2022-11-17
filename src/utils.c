@@ -59,7 +59,7 @@ void DynamicStringClean(DynamicString *string){
     string->value[0] = '\0';
 }
 
-TokenValueType getValueType(TokenType tokenType){
+ValueType getValueType(TokenType tokenType){
     switch (tokenType) {
         case TOKEN_TYPE_ID:
         case TOKEN_VAR_ID:

@@ -93,7 +93,7 @@ typedef enum{
     VALUE_STRING,
     VALUE_DOUBLE,
     VALUE_NULL
-}TokenValueType;
+}ValueType;
 
 typedef struct DynamicString{
     char *value;
@@ -103,7 +103,7 @@ typedef struct DynamicString{
 
 typedef struct{
     TokenType type;
-    TokenValueType valueType;
+    ValueType valueType;
 
     union{
         int integer;
@@ -112,6 +112,11 @@ typedef struct{
     }value;
 
 }Token;
+
+//typedef struct{
+//    ValueType valueType;
+//
+//}Value;
 
 typedef struct{
     Token **value;
@@ -333,7 +338,7 @@ void StackFlip(Stack *stack);
  * returns type of token value(str, int, null)
  * @return
  */
-TokenValueType getValueType(TokenType tokenType);
+ValueType getValueType(TokenType tokenType);
 
 
 
