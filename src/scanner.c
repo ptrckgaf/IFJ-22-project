@@ -233,6 +233,7 @@ TokenType getToken(AutomatonState state){
         case ASSIGN:            return TOKEN_ASSIGN;
         case COMPARE2:          return TOKEN_COMPARE;
         case NEG_COMPARE2:      return TOKEN_NEG_COMPARE;
+        case DOT:               return TOKEN_CONCATENATE;
         case NUMBER:            return TOKEN_INT;
         case NUMBER_EXPONENTIAL:
         case NUMBER_DECIMAL:    return TOKEN_FLOAT;
@@ -258,6 +259,13 @@ TokenType processIdentifier(DynamicString *identifier){
     if (DynamicStringCompare(identifier, "while")){return TOKEN_KEYWORD_WHILE;}
     if (DynamicStringCompare(identifier, "declare")){return TOKEN_DECLARE;}
     if (DynamicStringCompare(identifier, "strict_types")){return TOKEN_STRICT_TYPES;}
+    if (DynamicStringCompare(identifier, "reads")){return TOKEN_READS;}
+    if (DynamicStringCompare(identifier, "readi")){return TOKEN_READI;}
+    if (DynamicStringCompare(identifier, "readf")){return TOKEN_READF;}
+    if (DynamicStringCompare(identifier, "write")){return TOKEN_WRITE;}
+    if (DynamicStringCompare(identifier, "strlen")){return TOKEN_STRLEN;}
+    if (DynamicStringCompare(identifier, "substring")){return TOKEN_SUBSTRING;}
+
     return TOKEN_ID;
 }
 
