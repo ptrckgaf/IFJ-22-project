@@ -314,6 +314,7 @@ ASTstruct *stmt(Stack *stack)
     ASTstruct *while_node = NULL;
     ASTstruct *identif_node = NULL;
     ASTstruct *node_var_assignment = NULL;
+    ASTstruct *func = NULL;
 
     token = loadToken(stack);
     if (token == NULL)
@@ -364,7 +365,7 @@ ASTstruct *stmt(Stack *stack)
         case TOKEN_VAR_ID:
             expectToken(TOKEN_ASSIGN, stack);
             identif_node = createNode(NODE_VAR_ID, token->value.stringPtr, NULL, NULL);
-            node_var_assignment = createNode(NODE_VAR_ASSIGNMENT, NULL, identif_node, expr(stack,1));
+            node_var_assignment = createNode(NODE_VAR_ASSIGNMENT, NULL, identif_node, expr(stack,0));
             if (node_var_assignment->rightNode == NULL)
             {
                 error_exit(SYN_ERR, "Syntax error! 'R-value' expected in variable assignment.");
@@ -375,10 +376,13 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_ID:
             expectToken(TOKEN_L_PAR, stack);
-
+            func = createNode(NODE_FUNC_ID, token->value.stringPtr, func_args(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            expectToken(TOKEN_SEMICOLON, stack);
+            root = createNode(SEQ, NULL, stmt(stack), func);
             break;
 
-        case TOKEN_READS:
+       /* case TOKEN_READS:
             break;
 
         case TOKEN_READI:
@@ -394,7 +398,7 @@ ASTstruct *stmt(Stack *stack)
             break;
 
         case TOKEN_STRLEN:
-            break;
+            break;*/
 
         default:
             unloadToken(stack);
@@ -491,7 +495,7 @@ ASTstruct *expr(Stack *stack, int preced)
 
     // TODO kontrola dvoch po sebe iducich operatorov
 
-    // kontrola precedencie
+    // kontrola precedencie, cyklus while prevzaty z internetu
     while (token && preced_table[token->type].preced_value >= preced)
     {
         int op = token->type;
