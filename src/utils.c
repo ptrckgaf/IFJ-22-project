@@ -178,7 +178,7 @@ char *displayTokenType[] = {
         "TOKEN_ASSIGN",
         "TOKEN_COMPARE",
         "TOKEN_NEG_COMPARE",
-        "TOKEN_CONCATENATE",
+        "TOKEN_CONCATENATE", //
 
         "TOKEN_INT",
         "TOKEN_FLOAT",

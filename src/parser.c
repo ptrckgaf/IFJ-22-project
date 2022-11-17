@@ -69,6 +69,7 @@ precedence_table preced_table[] = {
         {TOKEN_ASSIGN, -1,NODE_VAR_ASSIGNMENT},
         {TOKEN_COMPARE, 9,NODE_COMPARE},
         {TOKEN_NEG_COMPARE, 9,NODE_NEG_COMPARE},
+        {TOKEN_CONCATENATE, 12,NODE_CONCATENATE},
         {TOKEN_INT, -1,NODE_INT},
         {TOKEN_FLOAT, -1, NODE_FLOAT},
         {TOKEN_STRING, -1,NODE_STRING},

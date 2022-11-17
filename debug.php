@@ -1,4 +1,4 @@
 <?php
 declare(strict_types=1);
 
-$x = 5;
+$xasdasd = 5 + 6 * 8 - 1;
