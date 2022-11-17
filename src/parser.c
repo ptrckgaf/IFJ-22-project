@@ -463,7 +463,7 @@ ASTstruct *expr(Stack *stack, int preced)
         case TOKEN_INT:
         case TOKEN_FLOAT:
         case TOKEN_STRING:
-            root = createNode(preced_table[token->type].node_type, NULL, NULL, NULL);
+            root = createNode(preced_table[token->type].node_type, token, NULL, NULL);
             token = loadToken(stack);
             is_loaded = true;
             break;

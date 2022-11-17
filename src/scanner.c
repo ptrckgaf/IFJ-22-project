@@ -345,6 +345,10 @@ Stack *scanner(FILE *source){
         }
     }
 
+    if (isEnd){
+        //remove ?> from stack
+        StackPop(stackPtr);
+    }
     StackFlip(stackPtr);
 
     //checking that the first token is prolog
