@@ -321,6 +321,9 @@ Stack *scanner(FILE *source){
             current = next;
         }
     }
+
+    StackFlip(stackPtr);
+
     DynamicStringFree(bufferPtr);
     return stackPtr;
 }
