@@ -26,6 +26,7 @@ typedef enum{
     //States for processing strings
     STRING_START,
     STRING,
+    STRING_MULTILINE,
     STRING_END,
     STRING_ESC,
 

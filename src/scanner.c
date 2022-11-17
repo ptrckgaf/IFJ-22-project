@@ -4,7 +4,7 @@
 AutomatonState AutomatonNext(AutomatonState current, char input){
     switch (current) {
         case START:
-            if (input == ' ' || input == '\t' || input == '\n'){return START;}
+            if (input == ' ' || input == '\t' || input == '\n' || input == EOF){return START;}
             if (input == '$'){return VARIABLE_DOLLAR;}
             if (isalpha(input) || input == '_'){return IDENTIFIER;}
             if (input == '?'){return QUESTION_MARK;}
@@ -40,6 +40,7 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
         case STRING_START:
             if (input == '"'){return STRING_END;}
             if (input > 31){return STRING;}
+            if (input == '\n'){return STRING_MULTILINE;}
             //TODO escape sequences
             return ERROR;
 
@@ -74,14 +75,19 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
         case STRING:
             if (input == '"'){return STRING_END;}
             if (input > 31){return STRING;}
+            if (input == '\n'){return STRING_MULTILINE;}
+            //TODO escape sequence
+            return ERROR;
+
+        case STRING_MULTILINE:
+            if (input == '"'){return STRING_END;}
+            if (input > 31){return STRING;}
+            if (input == '\n'){return STRING_MULTILINE;}
             //TODO escape sequence
             return ERROR;
 
         case STRING_END:
             return ERROR;
-
-//        case STRING_ESC:
-//            return ERROR;
 
         case VARIABLE_DOLLAR:
             if (isalpha(input) || input == '_'){return VARIABLE_ID;}
@@ -94,6 +100,7 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
         case SLASH:
             if (input == '*'){return COMMENT_BLOCK;}
             if (input == '/'){return COMMENT;}
+            //todo fix division
             return DIVISION;
 
         case COMMENT:
@@ -280,14 +287,22 @@ Stack *scanner(FILE *source){
 
     DynamicString *tokenValuePtr;
     TokenType tokenType;
+    bool isEnd = 0;     // 1 - end token(?>) was read
 
-    char input;
+    char input = fgetc(source);
+    ungetc(input, source);
+    if (input != '<'){
+        fprintf(stderr, "File should start with <?php");
+        return NULL;
+    }
 
     //scanner main loop
     while (true){
         input = fgetc(source);
-        if (input == EOF){
-            break;
+        if (isEnd && input != EOF){
+            //return error when there are symbols after end token >?
+            fprintf(stderr, "No symbols are allowed after ?>");
+            return NULL;
         }
 
         next = AutomatonNext(current, input);
@@ -300,6 +315,11 @@ Stack *scanner(FILE *source){
                 ungetc(input, source);
                 DynamicStringRemoveChar(bufferPtr);
                 tokenType = getToken(current);
+
+                if (tokenType == TOKEN_END){
+                    isEnd = 1;
+                }
+                //process keywords and built-in functions
                 if (tokenType == TOKEN_ID){
                     tokenType = processIdentifier(bufferPtr);
                 }
@@ -320,9 +340,18 @@ Stack *scanner(FILE *source){
         } else{
             current = next;
         }
+        if (input == EOF){
+            break;
+        }
     }
 
     StackFlip(stackPtr);
+
+    //checking that the first token is prolog
+    if (StackTop(stackPtr)->type != TOKEN_PROLOG){
+        fprintf(stderr, "File should start with <?php");
+        return NULL;
+    }
 
     DynamicStringFree(bufferPtr);
     return stackPtr;
