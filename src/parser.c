@@ -366,7 +366,7 @@ ASTstruct *stmt(Stack *stack)
         case TOKEN_KEYWORD_WHILE:
             expectToken(TOKEN_L_PAR, stack);
             while_cond = createNode(SEQ, NULL, NULL, expr(stack,0));
-            if (if_cond->rightNode == NULL)
+            if (while_cond->rightNode == NULL)
             {
                 error_exit(SYN_ERR, "Syntax error! Condition expected after 'while'.");
             }
@@ -392,14 +392,14 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_ID:
             expectToken(TOKEN_L_PAR, stack);
-            func = createNode(NODE_FUNC_ID, token, func_args(stack), NULL);
+            func = createNode(NODE_FUNC_ID, NULL, func_args(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
             root = createNode(SEQ, NULL, stmt(stack), func);
             break;
 
         case TOKEN_READS:
-            built_in_func = createNode(NODE_READS, token, NULL, NULL);
+            built_in_func = createNode(NODE_READS, NULL, NULL, NULL);
             expectToken(TOKEN_L_PAR, stack);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
@@ -407,7 +407,7 @@ ASTstruct *stmt(Stack *stack)
             break;
 
         case TOKEN_READI:
-            built_in_func = createNode(NODE_READI, token, NULL, NULL);
+            built_in_func = createNode(NODE_READI, NULL, NULL, NULL);
             expectToken(TOKEN_L_PAR, stack);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
@@ -415,7 +415,7 @@ ASTstruct *stmt(Stack *stack)
             break;
 
         case TOKEN_READF:
-            built_in_func = createNode(NODE_READF, token, NULL, NULL);
+            built_in_func = createNode(NODE_READF, NULL, NULL, NULL);
             expectToken(TOKEN_L_PAR, stack);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
@@ -424,7 +424,7 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_WRITE:
             expectToken(TOKEN_L_PAR, stack);
-            built_in_func = createNode(NODE_WRITE, token, func_args(stack), NULL);
+            built_in_func = createNode(NODE_WRITE, NULL, func_args(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
             root = createNode(SEQ, NULL, stmt(stack), built_in_func);
@@ -432,7 +432,7 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_STRLEN:
             expectToken(TOKEN_L_PAR, stack);
-            built_in_func = createNode(NODE_STRLEN, token, str_arg(stack), NULL);
+            built_in_func = createNode(NODE_STRLEN, NULL, str_arg(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
             root = createNode(SEQ, NULL, stmt(stack), built_in_func);
@@ -440,7 +440,7 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_SUBSTRING:
             expectToken(TOKEN_L_PAR, stack);
-            built_in_func = createNode(NODE_SUBSTRING, token, substr_args(stack), NULL);
+            built_in_func = createNode(NODE_SUBSTRING, NULL, substr_args(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
             root = createNode(SEQ, NULL, stmt(stack), built_in_func);
@@ -662,19 +662,19 @@ ASTstruct *expr(Stack *stack, int preced)
         case TOKEN_GREATER_EQ:
         case TOKEN_COMPARE:
         case TOKEN_NEG_COMPARE:
+        case TOKEN_CONCATENATE:
             root = expr(stack, preced);
             break;
 
         case TOKEN_VAR_ID:
-            value = token;
-            root = createNode(NODE_VAR_ID, value, NULL, NULL);
+            root = createNode(NODE_VAR_ID, token, NULL, NULL);
             token = loadToken(stack);
             is_loaded = true;
             break;
 
         case TOKEN_ID:
             expectToken(TOKEN_L_PAR, stack);
-            root = createNode(NODE_FUNC_ID, token, func_args(stack), NULL);
+            root = createNode(NODE_FUNC_ID, NULL, func_args(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             break;
 
