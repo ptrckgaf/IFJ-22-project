@@ -669,6 +669,7 @@ ASTstruct *expr(Stack *stack, int preced)
             value = token;
             root = createNode(NODE_VAR_ID, value, NULL, NULL);
             token = loadToken(stack);
+            is_loaded = true;
             break;
 
         case TOKEN_ID:
