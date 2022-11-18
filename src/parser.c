@@ -399,7 +399,7 @@ ASTstruct *stmt(Stack *stack)
             break;
 
         case TOKEN_READS:
-            built_in_func = createNode(NODE_READS, token, NULL, NULL);
+            built_in_func = createNode(NODE_READS, NULL, NULL, NULL);
             expectToken(TOKEN_L_PAR, stack);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
@@ -407,7 +407,7 @@ ASTstruct *stmt(Stack *stack)
             break;
 
         case TOKEN_READI:
-            built_in_func = createNode(NODE_READI, token, NULL, NULL);
+            built_in_func = createNode(NODE_READI, NULL, NULL, NULL);
             expectToken(TOKEN_L_PAR, stack);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
@@ -415,7 +415,7 @@ ASTstruct *stmt(Stack *stack)
             break;
 
         case TOKEN_READF:
-            built_in_func = createNode(NODE_READF, token, NULL, NULL);
+            built_in_func = createNode(NODE_READF, NULL, NULL, NULL);
             expectToken(TOKEN_L_PAR, stack);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
@@ -424,7 +424,7 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_WRITE:
             expectToken(TOKEN_L_PAR, stack);
-            built_in_func = createNode(NODE_WRITE, token, func_args(stack), NULL);
+            built_in_func = createNode(NODE_WRITE, NULL, func_args(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
             root = createNode(SEQ, NULL, stmt(stack), built_in_func);
@@ -432,7 +432,7 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_STRLEN:
             expectToken(TOKEN_L_PAR, stack);
-            built_in_func = createNode(NODE_STRLEN, token, str_arg(stack), NULL);
+            built_in_func = createNode(NODE_STRLEN, NULL, str_arg(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
             root = createNode(SEQ, NULL, stmt(stack), built_in_func);
@@ -440,7 +440,8 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_SUBSTRING:
             expectToken(TOKEN_L_PAR, stack);
-            built_in_func = createNode(NODE_SUBSTRING, token, substr_args(stack), NULL);
+            built_in_func = createNode(NODE_SUBSTRING, NULL
+                                       , substr_args(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
             root = createNode(SEQ, NULL, stmt(stack), built_in_func);
@@ -726,25 +727,6 @@ ASTstruct *expr(Stack *stack, int preced)
 
 /**** PRINT AST ******/
 
-
-void prt_ast(ASTstruct *t) {
-    if (t == NULL)
-        printf("NULL\n");
-    else {
-        printf("%s ", displayNodes[t->type]);
-        //if (t->type == nIdentifier || t->type == nLitInt || t->type == nLitFloat
-        //|| t->type == nLitString || t->type == nLitNone || t->type == nMulticomment) {
-        if (t->type == NODE_PARAM_ID_INT ||t->type == NODE_PARAM_ID_FLOAT ||t->type == NODE_PARAM_ID_STRING ){
-            printf("%s\n", (char*)t->value);
-        } else {
-            printf("\n");
-            prt_ast(t->leftNode);
-            prt_ast(t->rightNode);
-        }
-    }
-}
-
-
 void Print_tree2(ASTstruct* TempTree, char* sufix, char fromdir) {
 /* vykresli sktrukturu binarniho stromu */
   if (TempTree != NULL) {
@@ -761,7 +743,7 @@ void Print_tree2(ASTstruct* TempTree, char* sufix, char fromdir) {
     if (TempTree->value){
         switch (TempTree->value->valueType) {
             case VALUE_STRING:
-                printf("%s  +-[ (%d) %s \"%s\" ]\n", sufix, TempTree->type,  displayNodes[TempTree->type], (char*)TempTree->value->data.stringPtr->value);
+                printf("%s  +-[ (%d) %s \"%s\" ]\n", sufix, TempTree->type,  displayNodes[TempTree->type], TempTree->value->data.stringPtr->value);
                 break;
             case VALUE_INT:
                 printf("%s  +-[ (%d) %s \"%d\" ]\n", sufix, TempTree->type,  displayNodes[TempTree->type], TempTree->value->data.integer);

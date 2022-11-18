@@ -1,11 +1,5 @@
 <?php
 declare(strict_types=1);
-
-if($var === 5)
-{
-    $var = readi();
-}
-else
-{
-    $var = 14 + 2 * 6;
-}
+readf();
+$a = readf();
+readf();
