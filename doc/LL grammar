@@ -42,7 +42,9 @@ arg_comma -> eps
 <int_arg> -> TOKEN_INT
 <int_arg> -> TOKEN_VAR_ID
 
-<expr> -> TOKEN_ID <expr3>
+<substr_args> -> <str_arg> <int_arg> <int_arg>
+
+<expr> -> TOKEN_ID TOKEN_L_PAR <func_args> TOKEN_R_PAR
 <expr> -> <term> <expr2>
 <expr> -> TOKEN_L_PAR <expr> TOKEN_R_PAR
 <expr> -> TOKEN_READS TOKEN_L_PAR TOKEN_R_PAR
@@ -50,7 +52,7 @@ arg_comma -> eps
 <expr> -> TOKEN_READF TOKEN_L_PAR TOKEN_R_PAR
 <expr> -> TOKEN_WRITE TOKEN_L_PAR <func_args> TOKEN_R_PAR
 <expr> -> TOKEN_STRLEN TOKEN_L_PAR <str_arg> TOKEN_R_PAR
-<expr> -> TOKEN_SUBSTRING TOKEN_L_PAR <str_arg> <int_arg> <int_arg> TOKEN_R_PAR
+<expr> -> TOKEN_SUBSTRING TOKEN_L_PAR <substr_args> TOKEN_R_PAR
 <expr> -> TOKEN_ORD TOKEN_L_PAR <str_arg> TOKEN_R_PAR
 <expr> -> TOKEN_CHR TOKEN_L_PAR <int_arg> TOKEN_R_PAR
 
@@ -65,5 +67,3 @@ expr2 -> TOKEN_LESS_EQ expr
 expr2 -> TOKEN_COMPARE expr
 expr2 -> TOKEN_NEG_COMPARE expr
 expr2 -> eps
-
-expr3 -> TOKEN_L_PAR <func_args> TOKEN_R_PAR

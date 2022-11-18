@@ -14,7 +14,7 @@
 #define UNDEF_FUNC_ERR 3
 #define PARAMS_ERR 4
 #define UNDEF_VAR_ERR 5
-#define TERM_ERR 6
+#define EXPR_ERR 6
 #define TYPE_ERR 7
 #define SEM_ERR 8
 #define INT_ERR 99
@@ -380,6 +380,9 @@ ASTstruct *rt(Stack *stack);
 ASTstruct *params(Stack *stack);
 ASTstruct *stmt(Stack *stack);
 ASTstruct *func_args(Stack *stack);
+ASTstruct *str_arg(Stack *stack);
+ASTstruct *int_arg(Stack *stack);
+ASTstruct *substr_args(Stack *stack);
 ASTstruct *expr(Stack *stack, int preced);
 ASTstruct *expr2(Stack *stack, int preced);
 ASTstruct *expr3(Stack *stack, int preced);

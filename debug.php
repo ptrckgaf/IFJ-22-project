@@ -1,5 +1,11 @@
 <?php
 declare(strict_types=1);
 
-$xasdasd = 5;
-?>
+if($var === 5)
+{
+    $var = readi();
+}
+else
+{
+    $var = 14 + 2;
+}

@@ -32,7 +32,22 @@ char *displayNodes[] = {"SEQ",
                         "PLUS",
                         "MINUS",
                         "MUL",
-                        "DIV"};
+                        "DIV",
+                        "GREATER",
+                        "LESS",
+                        "GREATER_EQ",
+                        "LESS_EQ",
+                        "COMPARE",
+                        "NEG_COMPARE",
+                        "CONCATENATE",
+                        "READS",
+                        "READI",
+                        "READF",
+                        "WRITE",
+                        "STRLEN",
+                        "SUBSTRING",
+                        "END",
+                        "FUNC_ID"};
 
 
 precedence_table preced_table[] = {
@@ -87,7 +102,6 @@ precedence_table preced_table[] = {
 // TODO literaly mozu byt typu NULL
 // TODO term moze byt int, float, string, var_id alebo null
 // TODO operator konkatenacie
-// TODO pred <?php a za ?> sa nemozu nachadzat white spaces
 // TODO volanie funkcie -> zoznam parametrov je zoznam termov oddelenych ciarkami, moze byt aj prazdny
 
 
@@ -316,6 +330,7 @@ ASTstruct *stmt(Stack *stack)
     ASTstruct *identif_node = NULL;
     ASTstruct *node_var_assignment = NULL;
     ASTstruct *func = NULL;
+    ASTstruct *built_in_func = NULL;
 
     token = loadToken(stack);
     if (token == NULL)
@@ -383,28 +398,198 @@ ASTstruct *stmt(Stack *stack)
             root = createNode(SEQ, NULL, stmt(stack), func);
             break;
 
-       /* case TOKEN_READS:
+        case TOKEN_READS:
+            built_in_func = createNode(NODE_READS, token, NULL, NULL);
+            expectToken(TOKEN_L_PAR, stack);
+            expectToken(TOKEN_R_PAR, stack);
+            expectToken(TOKEN_SEMICOLON, stack);
+            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
             break;
 
         case TOKEN_READI:
+            built_in_func = createNode(NODE_READI, token, NULL, NULL);
+            expectToken(TOKEN_L_PAR, stack);
+            expectToken(TOKEN_R_PAR, stack);
+            expectToken(TOKEN_SEMICOLON, stack);
+            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
             break;
 
         case TOKEN_READF:
+            built_in_func = createNode(NODE_READF, token, NULL, NULL);
+            expectToken(TOKEN_L_PAR, stack);
+            expectToken(TOKEN_R_PAR, stack);
+            expectToken(TOKEN_SEMICOLON, stack);
+            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
             break;
 
         case TOKEN_WRITE:
+            expectToken(TOKEN_L_PAR, stack);
+            built_in_func = createNode(NODE_WRITE, token, func_args(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            expectToken(TOKEN_SEMICOLON, stack);
+            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
             break;
 
         case TOKEN_STRLEN:
+            expectToken(TOKEN_L_PAR, stack);
+            built_in_func = createNode(NODE_STRLEN, token, str_arg(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            expectToken(TOKEN_SEMICOLON, stack);
+            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
             break;
 
-        case TOKEN_STRLEN:
-            break;*/
+        case TOKEN_SUBSTRING:
+            expectToken(TOKEN_L_PAR, stack);
+            built_in_func = createNode(NODE_SUBSTRING, token, substr_args(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            expectToken(TOKEN_SEMICOLON, stack);
+            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
+            break;
+
+       /* case TOKEN_ORD:
+            expectToken(TOKEN_L_PAR, stack);
+            built_in_func = createNode(NODE_ORD, token, str_arg(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            expectToken(TOKEN_SEMICOLON, stack);
+            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
+            break;
+
+        case TOKEN_CHR:
+            expectToken(TOKEN_L_PAR, stack);
+            built_in_func = createNode(NODE_CHR, token, int_arg(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            expectToken(TOKEN_SEMICOLON, stack);
+            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
+            break; */
 
         default:
             unloadToken(stack);
             return NULL;
             
+    }
+
+    return root;
+}
+
+ASTstruct *str_arg(Stack *stack)
+{
+    ASTstruct *root = NULL;
+    token = loadToken(stack);
+
+    switch (token->type)
+    {
+        case TOKEN_VAR_ID:
+            createNode(NODE_VAR_ID, token, NULL, NULL);
+            break;
+
+        case TOKEN_STRING:
+            createNode(NODE_STRING, token, NULL, NULL);
+            break;
+
+        case TOKEN_INT:
+        case TOKEN_FLOAT:
+            error_exit(PARAMS_ERR, "Semantic error! Function must have string as parameter.");
+
+
+        default:
+            error_exit(SYN_ERR, "Syntax error! Invalid argument(s) in built-in function call.");
+    }
+
+    return root;
+}
+
+ASTstruct *int_arg(Stack *stack)
+{
+    ASTstruct *root = NULL;
+    token = loadToken(stack);
+
+    switch (token->type)
+    {
+        case TOKEN_VAR_ID:
+            createNode(NODE_VAR_ID, token, NULL, NULL);
+            break;
+
+        case TOKEN_INT:
+            createNode(NODE_STRING, token, NULL, NULL);
+            break;
+
+        case TOKEN_STRING:
+        case TOKEN_FLOAT:
+        error_exit(PARAMS_ERR, "Semantic error! Function must have integer as parameter.");
+
+
+        default:
+        error_exit(SYN_ERR, "Syntax error! Invalid argument(s) in built-in function call.");
+    }
+
+    return root;
+}
+
+ASTstruct *substr_args(Stack *stack)
+{
+    ASTstruct *root = NULL;
+    token = loadToken(stack);
+
+    switch (token->type)
+    {
+        case TOKEN_VAR_ID:
+            root = createNode(SEQ, NULL, NULL, createNode(NODE_VAR_ID, token, NULL, NULL));
+            break;
+
+        case TOKEN_STRING:
+            root = createNode(SEQ, NULL, NULL, createNode(NODE_STRING, token, NULL, NULL));
+            break;
+
+        case TOKEN_INT:
+        case TOKEN_FLOAT:
+        error_exit(PARAMS_ERR, "Semantic error! 'substr()' must have string as first parameter.");
+
+
+        default:
+        error_exit(SYN_ERR, "Syntax error! Invalid argument(s) in built-in function call.");
+    }
+    expectToken(TOKEN_COMMA, stack);
+    token = loadToken(stack);
+
+    switch (token->type)
+    {
+        case TOKEN_VAR_ID:
+            root->leftNode = createNode(SEQ, NULL, NULL, createNode(NODE_VAR_ID, token, NULL, NULL));
+            break;
+
+        case TOKEN_INT:
+            root->leftNode = createNode(SEQ, NULL, NULL, createNode(NODE_INT, token, NULL, NULL));
+            break;
+
+        case TOKEN_STRING:
+        case TOKEN_FLOAT:
+        error_exit(PARAMS_ERR, "Semantic error! 'substr()' must have int as second parameter.");
+
+
+        default:
+        error_exit(SYN_ERR, "Syntax error! Invalid argument(s) in built-in function call.");
+    }
+
+    expectToken(TOKEN_COMMA, stack);
+    token = loadToken(stack);
+
+    switch (token->type)
+    {
+        case TOKEN_VAR_ID:
+            root->leftNode->leftNode = createNode(SEQ, NULL, NULL, createNode(NODE_VAR_ID, token, NULL, NULL));
+            break;
+
+        case TOKEN_INT:
+            root->leftNode->leftNode = createNode(SEQ, NULL, NULL, createNode(NODE_INT, token, NULL, NULL));
+            break;
+
+        case TOKEN_STRING:
+        case TOKEN_FLOAT:
+        error_exit(PARAMS_ERR, "Semantic error! 'substr()' must have int as third parameter.");
+
+
+        default:
+        error_exit(SYN_ERR, "Syntax error! Invalid argument(s) in built-in function call.");
     }
 
     return root;
@@ -454,7 +639,6 @@ ASTstruct *expr(Stack *stack, int preced)
     Token *value = NULL;
     bool is_loaded = false;
 
-
     token = loadToken(stack);
     if (token == NULL) return NULL;
 
@@ -484,10 +668,37 @@ ASTstruct *expr(Stack *stack, int preced)
         case TOKEN_VAR_ID:
             value = token;
             root = createNode(NODE_VAR_ID, value, NULL, NULL);
-            unloadToken(stack);
+            token = loadToken(stack);
             break;
 
-        // TODO BUILTIN FUNCTIONS
+        case TOKEN_ID:
+            expectToken(TOKEN_L_PAR, stack);
+            root = createNode(NODE_FUNC_ID, token, func_args(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            break;
+
+        case TOKEN_READS:
+        case TOKEN_READI:
+        case TOKEN_READF:
+            root = createNode(preced_table[token->type].node_type, NULL, NULL, NULL);
+            expectToken(TOKEN_L_PAR, stack);
+            expectToken(TOKEN_R_PAR, stack);
+            break;
+
+        case TOKEN_WRITE:
+            error_exit(EXPR_ERR, "Semantic error! write() cannot be a part of expression.");
+
+        case TOKEN_STRLEN:
+            expectToken(TOKEN_L_PAR, stack);
+            root = createNode(NODE_STRLEN, token, str_arg(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            break;
+
+        case TOKEN_SUBSTRING:
+            expectToken(TOKEN_L_PAR, stack);
+            root = createNode(NODE_SUBSTRING, token, substr_args(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            break;
 
         default:
             unloadToken(stack);
@@ -510,43 +721,6 @@ ASTstruct *expr(Stack *stack, int preced)
     }
 
     return root;
-}
-
-ASTstruct *expr3(Stack *stack, int preced)
-{
-    return NULL;
-}
-
-
-ASTstruct *term(Stack *stack)
-{
-
-    token = loadToken(stack);
-    if (token == NULL)
-        return NULL;
-
-    switch(token->type)
-    {
-        case TOKEN_INT:
-            return createNode(NODE_INT, NULL, NULL, NULL);
-            break;
-
-        case TOKEN_FLOAT:
-            return createNode(NODE_FLOAT, NULL, NULL, NULL);
-            break;
-
-        case TOKEN_STRING:
-            return createNode(NODE_STRING, NULL, NULL, NULL);
-            break;
-
-        case TOKEN_VAR_ID:
-            return createNode(NODE_VAR_ID, NULL, NULL, NULL);
-            break;
-
-        default:
-            error_exit(SYN_ERR, "Syntax error! Term has to be INT, FLOAT, STRING, IDENTIFIER.");
-    }
-
 }
 
 /**** PRINT AST ******/
