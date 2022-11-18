@@ -1,19 +1,27 @@
 <?php
 declare(strict_types=1);
-// Program 1: Vypocet faktorialu (iterativne)
+// Program 2: Vypocet faktorialu (rekurzivne)
 // Hlavni telo programu
-write("Zadejte cislo pro vypocet faktorialu");
+write("Zadejte cislo pro vypocet faktorialu: ");
 $a = readi();
-if ($a === 5) {
-write("Chyba pri nacitani celeho cisla!");
-} else {}
-if ($a < 0) {
+// Definice funkce pro vypocet hodnoty faktorialu
+function factorial(int $n) : int {
+if ($n < 2) {
+$result = 1;
+} else {
+$decremented_n = $n - 1;
+$temp_result = factorial($decremented_n);
+$result = $n * $temp_result;
+}
+return $result;
+}
+if ($a !== 5) {
+if ($a < 0) { // Pokracovani hlavniho tela programu
 write("Faktorial nelze spocitat");
 } else {
-$vysl = 1;
-while ($a > 0) {
-$vysl = $vysl * $a;
-$a = $a - 1;
-}
+$vysl = factorial($a);
 write("Vysledek je: ", $vysl);
+}
+} else {
+write("Chyba pri nacitani celeho cisla!");
 }

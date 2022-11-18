@@ -360,7 +360,7 @@ ASTstruct *stmt(Stack *stack)
             expectToken(TOKEN_R_BRACKET, stack);
             node_else = createNode(NODE_ELSE, NULL, else_body, if_body);
             node_if = createNode(NODE_IF, NULL, if_cond, node_else);
-            root = createNode(SEQ, NULL, stmt(stack), node_if);
+            root = createNode(SEQ, NULL, program(stack), node_if);
             break;
 
         case TOKEN_KEYWORD_WHILE:
@@ -375,7 +375,7 @@ ASTstruct *stmt(Stack *stack)
             while_body = stmt(stack);
             expectToken(TOKEN_R_BRACKET, stack);
             while_node = createNode(NODE_WHILE, NULL, while_cond, while_body);
-            root = createNode(SEQ, NULL, stmt(stack), while_node);
+            root = createNode(SEQ, NULL, program(stack), while_node);
             break;
 
         case TOKEN_VAR_ID:
@@ -387,15 +387,15 @@ ASTstruct *stmt(Stack *stack)
                 error_exit(SYN_ERR, "Syntax error! 'R-value' expected in variable assignment.");
             }
             expectToken(TOKEN_SEMICOLON, stack);
-            root = createNode(SEQ, NULL, stmt(stack), node_var_assignment);
+            root = createNode(SEQ, NULL, program(stack), node_var_assignment);
             break;
 
         case TOKEN_ID:
             expectToken(TOKEN_L_PAR, stack);
-            func = createNode(NODE_FUNC_ID, token, func_args(stack), NULL);
+            func = createNode(NODE_FUNC_ID, NULL, func_args(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
-            root = createNode(SEQ, NULL, stmt(stack), func);
+            root = createNode(SEQ, NULL, program(stack), func);
             break;
 
         case TOKEN_READS:
@@ -403,7 +403,7 @@ ASTstruct *stmt(Stack *stack)
             expectToken(TOKEN_L_PAR, stack);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
-            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
+            root = createNode(SEQ, NULL, program(stack), built_in_func);
             break;
 
         case TOKEN_READI:
@@ -411,7 +411,7 @@ ASTstruct *stmt(Stack *stack)
             expectToken(TOKEN_L_PAR, stack);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
-            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
+            root = createNode(SEQ, NULL, program(stack), built_in_func);
             break;
 
         case TOKEN_READF:
@@ -419,7 +419,7 @@ ASTstruct *stmt(Stack *stack)
             expectToken(TOKEN_L_PAR, stack);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
-            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
+            root = createNode(SEQ, NULL, program(stack), built_in_func);
             break;
 
         case TOKEN_WRITE:
@@ -427,7 +427,7 @@ ASTstruct *stmt(Stack *stack)
             built_in_func = createNode(NODE_WRITE, NULL, func_args(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
-            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
+            root = createNode(SEQ, NULL, program(stack), built_in_func);
             break;
 
         case TOKEN_STRLEN:
@@ -435,7 +435,7 @@ ASTstruct *stmt(Stack *stack)
             built_in_func = createNode(NODE_STRLEN, NULL, str_arg(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
-            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
+            root = createNode(SEQ, NULL, program(stack), built_in_func);
             break;
 
         case TOKEN_SUBSTRING:
@@ -443,7 +443,7 @@ ASTstruct *stmt(Stack *stack)
             built_in_func = createNode(NODE_SUBSTRING, NULL, substr_args(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
-            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
+            root = createNode(SEQ, NULL, program(stack), built_in_func);
             break;
 
        /* case TOKEN_ORD:
@@ -674,7 +674,7 @@ ASTstruct *expr(Stack *stack, int preced)
 
         case TOKEN_ID:
             expectToken(TOKEN_L_PAR, stack);
-            root = createNode(NODE_FUNC_ID, token, func_args(stack), NULL);
+            root = createNode(NODE_FUNC_ID, NULL, func_args(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             break;
 
