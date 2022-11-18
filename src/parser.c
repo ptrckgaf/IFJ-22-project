@@ -366,7 +366,7 @@ ASTstruct *stmt(Stack *stack)
         case TOKEN_KEYWORD_WHILE:
             expectToken(TOKEN_L_PAR, stack);
             while_cond = createNode(SEQ, NULL, NULL, expr(stack,0));
-            if (if_cond->rightNode == NULL)
+            if (while_cond->rightNode == NULL)
             {
                 error_exit(SYN_ERR, "Syntax error! Condition expected after 'while'.");
             }
@@ -440,8 +440,7 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_SUBSTRING:
             expectToken(TOKEN_L_PAR, stack);
-            built_in_func = createNode(NODE_SUBSTRING, NULL
-                                       , substr_args(stack), NULL);
+            built_in_func = createNode(NODE_SUBSTRING, NULL, substr_args(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
             root = createNode(SEQ, NULL, stmt(stack), built_in_func);
@@ -663,12 +662,12 @@ ASTstruct *expr(Stack *stack, int preced)
         case TOKEN_GREATER_EQ:
         case TOKEN_COMPARE:
         case TOKEN_NEG_COMPARE:
+        case TOKEN_CONCATENATE:
             root = expr(stack, preced);
             break;
 
         case TOKEN_VAR_ID:
-            value = token;
-            root = createNode(NODE_VAR_ID, value, NULL, NULL);
+            root = createNode(NODE_VAR_ID, token, NULL, NULL);
             token = loadToken(stack);
             is_loaded = true;
             break;
