@@ -392,7 +392,14 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_ID:
             expectToken(TOKEN_L_PAR, stack);
-            func = createNode(NODE_FUNC_ID, NULL, func_args(stack), NULL);
+
+            DynamicString *tmpString = DynamicStringInit();
+            DynamicStringCopy(token->value.stringPtr, tmpString);
+            Token *tmpToken = TokenInit(TOKEN_ID, tmpString);
+            ASTstruct *args = func_args(stack);
+            token = tmpToken;
+
+            func = createNode(NODE_FUNC_ID, token, args, NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
             root = createNode(SEQ, NULL, program(stack), func);
@@ -674,7 +681,14 @@ ASTstruct *expr(Stack *stack, int preced)
 
         case TOKEN_ID:
             expectToken(TOKEN_L_PAR, stack);
-            root = createNode(NODE_FUNC_ID, NULL, func_args(stack), NULL);
+
+            DynamicString *tmpString = DynamicStringInit();
+            DynamicStringCopy(token->value.stringPtr, tmpString);
+            Token *tmpToken = TokenInit(TOKEN_ID, tmpString);
+            ASTstruct *args = func_args(stack);
+            token = tmpToken;
+
+            root = createNode(NODE_FUNC_ID, token, args, NULL);
             expectToken(TOKEN_R_PAR, stack);
             break;
 
