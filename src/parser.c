@@ -105,8 +105,6 @@ precedence_table preced_table[] = {
 
 // TODO literaly mozu byt typu NULL
 // TODO term moze byt int, float, string, var_id alebo null
-// TODO operator konkatenacie
-// TODO volanie funkcie -> zoznam parametrov je zoznam termov oddelenych ciarkami, moze byt aj prazdny
 
 
 // funkcia vykona syntakticku analyzu tokenov a vytvori AST
@@ -205,6 +203,10 @@ ASTstruct *function_define(Stack *stack)
 
     if (token->type == TOKEN_ID)
     {
+        DynamicString *tmpString = DynamicStringInit();
+        DynamicStringCopy(token->value.stringPtr, tmpString);
+        Token *tmpToken = TokenInit(TOKEN_ID, tmpString);
+
         expectToken(TOKEN_L_PAR, stack);
         parameters = params(stack);
         expectToken(TOKEN_R_PAR, stack);
@@ -212,8 +214,8 @@ ASTstruct *function_define(Stack *stack)
         returntype = rt(stack);
         expectToken(TOKEN_L_BRACKET, stack);
         params_returntype = createNode(NODE_PARAMS_RETURNTYPE, NULL, parameters, returntype);
-        
-        func = createNode(NODE_FUNC_DEF, NULL, params_returntype, stmt(stack));
+
+        func = createNode(NODE_FUNC_DEF, tmpToken, params_returntype, stmt(stack));
 
         expectToken(TOKEN_R_BRACKET, stack);
 
@@ -246,7 +248,6 @@ ASTstruct *params(Stack *stack)
                 break;
             }
             error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
-            break;
 
         case TOKEN_KEYWORD_FLOAT:
             token = loadToken(stack);
@@ -256,7 +257,6 @@ ASTstruct *params(Stack *stack)
                 break;
             }
             error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
-            break;
 
         case TOKEN_KEYWORD_STRING:
             token = loadToken(stack);
@@ -266,7 +266,6 @@ ASTstruct *params(Stack *stack)
                 break;
             }
             error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
-            break;
 
         default:
             unloadToken(stack);
@@ -299,19 +298,15 @@ ASTstruct *rt(Stack *stack)
     {
         case TOKEN_KEYWORD_INT:
             return createNode(RETURN_TYPE_INT, NULL, NULL, NULL);
-            break;
 
         case TOKEN_KEYWORD_FLOAT:
             return createNode(RETURN_TYPE_FLOAT, NULL, NULL, NULL);
-            break;
 
         case TOKEN_KEYWORD_STRING:
             return createNode(RETURN_TYPE_STRING, NULL, NULL, NULL);
-            break;
 
         case TOKEN_KEYWORD_VOID:
             return createNode(RETURN_TYPE_VOID, NULL, NULL, NULL);
-            break;
 
         default:
             error_exit(SYN_ERR, "Syntax error! Invalid returntype.");
@@ -462,7 +457,7 @@ ASTstruct *stmt(Stack *stack)
             built_in_func = createNode(NODE_ORD, NULL, str_arg(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
-            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
+            root = createNode(SEQ, NULL, program(stack), built_in_func);
             break;
 
         case TOKEN_CHR:
@@ -470,7 +465,7 @@ ASTstruct *stmt(Stack *stack)
             built_in_func = createNode(NODE_CHR, NULL, int_arg(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
-            root = createNode(SEQ, NULL, stmt(stack), built_in_func);
+            root = createNode(SEQ, NULL, program(stack), built_in_func);
             break;
 
         default:
@@ -490,11 +485,11 @@ ASTstruct *str_arg(Stack *stack)
     switch (token->type)
     {
         case TOKEN_VAR_ID:
-            createNode(NODE_VAR_ID, token, NULL, NULL);
+            root = createNode(NODE_VAR_ID, token, NULL, NULL);
             break;
 
         case TOKEN_STRING:
-            createNode(NODE_STRING, token, NULL, NULL);
+            root = createNode(NODE_STRING, token, NULL, NULL);
             break;
 
         case TOKEN_INT:
@@ -517,11 +512,11 @@ ASTstruct *int_arg(Stack *stack)
     switch (token->type)
     {
         case TOKEN_VAR_ID:
-            createNode(NODE_VAR_ID, token, NULL, NULL);
+            root = createNode(NODE_VAR_ID, token, NULL, NULL);
             break;
 
         case TOKEN_INT:
-            createNode(NODE_STRING, token, NULL, NULL);
+            root = createNode(NODE_STRING, token, NULL, NULL);
             break;
 
         case TOKEN_STRING:
@@ -685,7 +680,6 @@ ASTstruct *expr(Stack *stack, int preced)
 
         case TOKEN_ID:
             expectToken(TOKEN_L_PAR, stack);
-
             DynamicString *tmpString = DynamicStringInit();
             DynamicStringCopy(token->value.stringPtr, tmpString);
             Token *tmpToken = TokenInit(TOKEN_ID, tmpString);
@@ -709,13 +703,25 @@ ASTstruct *expr(Stack *stack, int preced)
 
         case TOKEN_STRLEN:
             expectToken(TOKEN_L_PAR, stack);
-            root = createNode(NODE_STRLEN, token, str_arg(stack), NULL);
+            root = createNode(NODE_STRLEN, NULL, str_arg(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             break;
 
         case TOKEN_SUBSTRING:
             expectToken(TOKEN_L_PAR, stack);
-            root = createNode(NODE_SUBSTRING, token, substr_args(stack), NULL);
+            root = createNode(NODE_SUBSTRING, NULL, substr_args(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            break;
+
+        case TOKEN_ORD:
+            expectToken(TOKEN_L_PAR, stack);
+            root = createNode(NODE_ORD, NULL, str_arg(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            break;
+
+        case TOKEN_CHR:
+            expectToken(TOKEN_L_PAR, stack);
+            root = createNode(NODE_CHR, NULL, int_arg(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             break;
 
