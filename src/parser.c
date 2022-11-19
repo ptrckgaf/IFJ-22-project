@@ -5,6 +5,7 @@
 
 
 #include "utils.h"
+#include "parser.h"
 
 Token *token;
 ASTstruct *ast;

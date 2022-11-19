@@ -369,32 +369,11 @@ Value *TokenToValue(Token *token);
 char* ValueToString(Value *value);
 
 
-
 int parser();
-ASTstruct *parse();
-ASTstruct *prolog();
-ASTstruct *program();
 
-// vytvori uzol v AST
 ASTstruct *createNode(int type, Token *token, ASTstruct *leftNode, ASTstruct *rightNode);
 void expectToken(int type, Stack *stack);
 Token *loadToken(Stack *stack);
 void unloadToken(Stack *stack);
-ASTstruct *rt(Stack *stack);
-ASTstruct *params(Stack *stack);
-ASTstruct *stmt(Stack *stack);
-ASTstruct *func_args(Stack *stack);
-ASTstruct *str_arg(Stack *stack);
-ASTstruct *int_arg(Stack *stack);
-ASTstruct *substr_args(Stack *stack);
-ASTstruct *expr(Stack *stack, int preced);
-ASTstruct *expr2(Stack *stack, int preced);
-ASTstruct *expr3(Stack *stack, int preced);
-ASTstruct *term(Stack *stack);
-ASTstruct *function_define(Stack *stack);
-void Print_tree(ASTstruct* TempTree);
-void Print_tree2(ASTstruct* TempTree, char* sufix, char fromdir);
-void prt_ast(ASTstruct *t);
-
 
 #endif //IFJ_22_PROJEKT_UTILS_H
