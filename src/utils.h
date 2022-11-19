@@ -79,6 +79,8 @@ typedef enum{
     TOKEN_WRITE,
     TOKEN_STRLEN,
     TOKEN_SUBSTRING,
+    TOKEN_CHR,
+    TOKEN_ORD,
 
     TOKEN_PROLOG,
     TOKEN_END,
@@ -178,6 +180,8 @@ typedef enum{
     NODE_WRITE,
     NODE_STRLEN,
     NODE_SUBSTRING,
+    NODE_CHR,
+    NODE_ORD,
     NODE_END,
     NODE_FUNC_ID
 

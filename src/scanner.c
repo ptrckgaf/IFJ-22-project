@@ -273,6 +273,8 @@ TokenType processIdentifier(DynamicString *identifier){
     if (DynamicStringCompare(identifier, "write")){return TOKEN_WRITE;}
     if (DynamicStringCompare(identifier, "strlen")){return TOKEN_STRLEN;}
     if (DynamicStringCompare(identifier, "substring")){return TOKEN_SUBSTRING;}
+    if (DynamicStringCompare(identifier, "chr")){return TOKEN_CHR;}
+    if (DynamicStringCompare(identifier, "ord")){return TOKEN_ORD;}
 
     return TOKEN_ID;
 }

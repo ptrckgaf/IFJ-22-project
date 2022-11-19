@@ -46,6 +46,8 @@ char *displayNodes[] = {"SEQ",
                         "WRITE",
                         "STRLEN",
                         "SUBSTRING",
+                        "CHR",
+                        "ORD",
                         "END",
                         "FUNC_ID"};
 
@@ -94,6 +96,8 @@ precedence_table preced_table[] = {
         {TOKEN_WRITE, -1,NODE_WRITE},
         {TOKEN_STRLEN, -1,NODE_STRLEN},
         {TOKEN_SUBSTRING, -1,NODE_SUBSTRING},
+        {TOKEN_CHR, -1,NODE_CHR},
+        {TOKEN_ORD, -1,NODE_ORD},
         {TOKEN_PROLOG, -1,-1},
         {TOKEN_END, -1,-1}
 
@@ -453,9 +457,9 @@ ASTstruct *stmt(Stack *stack)
             root = createNode(SEQ, NULL, program(stack), built_in_func);
             break;
 
-       /* case TOKEN_ORD:
+        case TOKEN_ORD:
             expectToken(TOKEN_L_PAR, stack);
-            built_in_func = createNode(NODE_ORD, token, str_arg(stack), NULL);
+            built_in_func = createNode(NODE_ORD, NULL, str_arg(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
             root = createNode(SEQ, NULL, stmt(stack), built_in_func);
@@ -463,11 +467,11 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_CHR:
             expectToken(TOKEN_L_PAR, stack);
-            built_in_func = createNode(NODE_CHR, token, int_arg(stack), NULL);
+            built_in_func = createNode(NODE_CHR, NULL, int_arg(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
             root = createNode(SEQ, NULL, stmt(stack), built_in_func);
-            break; */
+            break;
 
         default:
             unloadToken(stack);

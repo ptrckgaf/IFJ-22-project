@@ -190,6 +190,8 @@ char *displayTokenType[] = {
         "TOKEN_WRITE",
         "TOKEN_STRLEN",
         "TOKEN_SUBSTRING",
+        "TOKEN_CHR",
+        "TOKEN_ORD",
 
         "TOKEN_PROLOG",
         "TOKEN_END",

@@ -1,4 +1,11 @@
 <?php
 declare(strict_types=1);
-foo($a);
+
+function foo(int $n)    :  int {
+    write($n);
+}
+
+foo();
+
+strlen($str);
 ?>
