@@ -16,7 +16,7 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
             if (input == '>'){return GREATER;}
             if (input == '<'){return LESS;}
             if (input =='='){return ASSIGN;}
-            if (input =='/'){return SLASH;}
+            if (input =='/'){return DIVISION;}
             if (input =='"'){return STRING_START;}
             if (isdigit(input)){return NUMBER;}
             if (input == '!'){return EXCLAMATION_MARK;}
@@ -76,9 +76,13 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
             if (input == '"'){return STRING_END;}
             if (input > 31){return STRING;}
             if (input == '\n'){return STRING_MULTILINE;}
+            if (input == '\\'){return STRING_SLASH;}
             //TODO escape sequence
             return ERROR;
 
+        case STRING_SLASH:
+//            if (input == '"')
+            return ERROR;
         case STRING_MULTILINE:
             if (input == '"'){return STRING_END;}
             if (input > 31){return STRING;}
@@ -97,11 +101,11 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
             if (isdigit(input) || isalpha(input) || input == '_'){return VARIABLE_ID;}
             return ERROR;
 
-        case SLASH:
+        case DIVISION:
             if (input == '*'){return COMMENT_BLOCK;}
             if (input == '/'){return COMMENT;}
             //todo fix division
-            return DIVISION;
+            return ERROR;
 
         case COMMENT:
             //TODO maybe exclude EOL

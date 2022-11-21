@@ -12,7 +12,7 @@ int main(int argc, char **argv){
     if (stack == NULL){
         return LEX_ERR;
     }
-//    StackPrint(stack);
+    StackPrint(stack);
 
 
     parser(stack);
