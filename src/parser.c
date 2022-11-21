@@ -201,6 +201,13 @@ ASTstruct *function_define(Stack *stack)
     if (token == NULL)
         return NULL;
 
+    if (token->type == TOKEN_READS || token->type == TOKEN_READF || token->type == TOKEN_READI
+        || token->type == TOKEN_WRITE || token->type == TOKEN_STRLEN || token->type == TOKEN_SUBSTRING
+        || token->type == TOKEN_CHR || token->type == TOKEN_ORD)
+    {
+        error_exit(UNDEF_FUNC_ERR, "Semantic error! Re-definition of built-in function.");
+    }
+
 
     if (token->type == TOKEN_ID)
     {
