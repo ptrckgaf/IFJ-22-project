@@ -46,7 +46,7 @@ void gen_func_def(ASTstruct *ast)
 {
     if (ast->rightNode->type == NODE_FUNC_DEF)
     {
-        fprintf(stdout, "\nLABEL %s\n", ast->value->data.stringPtr);
+        fprintf(stdout, "\nLABEL %s\n", ast->value->data.stringPtr->value);
         fprintf(stdout, "PUSHFRAME\n");
 
         if (ast->leftNode)
@@ -71,13 +71,13 @@ void gen_func_def(ASTstruct *ast)
 
 void gen_var_assignment(ASTstruct *ast)
 {
-    fprintf(stdout, "DEFVAR LF@%s\n", ast->leftNode->value->data.stringPtr);
+    fprintf(stdout, "DEFVAR LF@%s\n", ast->leftNode->value->data.stringPtr->value);
 
     switch(ast->rightNode->type)
     {
         case NODE_STRING:
-            fprintf(stdout, "MOVE LF@%s", ast->leftNode->value->data.stringPtr);
-            fprintf(stdout, "string@%s", ast->leftNode->value->data.stringPtr);
+            fprintf(stdout, "MOVE LF@%s", ast->leftNode->value->data.stringPtr->value);
+            fprintf(stdout, "string@%s", ast->leftNode->value->data.stringPtr->value);
             fprintf(stdout, "\n");
             break;
 
@@ -96,7 +96,7 @@ void gen_func_call(ASTstruct *ast)
 
         case NODE_VAR_ID:
             fprintf(stdout, "DEFVAR TF@%d\n", arg_number);
-            fprintf(stdout, "MOVE TF@%d LF@%s\n", arg_number, ast->rightNode->value->data.stringPtr);
+            fprintf(stdout, "MOVE TF@%d LF@%s\n", arg_number, ast->rightNode->value->data.stringPtr->value);
             break;
 
         default:
@@ -113,8 +113,8 @@ void gen_func_call(ASTstruct *ast)
 void gen_func_params(ASTstruct *ast)
 {
     int param_number = 1;
-    fprintf(stdout, "DEFVAR LF@%s\n", ast->rightNode->value->data.stringPtr);
-    fprintf(stdout, "MOVE LF@%s LF@%d\n", ast->rightNode->value->data.stringPtr, param_number);
+    fprintf(stdout, "DEFVAR LF@%s\n", ast->rightNode->value->data.stringPtr->value);
+    fprintf(stdout, "MOVE LF@%s LF@%d\n", ast->rightNode->value->data.stringPtr->value, param_number);
 
     if (!ast->leftNode)
     {
@@ -143,7 +143,7 @@ void gen_write(ASTstruct *ast)
     {
         case NODE_VAR_ID:
             fprintf(stdout, "WRITE ");
-            fprintf(stdout, "string@%s", ast->rightNode->value->data.stringPtr);
+            fprintf(stdout, "string@%s", ast->rightNode->value->data.stringPtr->value);
             fprintf(stdout, "\n");
             break;
 
