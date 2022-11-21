@@ -76,13 +76,9 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
             if (input == '"'){return STRING_END;}
             if (input > 31){return STRING;}
             if (input == '\n'){return STRING_MULTILINE;}
-            if (input == '\\'){return STRING_SLASH;}
             //TODO escape sequence
             return ERROR;
 
-        case STRING_SLASH:
-//            if (input == '"')
-            return ERROR;
         case STRING_MULTILINE:
             if (input == '"'){return STRING_END;}
             if (input > 31){return STRING;}
