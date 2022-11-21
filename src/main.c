@@ -16,10 +16,7 @@ int main(int argc, char **argv){
 
 
     parser(stack);
-
-
-
-
+    codegen();
 
 
     StackFree(stack);

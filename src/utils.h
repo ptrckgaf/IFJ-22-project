@@ -370,10 +370,13 @@ char* ValueToString(Value *value);
 
 
 int parser();
+int codegen();
 
 ASTstruct *createNode(int type, Token *token, ASTstruct *leftNode, ASTstruct *rightNode);
 void expectToken(int type, Stack *stack);
 Token *loadToken(Stack *stack);
 void unloadToken(Stack *stack);
+
+extern ASTstruct *ast;
 
 #endif //IFJ_22_PROJEKT_UTILS_H
