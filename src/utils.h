@@ -183,7 +183,8 @@ typedef enum{
     NODE_CHR,
     NODE_ORD,
     NODE_END,
-    NODE_FUNC_ID
+    NODE_FUNC_ID,
+    NODE_NULL
 
 } Nodes;
 
