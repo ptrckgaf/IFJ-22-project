@@ -50,7 +50,8 @@ char *displayNodes[] = {"SEQ",
                         "CHR",
                         "ORD",
                         "END",
-                        "FUNC_ID"};
+                        "FUNC_ID",
+                        "NODE_NULL"};
 
 
 precedence_table preced_table[] = {
@@ -62,7 +63,7 @@ precedence_table preced_table[] = {
         {TOKEN_KEYWORD_FUNCTION, -1, NODE_FUNC_DEF},
         {TOKEN_KEYWORD_IF, -1, NODE_IF},
         {TOKEN_KEYWORD_INT, -1, RETURN_TYPE_INT},
-        {TOKEN_KEYWORD_NULL, -1, -1},
+        {TOKEN_KEYWORD_NULL, -1, NODE_NULL},
         {TOKEN_KEYWORD_RETURN, -1, NODE_RETURN},
         {TOKEN_KEYWORD_STRING, -1, RETURN_TYPE_STRING},
         {TOKEN_KEYWORD_VOID, -1, RETURN_TYPE_VOID},
@@ -386,6 +387,13 @@ ASTstruct *stmt(Stack *stack)
             break;
 
         case TOKEN_VAR_ID:
+            // fix pre $var;
+            if (loadToken(stack)->type == TOKEN_SEMICOLON)
+            {
+                error_exit(UNDEF_VAR_ERR, "Semantic error! Undefined variable!");
+            }
+            unloadToken(stack);
+
             expectToken(TOKEN_ASSIGN, stack);
             identif_node = createNode(NODE_VAR_ID, token, NULL, NULL);
             node_var_assignment = createNode(NODE_VAR_ASSIGNMENT, NULL, identif_node, expr(stack,0));
@@ -661,6 +669,7 @@ ASTstruct *expr(Stack *stack, int preced)
         case TOKEN_INT:
         case TOKEN_FLOAT:
         case TOKEN_STRING:
+        case TOKEN_KEYWORD_NULL:
             root = createNode(preced_table[token->type].node_type, token, NULL, NULL);
             token = loadToken(stack);
             is_loaded = true;
@@ -678,6 +687,13 @@ ASTstruct *expr(Stack *stack, int preced)
         case TOKEN_NEG_COMPARE:
         case TOKEN_CONCATENATE:
             root = expr(stack, preced);
+            break;
+
+        case TOKEN_L_PAR:
+            root = expr(stack, 0);
+            expectToken(TOKEN_R_PAR, stack);
+            token = loadToken(stack);
+            is_loaded = true;
             break;
 
         case TOKEN_VAR_ID:

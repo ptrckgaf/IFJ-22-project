@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
 
-$variable = "Hello, world!\n";
+$variable = "Hello, world\n";
 
 function foo(string $var) : void
 {
-    write($string);
+    write($var);
 }
 
 foo($variable);
+
