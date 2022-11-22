@@ -37,13 +37,6 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
             if (input == '>'){return END;}
             return ERROR;
 
-        case STRING_START:
-            if (input == '"'){return STRING_END;}
-            if (input > 31){return STRING;}
-            if (input == '\n'){return STRING_MULTILINE;}
-            //TODO escape sequences
-            return ERROR;
-
         case NUMBER:
             if (isdigit(input)){return NUMBER;}
             if (input == '.'){return NUMBER_DOT;}
@@ -72,18 +65,26 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
             if (isdigit(input)){return NUMBER_EXPONENTIAL;}
             return ERROR;
 
-        case STRING:
+        case STRING_START:
             if (input == '"'){return STRING_END;}
+            if (input == '\\'){return STRING_BACKSLASH;}
             if (input > 31){return STRING;}
             if (input == '\n'){return STRING_MULTILINE;}
-            //TODO escape sequence
+            return ERROR;
+
+        case STRING:
+            if (input == '"'){return STRING_END;}
+            if (input == '\\'){return STRING_BACKSLASH;}
+            if (input > 31){return STRING;}
+            if (input == '\n'){return STRING_MULTILINE;}
             return ERROR;
 
         case STRING_MULTILINE:
+            //this state is needed to ignore new line symbols in strings
             if (input == '"'){return STRING_END;}
+            if (input == '\\'){return STRING_BACKSLASH;}
             if (input > 31){return STRING;}
             if (input == '\n'){return STRING_MULTILINE;}
-            //TODO escape sequence
             return ERROR;
 
         case STRING_END:
@@ -100,11 +101,9 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
         case DIVISION:
             if (input == '*'){return COMMENT_BLOCK;}
             if (input == '/'){return COMMENT;}
-            //todo fix division
             return ERROR;
 
         case COMMENT:
-            //TODO maybe exclude EOL
             return COMMENT_TEXT;
 
         case COMMENT_TEXT:
@@ -255,6 +254,7 @@ TokenType getToken(AutomatonState state){
 }
 
 TokenType processIdentifier(DynamicString *identifier){
+    //todo implement using lookup table
     if (DynamicStringCompare(identifier, "else")){return TOKEN_KEYWORD_ELSE;}
     if (DynamicStringCompare(identifier, "float")){return TOKEN_KEYWORD_FLOAT;}
     if (DynamicStringCompare(identifier, "function")){return TOKEN_KEYWORD_FUNCTION;}
@@ -309,10 +309,39 @@ Stack *scanner(FILE *source){
         }
 
         next = AutomatonNext(current, input);
+
+        if (next == STRING_BACKSLASH){
+            input = fgetc(source);
+            switch (input) {
+                case 'n':
+                    DynamicStringAddChar(bufferPtr, '\n');
+                    break;
+                case 't':
+                    DynamicStringAddChar(bufferPtr, '\t');
+                    break;
+                case '\\':
+                    DynamicStringAddChar(bufferPtr, '\\');
+                    break;
+                case '"':
+                    DynamicStringAddChar(bufferPtr, '\"');
+                    break;
+                case '$':
+                    DynamicStringAddChar(bufferPtr, '$');
+                    break;
+                default:
+                    //given sequence is not valid escape sequence, that's why we should put backslash to buffer
+                    DynamicStringAddChar(bufferPtr, '\\');
+                    ungetc(input, source);
+                    break;
+            }
+            //change current state to state before STRING_BACKSLASH
+            current = current;
+            continue;
+        }
+
         if (isRead(current) || isRead(next)){
             DynamicStringAddChar(bufferPtr, input);
         }
-
         if (next == ERROR){
             if (isStateFinal(current)){
                 ungetc(input, source);

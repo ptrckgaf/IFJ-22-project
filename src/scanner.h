@@ -1,7 +1,8 @@
-/*
- * automata states
- */
 #include "utils.h"
+
+/*
+ * automaton states
+ */
 
 typedef enum{
     START,
@@ -28,12 +29,13 @@ typedef enum{
     STRING,
     STRING_MULTILINE,
     STRING_END,
+    STRING_BACKSLASH,
+
 
     VARIABLE_DOLLAR,
     VARIABLE_ID,
 
     //States for processing comments
-    SLASH,
     COMMENT,
     COMMENT_TEXT,
     COMMENT_BLOCK,
