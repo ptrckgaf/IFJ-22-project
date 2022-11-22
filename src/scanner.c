@@ -68,14 +68,14 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
         case STRING_START:
             if (input == '"'){return STRING_END;}
             if (input == '\\'){return STRING_BACKSLASH;}
-            if (input > 31){return STRING;}
+            if (input > 31 && input != '$'){return STRING;}
             if (input == '\n'){return STRING_MULTILINE;}
             return ERROR;
 
         case STRING:
             if (input == '"'){return STRING_END;}
             if (input == '\\'){return STRING_BACKSLASH;}
-            if (input > 31){return STRING;}
+            if (input > 31 && input != '$'){return STRING;}
             if (input == '\n'){return STRING_MULTILINE;}
             return ERROR;
 
@@ -83,7 +83,7 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
             //this state is needed to ignore new line symbols in strings
             if (input == '"'){return STRING_END;}
             if (input == '\\'){return STRING_BACKSLASH;}
-            if (input > 31){return STRING;}
+            if (input > 31 && input != '$'){return STRING;}
             if (input == '\n'){return STRING_MULTILINE;}
             return ERROR;
 
@@ -312,6 +312,7 @@ Stack *scanner(FILE *source){
 
         if (next == STRING_BACKSLASH){
             input = fgetc(source);
+            printf("a");
             switch (input) {
                 case 'n':
                     DynamicStringAddChar(bufferPtr, '\n');
@@ -335,7 +336,7 @@ Stack *scanner(FILE *source){
                     break;
             }
             //change current state to state before STRING_BACKSLASH
-            current = current;
+            current = STRING;
             continue;
         }
 
