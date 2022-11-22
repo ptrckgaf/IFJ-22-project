@@ -312,7 +312,6 @@ Stack *scanner(FILE *source){
 
         if (next == STRING_BACKSLASH){
             input = fgetc(source);
-            printf("a");
             switch (input) {
                 case 'n':
                     DynamicStringAddChar(bufferPtr, '\n');
