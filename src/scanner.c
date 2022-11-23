@@ -279,6 +279,58 @@ TokenType processIdentifier(DynamicString *identifier){
     return TOKEN_ID;
 }
 
+void processHexSequence(FILE *source, char *input, DynamicString *bufferPtr){
+    char hexString[3];
+    hexString[0] = fgetc(source);
+    hexString[1] = fgetc(source);
+    hexString[2] = '\0';
+    char *endPtr;
+    int hex = strtol(hexString, &endPtr, 16);
+    if (*endPtr == '\0' && hex >= 1){
+        //remove /x from buffer
+        DynamicStringRemoveChar(bufferPtr);
+        DynamicStringRemoveChar(bufferPtr);
+        //add character to buffer
+        DynamicStringAddChar(bufferPtr, hex);
+        //set input to last read character
+        *input = hexString[1];
+    } else{
+        //if /xAA is not valid hex escape sequence then remove x from buffer, unget xAA and put \ to buffer
+        ungetc(hexString[1], source);
+        ungetc(hexString[0], source);
+        ungetc('x', source);
+        DynamicStringAddChar(bufferPtr, '\\');
+    }
+}
+
+void processOctSequence(FILE *source, char *input, DynamicString *bufferPtr){
+    char octString[4];
+    octString[0] = *input;
+    octString[1] = fgetc(source);
+    octString[2] = fgetc(source);
+    octString[3] = '\0';
+
+    //1 if octString is between 001 and 377
+    char *endPtr;
+    int oct = strtol(octString, &endPtr, 8);
+
+    if (*endPtr == '\0' && oct > 00 && oct <= 0377){
+        //remove / and digit after it from buffer
+        DynamicStringRemoveChar(bufferPtr);
+        DynamicStringRemoveChar(bufferPtr);
+        //add character to buffer
+        DynamicStringAddChar(bufferPtr, oct);
+        //set input to last read character
+        *input = octString[2];
+    } else{
+        //if /AAA is not valid octal escape sequence then remove first digit from buffer, unget AAA and put \ to buffer
+        ungetc(octString[2], source);
+        ungetc(octString[1], source);
+        ungetc(octString[0], source);
+        DynamicStringAddChar(bufferPtr, '\\');
+    }
+}
+
 Stack *scanner(FILE *source){
     //resources initialization
     Stack *stackPtr = StackInit();
@@ -311,6 +363,7 @@ Stack *scanner(FILE *source){
         next = AutomatonNext(current, input);
 
         if (next == STRING_BACKSLASH){
+            //escape sequence
             input = fgetc(source);
             switch (input) {
                 case 'n':
@@ -327,6 +380,12 @@ Stack *scanner(FILE *source){
                     break;
                 case '$':
                     DynamicStringAddChar(bufferPtr, '$');
+                    break;
+                case 'x':
+                    processHexSequence(source, &input, bufferPtr);
+                    break;
+                case '0':case '1':case '2':case '3':
+                    processOctSequence(source, &input, bufferPtr);
                     break;
                 default:
                     //given sequence is not valid escape sequence, that's why we should put backslash to buffer

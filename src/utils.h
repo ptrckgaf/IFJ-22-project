@@ -369,7 +369,6 @@ Value *TokenToValue(Token *token);
  */
 char* ValueToString(Value *value);
 
-
 int parser();
 int codegen();
 

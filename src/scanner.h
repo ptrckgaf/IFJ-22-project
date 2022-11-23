@@ -87,4 +87,20 @@ bool isRead(AutomatonState state);
  */
 TokenType getToken(AutomatonState state);
 
+/**
+ * Function to process /x00 -/xFF sequence
+ * @param source
+ * @param input
+ * @param bufferPtr
+ */
+void processHexSequence(FILE *source, char *input, DynamicString *bufferPtr);
+
+/**
+ * Function to process octal escape sequnce
+ * @param source
+ * @param input
+ * @param bufferPtr
+ */
+void processOctSequence(FILE *source, char *input, DynamicString *bufferPtr);
+
 Stack *scanner(FILE *source);
