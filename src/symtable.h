@@ -1,5 +1,5 @@
 #include "utils.h"
-#define ST_SIZE 23 //Maximalna velkost tabulky
+#define MAX_SIZE 23 //Maximalna velkost tabulky
 
 typedef struct st_item {
     int key_type; //Typ kluca, kde 1..integer
@@ -8,7 +8,7 @@ typedef struct st_item {
     struct st_item *next;
 } st_item;
 
-typedef st_item *STable[ST_SIZE];
+typedef st_item *STable[MAX_SIZE];
 
 typedef struct st_function {
     int key_type;
@@ -19,7 +19,7 @@ typedef struct st_function {
     STable *symtab_ptr;
 } st_function;
 
-typedef st_function *FSTable[ST_SIZE];
+typedef st_function *FSTable[MAX_SIZE];
 
 int get_hash(char *key);
 void st_init(STable *table);
