@@ -8,7 +8,7 @@
 #include "parser.h"
 
 Token *token;
-ASTstruct *ast;
+extern ASTstruct *ast;
 
 char *displayNodes[] = {"SEQ",
                         "PROLOG",

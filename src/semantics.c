@@ -1,3 +1,10 @@
 #include "semantics.h"
+#include "utils.h"
 
-//test
+void test(){
+
+}
+int semantics(){
+    test();
+    return 0;
+}
