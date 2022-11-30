@@ -33,8 +33,12 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
             return ERROR;
 
         case QUESTION_MARK:
-            if (isdigit(input) || isalpha(input) || input == '_'){return IDENTIFIER;}
+            if (isalpha(input)){return TYPE_IDENTIFIER;}
             if (input == '>'){return END;}
+            return ERROR;
+
+        case TYPE_IDENTIFIER:
+            if (isalpha(input)){return TYPE_IDENTIFIER;}
             return ERROR;
 
         case NUMBER:
@@ -170,6 +174,7 @@ bool isStateFinal(AutomatonState state){
         case VARIABLE_ID:
         case STRING_END:
         case IDENTIFIER:
+        case TYPE_IDENTIFIER:
         case LEFT_PARENTHESE:
         case RIGHT_PARENTHESE:
         case NUMBER_DECIMAL:
@@ -204,6 +209,7 @@ bool isRead(AutomatonState state){
     switch (state) {
         case STRING:
         case IDENTIFIER:
+        case TYPE_IDENTIFIER:
         case VARIABLE_ID:
         case NUMBER_EXPONENTIAL:
         case NUMBER_DECIMAL:
@@ -217,9 +223,10 @@ bool isRead(AutomatonState state){
     }
 }
 
-TokenType getToken(AutomatonState state){
+TokenType getTokenType(AutomatonState state){
     switch (state) {
-        case IDENTIFIER:        return TOKEN_ID; //todo identifier processing
+        case IDENTIFIER:        return TOKEN_ID;
+        case TYPE_IDENTIFIER:   return TOKEN_TYPE_ID;
         case VARIABLE_ID:       return TOKEN_VAR_ID;
         case LEFT_PARENTHESE:   return TOKEN_L_PAR;
         case RIGHT_PARENTHESE:  return TOKEN_R_PAR;
@@ -254,7 +261,6 @@ TokenType getToken(AutomatonState state){
 }
 
 TokenType processIdentifier(DynamicString *identifier){
-    //todo implement using lookup table
     if (DynamicStringCompare(identifier, "else")){return TOKEN_KEYWORD_ELSE;}
     if (DynamicStringCompare(identifier, "float")){return TOKEN_KEYWORD_FLOAT;}
     if (DynamicStringCompare(identifier, "function")){return TOKEN_KEYWORD_FUNCTION;}
@@ -277,6 +283,13 @@ TokenType processIdentifier(DynamicString *identifier){
     if (DynamicStringCompare(identifier, "ord")){return TOKEN_ORD;}
 
     return TOKEN_ID;
+}
+
+TokenType processTypeIdentifier(DynamicString *id){
+    if (DynamicStringCompare(id, "int")){return TOKEN_KEYWORD_INT;}
+    if (DynamicStringCompare(id, "float")){return TOKEN_KEYWORD_FLOAT;}
+    if (DynamicStringCompare(id, "string")){return TOKEN_KEYWORD_STRING;}
+    error_exit(LEX_ERR, "Only int,float and string keywords are allowed after \"?\"")
 }
 
 void processHexSequence(FILE *source, char *input, DynamicString *bufferPtr){
@@ -362,8 +375,8 @@ Stack *scanner(FILE *source){
 
         next = AutomatonNext(current, input);
 
+        //process escape sequence
         if (next == STRING_BACKSLASH){
-            //escape sequence
             input = fgetc(source);
             switch (input) {
                 case 'n':
@@ -398,15 +411,18 @@ Stack *scanner(FILE *source){
             continue;
         }
 
+        //adding chars to buffer
         if (isRead(current) || isRead(next)){
             DynamicStringAddChar(bufferPtr, input);
         }
+
         if (next == ERROR){
             if (isStateFinal(current)){
+                //remove last symbol from
                 ungetc(input, source);
                 DynamicStringRemoveChar(bufferPtr);
-                tokenType = getToken(current);
-
+                tokenType = getTokenType(current);
+                //token ?> was met
                 if (tokenType == TOKEN_END){
                     isEnd = 1;
                 }
@@ -414,13 +430,19 @@ Stack *scanner(FILE *source){
                 if (tokenType == TOKEN_ID){
                     tokenType = processIdentifier(bufferPtr);
                 }
+                //process ?int, ?float, ?string
+                if (tokenType == TOKEN_TYPE_ID){
+                    tokenType = processTypeIdentifier(bufferPtr);
+                }
 
-                //Initializes dynamic string in new memory location and copies there bufferPtr content
+                //Initialize dynamic string in new memory location and copies bufferPtr content
                 tokenValuePtr = DynamicStringInit();
                 DynamicStringCopy(bufferPtr, tokenValuePtr);
 
+                //push new token on top of stack and clear buffer
                 StackPush(stackPtr, TokenInit(tokenType, tokenValuePtr));
                 DynamicStringClean(bufferPtr);
+
                 current = START;
             } else{
                 //if lexical error occurred, clean resources
