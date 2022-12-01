@@ -2,7 +2,6 @@
 #include "scanner.h"
 #include "semantics.h"
 
-ASTstruct *ast;
 int main(){
 
     FILE *source = fopen("../debug.php", "r");//set source to stdin
