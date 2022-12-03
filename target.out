@@ -1,0 +1,6 @@
+# Ukazka kod pro zavolani funkce (predavani parametru i navratovych hodnot pres TF a LF):
+#   y = foo(10, "Hi X!")
+#   print y
+.IFJcode22
+
+WRITE string@asalam

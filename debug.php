@@ -1,2 +1,5 @@
 <?php
-"\x2"
+declare(strict_types=1);
+
+$a = 1;
+write("salamasldlsadl\n");

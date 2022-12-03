@@ -9,13 +9,13 @@ int main(){
     if (stack == NULL){
         return LEX_ERR;
     }
-    StackPrint(stack);
+    //StackPrint(stack);
 
 
     parser(stack);
-    semantics();
+    //semantics();
 
-    //codegen();
+    codegen();
 
 
     StackFree(stack);

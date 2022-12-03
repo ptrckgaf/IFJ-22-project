@@ -8,7 +8,7 @@
 #include "parser.h"
 
 Token *token;
-extern ASTstruct *ast;
+ASTstruct *ast;
 
 char *displayNodes[] = {"SEQ",
                         "PROLOG",
@@ -808,7 +808,7 @@ void Print_tree2(ASTstruct* TempTree, char* sufix, char fromdir) {
     strcpy(suf2, sufix);
     
     if (fromdir == 'R')
-      suf2 = strcat(suf2, "  |");    
+      suf2 = strcat(suf2, "  |");
     else
       suf2 = strcat(suf2, "   ");
 
@@ -822,17 +822,17 @@ void Print_tree2(ASTstruct* TempTree, char* sufix, char fromdir) {
 }
 
 void Print_tree(ASTstruct* TempTree) {
-  printf("===========================================\n");
-  printf("Struktura binarniho stromu:\n");
-  printf("\n");
+  printf("#===========================================\n");
+  printf("#Struktura binarniho stromu:\n");
+  printf("#\n");
 
   if (TempTree != NULL)
-     Print_tree2(TempTree, "", 'X');
+     Print_tree2(TempTree, "#", 'X');
   else
-     printf("Strom je prazdny...\n");
+     printf("#Strom je prazdny...\n");
 
-  printf("\n");
-  printf("===========================================\n");
+  printf("#\n");
+  printf("#===========================================\n");
 } 
 
 
