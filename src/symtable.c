@@ -37,7 +37,7 @@ st_item *st_search(STable *table, tKey key) {
 //Vlozenie noveho prvku do tabulky
 void st_insert(STable *table, int key_type, tKey key, char *value) {
     st_item *insrt = st_search(table, key);
-    if (insrt != NULL) { 
+    if (insrt != NULL) {
         insrt->value = value;
         insrt->key_type = key_type;
     }
@@ -58,6 +58,30 @@ void st_insert(STable *table, int key_type, tKey key, char *value) {
         (*table)[hash] = insrt;
     }
 }
+/*void st_insert(STable *table, int key_type, tKey key, char *value,bool isParam) {
+    st_item *insrt = st_search(table, key);
+    if (insrt != NULL) { 
+        insrt->value = value;
+        insrt->key_type = key_type;
+    }
+    else {
+        int hash = get_hash(key);
+
+        insrt = malloc(sizeof(st_item));
+        if (insrt == NULL) {
+            error_exit(INT_ERR, "Memory allocation failure.");
+        }
+
+        insrt->value = value;
+        insrt->key = key;
+        insrt->key_type = key_type;
+        insrt->next = (*table)[hash];
+        insrt->nextScope = NULL;
+        insrt->isParam = isParam;
+
+        (*table)[hash] = insrt;
+    }
+}*/
 
 //Odstranenie prvku z tabulky, uvolni alokovane zdroje
 void st_remove(STable *table, char *key) {
@@ -95,12 +119,12 @@ st_function *fst_search(FSTable *table, tKey key) {
 }
 
 //Vlozenie novej funckie do tabulky
-void fst_insert(FSTable *table, STable *symtab_ptr, int key_type, tKey key, int values, int params) {
+void fst_insert(FSTable *table, STable *symtab_ptr, tParams parameters, tKey key, int retType, int params) {
     st_function *insrt = fst_search(table, key);
     if (insrt != NULL) { 
-        insrt->values = values;
+        insrt->retType = retType;
         insrt->params - params;
-        insrt->key_type = key_type;
+        insrt->parameters = parameters;
         insrt->symtab_ptr = symtab_ptr;
     }
     else {
@@ -111,10 +135,10 @@ void fst_insert(FSTable *table, STable *symtab_ptr, int key_type, tKey key, int 
             error_exit(INT_ERR, "Memory allocation failure.");
         }
 
-        insrt->values = values;
+        insrt->retType = retType;
         insrt->params = params;
         insrt->key = key;
-        insrt->key_type = key_type;
+        insrt->parameters = parameters;
         insrt->next = (*table)[hash];
         insrt->symtab_ptr = symtab_ptr;
 
