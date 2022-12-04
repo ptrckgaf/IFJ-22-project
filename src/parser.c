@@ -9,6 +9,7 @@
 
 Token *token;
 ASTstruct *ast;
+bool in_func_body = false;
 
 char *displayNodes[] = {"SEQ",
                         "PROLOG",
@@ -178,6 +179,10 @@ ASTstruct *program(Stack *stack)
 
     if (token->type == TOKEN_KEYWORD_FUNCTION)
     {
+        if (in_func_body)
+        {
+            error_exit(SYN_ERR, "Syntax error! Nested function definition.");
+        }
         root = function_define(stack);
     }
     else
@@ -222,11 +227,13 @@ ASTstruct *function_define(Stack *stack)
         expectToken(TOKEN_COLON, stack);
         returntype = rt(stack);
         expectToken(TOKEN_L_BRACKET, stack);
+        in_func_body = true;
         params_returntype = createNode(NODE_PARAMS_RETURNTYPE, NULL, parameters, returntype);
 
         func = createNode(NODE_FUNC_DEF, tmpToken, params_returntype, stmt(stack));
 
         expectToken(TOKEN_R_BRACKET, stack);
+        in_func_body = false;
 
         root = createNode(SEQ, NULL, program(stack), func);
     }
