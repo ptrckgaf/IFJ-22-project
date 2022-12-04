@@ -9,8 +9,11 @@
 
 int runtime_err = 0;
 int value = 0;
-ASTstruct *ast;
-FSTable *ftab;
+char *func;
+int if_s, while_s;
+
+//ASTstruct *ast;
+//FSTable *ftab;
 
 int codegen()
 {
@@ -31,6 +34,8 @@ int codegen()
 
 void gen_statements(ASTstruct *tree){
     //generating main body of the program
+    int ifc, whilec;
+    int type;
 
     switch (tree->rightNode->type) {
         case NODE_FUNC_DEF:
@@ -41,6 +46,25 @@ void gen_statements(ASTstruct *tree){
             break;
 
         case NODE_IF:
+            ifc = if_s;
+            if_s++;
+            // podmienka if
+            gen_cond(ast->rightNode->leftNode->rightNode, ifc, 0);
+
+            if (ast->rightNode->rightNode->rightNode)
+            {
+                gen_statements(ast->rightNode->rightNode->rightNode);
+            }
+            PRINT_CODE("JUMP %s%dtrue\n", func, ifc);
+            PRINT_CODE("LABEL %s%dfalse", func, ifc);
+            PRINT_NL();
+
+            if (ast->rightNode->rightNode->leftNode)
+            {
+                gen_statements(ast->rightNode->rightNode->leftNode);
+            }
+            PRINT_CODE("LABEL %s%dtrue", func, ifc);
+            PRINT_NL();
             break;
 
         case NODE_WHILE:
@@ -100,7 +124,7 @@ void gen_func_def(ASTstruct *tree)
         }
         if (tree->rightNode->rightNode)
         {
-            gen_func_body(tree->rightNode->rightNode);
+            gen_statements(tree->rightNode->rightNode);
         }
         fprintf(stdout, "POPFRAME\n");
         fprintf(stdout, "RETURN\n");
@@ -126,11 +150,6 @@ void gen_func_params(ASTstruct *tree)
     }
     param_number++;
     gen_func_params(tree->leftNode);
-}
-
-void gen_func_body(ASTstruct *tree)
-{
-    gen_statements(tree);
 }
 
 void gen_write(ASTstruct *tree){
@@ -222,6 +241,130 @@ void calculate_expr(ASTstruct *tree)
 void gen_assignment(ASTstruct *ast){
 
 }
+
+
+
+
+void gen_cond(ASTstruct *ast, int count, int type)
+{
+    PRINT_CODE("MOVE LF@!condvar1");
+    generate_constant(ast->leftNode->type);
+    PRINT_NL();
+    gen_expr(ast->leftNode);
+    PRINT_CODE("POPS LF@!condvar1\n");
+
+    PRINT_CODE("MOVE LF@!condvar2");
+    generate_constant(ast->rightNode->type);
+    PRINT_NL();
+    gen_expr(ast->rightNode);
+    PRINT_CODE("POPS LF@!condvar2\n");
+
+    switch(ast->type)
+    {
+        case NODE_GREATER:
+            PRINT_CODE("GT LF@!compvar LF@!condvar1 LF@!condvar2\n");
+            if (type == 0)
+            {
+                PRINT_CODE("JUMPIFNEQ %s%dfalse LF@!compvar bool@true\n", func, count);
+            }
+            else
+            {
+                PRINT_CODE("JUMPIFNEQ %d%sfalse LF@!compvar bool@true\n", count, func);
+            }
+            break;
+
+        case NODE_LESS:
+            PRINT_CODE("LT LF@!compvar LF@!condvar1 LF@!condvar2\n");
+            if (type == 0)
+            {
+                PRINT_CODE("JUMPIFNEQ %s%dfalse LF@!compvar bool@true\n", func, count);
+            }
+            else
+            {
+                PRINT_CODE("JUMPIFNEQ %d%sfalse LF@!compvar bool@true\n", count, func);
+            }
+            break;
+
+        case NODE_COMPARE:
+            PRINT_CODE("EQ LF@!compvar LF@!condvar1 LF@!condvar2\n");
+            if (type == 0)
+            {
+                PRINT_CODE("JUMPIFNEQ %s%dfalse LF@!compvar bool@true\n", func, count);
+            }
+            else
+            {
+                PRINT_CODE("JUMPIFNEQ %d%sfalse LF@!compvar bool@true\n", count, func);
+            }
+            break;
+
+        case NODE_NEG_COMPARE:
+            PRINT_CODE("EQ LF@!compvar LF@!condvar1 LF@!condvar2\n");
+            if (type == 0)
+            {
+                PRINT_CODE("JUMPIFEQ %s%dfalse LF@!compvar bool@true\n", func, count);
+            }
+            else
+            {
+                PRINT_CODE("JUMPIFEQ %d%sfalse LF@!compvar bool@true\n", count, func);
+            }
+            break;
+
+        case NODE_GREATER_EQ:
+            PRINT_CODE("GT LF@!compvar LF@!condvar1 LF@!condvar2\n");
+            if (type == 0)
+            {
+                PRINT_CODE("JUMPIFEQ %s%dfalse LF@!compvar bool@true\n", func, count);
+            }
+            else
+            {
+                PRINT_CODE("JUMPIFEQ %d%sfalse LF@!compvar bool@true\n", count, func);
+            }
+            PRINT_CODE("EQ LF@!compvar LF@!condvar1 LF@!condvar2\n");
+            if (type == 0)
+            {
+                PRINT_CODE("JUMPIFNEQ %s%dfalse GF@!compvar bool@true\n", func, count);
+            }
+            else
+            {
+                PRINT_CODE("JUMPIFNEQ %d%sfalse GF@!compvar bool@true\n", count, func);
+            }
+            if (type == 0)
+            {
+                PRINT_CODE("LABEL %s%dfalse\n", func, count);
+            }
+            else
+            {
+                PRINT_CODE("LABEL %d%sfalse\n", count, func);
+            }
+            break;
+
+        default:
+            break;
+    }
+
+}
+
+void gen_expr(ASTstruct *ast)
+{
+    switch(ast->type)
+    {
+        case NODE_INT:
+        case NODE_STRING:
+        case NODE_FLOAT:
+        case NODE_VAR_ID:
+            generate_constant(ast->type);
+            PRINT_NL();
+            break;
+
+        case NODE_PLUS:
+        case NODE_MINUS:
+        case NODE_MUL:
+        case NODE_DIV:
+            calculate_expr(ast);
+            break;
+    }
+}
+
 
 
 //void gen_statements(ASTstruct *ast)

@@ -1,6 +1,45 @@
-# Ukazka kod pro zavolani funkce (predavani parametru i navratovych hodnot pres TF a LF):
-#   y = foo(10, "Hi X!")
-#   print y
-.IFJcode22
+#===========================================
+#Struktura binarniho stromu:
+#
+#        +-[ (1) PROLOG ]
+#        |
+#     +-[ (0) SEQ ]
+#     |  |
+#     |  |        +-[ (34) WRITE ]
+#     |  |        |  |
+#     |  |        |  |  +-[ (14) STRING "A" ]
+#     |  |        |  |  |
+#     |  |        |  +-[ (0) SEQ ]
+#     |  |        |
+#     |  |     +-[ (0) SEQ ]
+#     |  |     |
+#     |  |  +-[ (2) FUNC_DEF "a" ]
+#     |  |  |  |
+#     |  |  |  |  +-[ (7) RETURN_TYPE_VOID ]
+#     |  |  |  |  |
+#     |  |  |  +-[ (3) PARAMS_RETURNTYPE ]
+#     |  |  |     |
+#     |  |  |     |  +-[ (8) PARAM_ID_INT "a" ]
+#     |  |  |     |  |
+#     |  |  |     +-[ (0) SEQ ]
+#     |  |  |
+#     |  +-[ (0) SEQ ]
+#     |
+#  +-[ (0) SEQ ]
+#
+#===========================================
+global global2 .IFJcode22
 
-WRITE string@asalam
+JUMP $$main
+
+LABEL a
+PUSHFRAME
+DEFVAR LF@a
+MOVE LF@a LF@1
+WRITE string@A
+POPFRAME
+RETURN
+
+LABEL $$main
+CREATEFRAME
+PUSHFRAME
