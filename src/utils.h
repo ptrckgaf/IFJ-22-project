@@ -377,7 +377,7 @@ void expectToken(int type, Stack *stack);
 Token *loadToken(Stack *stack);
 void unloadToken(Stack *stack);
 
-void itoa(int n, char s[]);
+void itoac(int n, char s[]);
 void reverse(char s[]);
 
 extern ASTstruct *ast;

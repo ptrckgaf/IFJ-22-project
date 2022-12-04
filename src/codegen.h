@@ -20,3 +20,5 @@ void gen_declaration(ASTstruct *tree);
 void gen_if(ASTstruct *tree);
 void gen_write(ASTstruct *tree);
 void generate_constant(ASTstruct *node);
+void gen_cond(ASTstruct *ast, int count, int type);
+void gen_expr(ASTstruct *ast);

@@ -3,7 +3,6 @@
 #include "utils.h"
 
 ASTstruct *ast;
-FSTable *ftab;
 int scope = 0;
 void functionBody(ASTstruct *tree,FSTable *ftab,char *name){
     //printf("%s\n",name);
@@ -11,12 +10,12 @@ void functionBody(ASTstruct *tree,FSTable *ftab,char *name){
         case NODE_VAR_ASSIGNMENT:
             //printf("var asign\n");
             break;
-    case NODE_RETURN:
-        //printf("return\n");
-        break;
-    case NODE_FUNC_DEF:
-        //printf("func def\n");
-        break;
+        case NODE_RETURN:
+            //printf("return\n");
+            break;
+        case NODE_FUNC_DEF:
+            //printf("func def\n");
+            break;
     }
     if(tree->leftNode != NULL){
         functionBody(tree->leftNode,ftab,name);
@@ -24,15 +23,13 @@ void functionBody(ASTstruct *tree,FSTable *ftab,char *name){
 }
 void insert_global(ASTstruct *tree,FSTable *ftab){
     tree = ast->rightNode->leftNode;
-    //printf("global ");
     STable *stab = (STable *)malloc(sizeof(STable));
     if(stab == NULL){
         error_exit(INT_ERR,"Memory allocation error. ");
     }
     st_init(stab);
-    printf("global ");
     fst_insert(ftab,stab,"","0",0,0);
-    printf("global2 ");
+    st_insert(stab,0,"test",0);
     functionBody(tree,ftab,"global");
 }
 char *string_concatenate(char *s1,char *s2){
@@ -88,34 +85,30 @@ void function_params(ASTstruct *tree,FSTable *ftab){
     if(tmp->leftNode == NULL){
         parameters = NULL;
         params = 0;
-    }else{
-        while(tmp->leftNode != NULL){
+    }else {
+        while (tmp->leftNode != NULL) {
             //typy parametru
-            switch(tmp->leftNode->rightNode->type){
+            switch (tmp->leftNode->rightNode->type) {
                 case NODE_PARAM_ID_INT:
                     paramType = 1;
-                    itoa(paramType,paramTypeChar);
+                    itoac(paramType, paramTypeChar);
                     break;
                 case NODE_PARAM_ID_FLOAT:
                     paramType = 2;
-                    itoa(paramType,paramTypeChar);
+                    itoac(paramType, paramTypeChar);
                     break;
                 case NODE_PARAM_ID_STRING:
                     paramType = 3;
-                    itoa(paramType,paramTypeChar);
+                    itoac(paramType, paramTypeChar);
                     break;
             }
-            parametersTmp = string_concatenate(parameters,paramTypeChar);
+            parametersTmp = string_concatenate(parameters, paramTypeChar);
             parameters = parametersTmp;
-            //printf("%s\n",paramTypeChar);
             tmp = tmp->leftNode;
             params++;
         }
     }
     fst_insert(ftab,stab,parameters,tree->rightNode->value->data.stringPtr->value,retType,params);
-
-    //functionBody(tree);
-    //st_insert(stab,0,tree->rightNode->value->data.stringPtr->value,0);
 }
 void insert_function(ASTstruct *tree,FSTable *ftab){
     if(tree->rightNode->type == NODE_FUNC_DEF){
@@ -126,7 +119,6 @@ void insert_function(ASTstruct *tree,FSTable *ftab){
         }
     }
     if(tree->rightNode->type == NODE_FUNC_DEF) {
-        //printf("%s ",tree->rightNode->value->data.stringPtr->value);
         functionBody(tree->rightNode->rightNode,ftab,tree->rightNode->value->data.stringPtr->value);
     }
     if(tree->leftNode != NULL){
@@ -136,7 +128,7 @@ void insert_function(ASTstruct *tree,FSTable *ftab){
 
 
 int semantics(){
-    ftab = (FSTable *)malloc(sizeof(FSTable));
+    FSTable *ftab = (FSTable *)malloc(sizeof(FSTable));
     ASTstruct *tree;
     tree = ast->rightNode->leftNode;
     if(ftab == NULL){
