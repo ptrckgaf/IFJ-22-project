@@ -1,5 +1,5 @@
 PROG=ifj22
-SOURCE=$(filter-out src/semantics.c, $(wildcard src/*.c))
+SOURCE=src/*.c
 CC=gcc
 TARGET_CODE=target.out
 INTERPRET=ic22int

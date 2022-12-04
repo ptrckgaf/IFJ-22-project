@@ -130,7 +130,6 @@ void gen_func_params(ASTstruct *tree)
 
 void gen_func_body(ASTstruct *tree)
 {
-
     gen_statements(tree);
 }
 
