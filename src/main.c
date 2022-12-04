@@ -4,17 +4,15 @@
 
 int main(){
 
-    FILE *source = fopen("../debug.php", "r");//set source to stdin
+    FILE *source = fopen("debug.php", "r");//set source to stdin
     Stack *stack = scanner(source);
     if (stack == NULL){
         return LEX_ERR;
     }
     //StackPrint(stack);
 
-
     parser(stack);
     semantics();
-
     codegen();
 
 
