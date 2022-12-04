@@ -17,6 +17,7 @@ run: $(PROG)
 $(TARGET_CODE): $(PROG)
 	./$(PROG) > $(TARGET_CODE)
 interpret: $(TARGET_CODE)
+	./$(PROG) > $(TARGET_CODE)
 	./$(INTERPRET) $(TARGET_CODE)
 
 
