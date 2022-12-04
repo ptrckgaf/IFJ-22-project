@@ -3,20 +3,30 @@
 #include "utils.h"
 
 ASTstruct *ast;
-int scope = 0;
-void functionBody(ASTstruct *tree,FSTable *ftab,char *name){
-    //printf("%s\n",name);
-    switch(tree->rightNode->type){
-        case NODE_VAR_ASSIGNMENT:
-            //printf("var asign\n");
-            break;
-        case NODE_RETURN:
-            //printf("return\n");
-            break;
-        case NODE_FUNC_DEF:
-            //printf("func def\n");
-            break;
+
+
+semCheck(ASTstruct *tree,FSTable *ftab){
+    printf("%d\n",tree->rightNode->type);
+}
+//zjisti datovy typ promenne
+int getVarType(int type){
+    switch(type){
+        case 12:
+            return 1;
+        case 13:
+            return 2;
+        case 14:
+            return 3;
     }
+}
+void functionBody(ASTstruct *tree,FSTable *ftab,char *name){
+    printf("name %s\n",name);
+    st_function *pointer = NULL;
+    if(tree->rightNode->type == NODE_VAR_ASSIGNMENT){
+        pointer = fst_search(ftab,name);
+        st_insert(pointer->symtab_ptr, getVarType(tree->rightNode->rightNode->type),tree->rightNode->leftNode->value->data.stringPtr->value,NULL);
+    }
+
     if(tree->leftNode != NULL){
         functionBody(tree->leftNode,ftab,name);
     }
@@ -28,9 +38,8 @@ void insert_global(ASTstruct *tree,FSTable *ftab){
         error_exit(INT_ERR,"Memory allocation error. ");
     }
     st_init(stab);
-    fst_insert(ftab,stab,"","0",0,0);
-    st_insert(stab,0,"test",0);
-    functionBody(tree,ftab,"global");
+    fst_insert(ftab,stab,NULL,"0",NULL,NULL);
+    functionBody(tree,ftab,"0");
 }
 char *string_concatenate(char *s1,char *s2){
     int s1_length = strlen(s1);
@@ -111,8 +120,9 @@ void function_params(ASTstruct *tree,FSTable *ftab){
     fst_insert(ftab,stab,parameters,tree->rightNode->value->data.stringPtr->value,retType,params);
 }
 void insert_function(ASTstruct *tree,FSTable *ftab){
+    //printf("tree->rightNode->type %d\n",tree->rightNode->type);
     if(tree->rightNode->type == NODE_FUNC_DEF){
-        if(fst_search(ftab,tree->rightNode->value->data.stringPtr->value)!= NULL){
+        if(fst_search(ftab,tree->rightNode->value->data.stringPtr->value) != NULL){
             error_exit(UNDEF_FUNC_ERR,"Semantic error! Re-definition of function. ");
         }else{
             function_params(tree,ftab);
