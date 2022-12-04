@@ -1,6 +1,6 @@
 #include "symtable.h"
 int ST_SIZE = MAX_SIZE;
-
+int tableCount = 0;
 //Rozptylovacia funkcia, prideli index zadanemu klucu
 int get_hash(tKey key) {
     int result = 1;
@@ -60,7 +60,7 @@ void st_insert(STable *table, int key_type, tKey key, char *value) {
 }
 /*void st_insert(STable *table, int key_type, tKey key, char *value,bool isParam) {
     st_item *insrt = st_search(table, key);
-    if (insrt != NULL) { 
+    if (insrt != NULL) {
         insrt->value = value;
         insrt->key_type = key_type;
     }
@@ -121,7 +121,7 @@ st_function *fst_search(FSTable *table, tKey key) {
 //Vlozenie novej funckie do tabulky
 void fst_insert(FSTable *table, STable *symtab_ptr, tParams parameters, tKey key, int retType, int params) {
     st_function *insrt = fst_search(table, key);
-    if (insrt != NULL) { 
+    if (insrt != NULL) {
         insrt->retType = retType;
         insrt->params - params;
         insrt->parameters = parameters;
@@ -135,6 +135,18 @@ void fst_insert(FSTable *table, STable *symtab_ptr, tParams parameters, tKey key
             error_exit(INT_ERR, "Memory allocation failure.");
         }
 
+        if(tableCount != MAX_SIZE) {
+            while ((*table)[hash] != NULL) {
+                if (hash == MAX_SIZE) {
+                    hash = 0;
+                } else {
+                    hash++;
+                }
+            }
+        }else{
+            tableCount = 0;
+        }
+
         insrt->retType = retType;
         insrt->params = params;
         insrt->key = key;
@@ -143,6 +155,7 @@ void fst_insert(FSTable *table, STable *symtab_ptr, tParams parameters, tKey key
         insrt->symtab_ptr = symtab_ptr;
 
         (*table)[hash] = insrt;
+        tableCount++;
     }
 }
 
