@@ -362,7 +362,7 @@ void reverse(char s[])
     }
 }
 
-void itoa(int n, char s[])
+void itoac(int n, char s[])
 {
     int i, sign;
 
