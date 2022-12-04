@@ -10,25 +10,31 @@
 int runtime_err = 0;
 int value = 0;
 ASTstruct *ast;
+FSTable *ftab;
+
 int codegen()
 {
     PRINT_CODE(".IFJcode22\n\n");
+    PRINT_CODE("JUMP $$main\n");
+
+    gen_func_def(ast->rightNode);
 
     PRINT_CODE("LABEL $$main\n");
     PRINT_CODE("CREATEFRAME\n");
     PRINT_CODE("PUSHFRAME\n");
-    generate(ast->rightNode);
+    gen_statements(ast->rightNode);
 //    gen_func_def(ast->rightNode);
 //    gen_statements(ast->rightNode);
 
     return 0;
 }
 
-void generate(ASTstruct *tree){
+void gen_statements(ASTstruct *tree){
     //generating main body of the program
 
     switch (tree->rightNode->type) {
         case NODE_FUNC_DEF:
+
             break;
 
         case NODE_VAR_ID:
@@ -77,8 +83,55 @@ void generate(ASTstruct *tree){
 
     }
     if (tree->leftNode){
-        generate(tree->leftNode);
+        gen_statements(tree->leftNode);
     }
+}
+
+void gen_func_def(ASTstruct *tree)
+{
+    if (tree->rightNode->type == NODE_FUNC_DEF)
+    {
+        fprintf(stdout, "\nLABEL %s\n", tree->rightNode->value->data.stringPtr->value);
+        fprintf(stdout, "PUSHFRAME\n");
+
+        if (tree->rightNode->leftNode)
+        {
+            gen_func_params(tree->rightNode->leftNode->leftNode);
+        }
+        if (tree->rightNode->rightNode)
+        {
+            gen_func_body(tree->rightNode->rightNode);
+        }
+        fprintf(stdout, "POPFRAME\n");
+        fprintf(stdout, "RETURN\n");
+        fprintf(stdout, "\n");
+    }
+    if (!tree->leftNode)
+    {
+        return;
+    }
+    gen_func_def(tree->leftNode);
+
+}
+
+void gen_func_params(ASTstruct *tree)
+{
+    int param_number = 1;
+    fprintf(stdout, "DEFVAR LF@%s\n", tree->rightNode->value->data.stringPtr->value);
+    fprintf(stdout, "MOVE LF@%s LF@%d\n", tree->rightNode->value->data.stringPtr->value, param_number);
+
+    if (!tree->leftNode)
+    {
+        return;
+    }
+    param_number++;
+    gen_func_params(tree->leftNode);
+}
+
+void gen_func_body(ASTstruct *tree)
+{
+
+    gen_statements(tree);
 }
 
 void gen_write(ASTstruct *tree){
@@ -110,7 +163,10 @@ void generate_constant(ASTstruct *node){
         case NODE_NULL:
             PRINT_CODE(" nil@nil");
             break;
+        case NODE_VAR_ID:
+            //todo rozsah platnosti
 
+            PRINT_CODE(" LF@");
         default:
             break;
     }

@@ -3,6 +3,7 @@
 #include "utils.h"
 
 ASTstruct *ast;
+FSTable *ftab;
 int scope = 0;
 void functionBody(ASTstruct *tree,FSTable *ftab,char *name){
     //printf("%s\n",name);
@@ -135,7 +136,7 @@ void insert_function(ASTstruct *tree,FSTable *ftab){
 
 
 int semantics(){
-    FSTable *ftab = (FSTable *)malloc(sizeof(FSTable));
+    ftab = (FSTable *)malloc(sizeof(FSTable));
     ASTstruct *tree;
     tree = ast->rightNode->leftNode;
     if(ftab == NULL){

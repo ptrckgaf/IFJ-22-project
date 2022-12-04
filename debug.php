@@ -1,5 +1,5 @@
 <?php
 declare(strict_types=1);
-
-$a = 1;
-write("salamasldlsadl\n");
+function a(int $a) : void {
+    write("A");
+}
