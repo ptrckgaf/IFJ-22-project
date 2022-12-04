@@ -4,7 +4,7 @@
 
 ASTstruct *ast;
 int scope = 0;
-functionBody(ASTstruct *tree,FSTable *ftab,char *name){
+void functionBody(ASTstruct *tree,FSTable *ftab,char *name){
     //printf("%s\n",name);
     switch(tree->rightNode->type){
         case NODE_VAR_ASSIGNMENT:
@@ -21,7 +21,7 @@ functionBody(ASTstruct *tree,FSTable *ftab,char *name){
         functionBody(tree->leftNode,ftab,name);
     }
 }
-insert_global(ASTstruct *tree,FSTable *ftab){
+void insert_global(ASTstruct *tree,FSTable *ftab){
     tree = ast->rightNode->leftNode;
     //printf("global ");
     STable *stab = (STable *)malloc(sizeof(STable));
@@ -93,15 +93,15 @@ void function_params(ASTstruct *tree,FSTable *ftab){
             switch(tmp->leftNode->rightNode->type){
                 case NODE_PARAM_ID_INT:
                     paramType = 1;
-                    itoa(paramType,paramTypeChar,10);
+                    itoa(paramType,paramTypeChar);
                     break;
                 case NODE_PARAM_ID_FLOAT:
                     paramType = 2;
-                    itoa(paramType,paramTypeChar,10);
+                    itoa(paramType,paramTypeChar);
                     break;
                 case NODE_PARAM_ID_STRING:
                     paramType = 3;
-                    itoa(paramType,paramTypeChar,10);
+                    itoa(paramType,paramTypeChar);
                     break;
             }
             parametersTmp = string_concatenate(parameters,paramTypeChar);

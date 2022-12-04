@@ -13,7 +13,7 @@ int main(){
 
 
     parser(stack);
-    //semantics();
+    semantics();
 
     codegen();
 
