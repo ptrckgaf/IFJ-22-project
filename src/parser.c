@@ -293,7 +293,7 @@ ASTstruct *params(Stack *stack)
     // viac parametrov
     if (token->type == TOKEN_COMMA)
     {
-        return createNode(SEQ, NULL, params(stack), param);
+        return createNode(SEQ, NULL, param, params(stack)); // vymena left a right node kvoli codegenu
     }
     // jeden parameter
     else

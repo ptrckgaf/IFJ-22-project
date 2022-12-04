@@ -12,8 +12,8 @@ int main(){
     //StackPrint(stack);
 
     parser(stack);
-    semantics();
-    codegen();
+    //semantics();
+    //codegen();
 
 
     StackFree(stack);
