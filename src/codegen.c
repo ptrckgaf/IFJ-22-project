@@ -12,6 +12,8 @@ int value = 0;
 char *func;
 int if_s, while_s;
 
+bool neg = 0;
+
 ASTstruct *ast;
 FSTable *ftab;
 
@@ -267,7 +269,28 @@ void calculate_expr(ASTstruct *tree)
             calculate_expr(tree->rightNode);
             PRINT_CODE("DIVS\n");
             break;
-
+        case NODE_LESS:
+            //todo >= <=
+            calculate_expr(tree->leftNode);
+            calculate_expr(tree->rightNode);
+            PRINT_CODE("LTS\n");
+            break;
+        case NODE_GREATER:
+            calculate_expr(tree->leftNode);
+            calculate_expr(tree->rightNode);
+            PRINT_CODE("GTS\n");
+            break;
+        case NODE_COMPARE:
+            calculate_expr(tree->leftNode);
+            calculate_expr(tree->rightNode);
+            PRINT_CODE("EQS\n");
+            break;
+        case NODE_NEG_COMPARE:
+            calculate_expr(tree->leftNode);
+            calculate_expr(tree->rightNode);
+            PRINT_CODE("EQS\n");
+            PRINT_CODE("NOTS\n");
+            break;
         case NODE_INT:
         case NODE_FLOAT:
         case NODE_VAR_ID:

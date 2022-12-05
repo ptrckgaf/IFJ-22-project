@@ -380,19 +380,34 @@ Stack *scanner(FILE *source){
             input = fgetc(source);
             switch (input) {
                 case 'n':
-                    DynamicStringAddChar(bufferPtr, '\n');
+                    DynamicStringAddChar(bufferPtr, '\\');
+                    DynamicStringAddChar(bufferPtr, '0');
+                    DynamicStringAddChar(bufferPtr, '1');
+                    DynamicStringAddChar(bufferPtr, '0');
                     break;
                 case 't':
-                    DynamicStringAddChar(bufferPtr, '\t');
+                    DynamicStringAddChar(bufferPtr, '\\');
+                    DynamicStringAddChar(bufferPtr, '0');
+                    DynamicStringAddChar(bufferPtr, '0');
+                    DynamicStringAddChar(bufferPtr, '9');
                     break;
                 case '\\':
                     DynamicStringAddChar(bufferPtr, '\\');
+                    DynamicStringAddChar(bufferPtr, '0');
+                    DynamicStringAddChar(bufferPtr, '9');
+                    DynamicStringAddChar(bufferPtr, '2');
                     break;
                 case '"':
-                    DynamicStringAddChar(bufferPtr, '\"');
+                    DynamicStringAddChar(bufferPtr, '\\');
+                    DynamicStringAddChar(bufferPtr, '0');
+                    DynamicStringAddChar(bufferPtr, '3');
+                    DynamicStringAddChar(bufferPtr, '4');
                     break;
                 case '$':
-                    DynamicStringAddChar(bufferPtr, '$');
+                    DynamicStringAddChar(bufferPtr, '\\');
+                    DynamicStringAddChar(bufferPtr, '0');
+                    DynamicStringAddChar(bufferPtr, '3');
+                    DynamicStringAddChar(bufferPtr, '6');
                     break;
                 case 'x':
                     processHexSequence(source, &input, bufferPtr);

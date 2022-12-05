@@ -633,19 +633,19 @@ ASTstruct *func_args(Stack *stack)
         switch(token->type)
         {
             case TOKEN_VAR_ID:
-                root = createNode(SEQ, NULL, createNode(NODE_VAR_ID, token, NULL, NULL), root);
+                root = createNode(SEQ, NULL, root,createNode(NODE_VAR_ID, token, NULL, NULL));
                 break;
 
             case TOKEN_INT:
-                root = createNode(SEQ, NULL, createNode(NODE_INT, token, NULL, NULL), root);
+                root = createNode(SEQ, NULL, root , createNode(NODE_INT, token, NULL, NULL));
                 break;
 
             case TOKEN_FLOAT:
-                root = createNode(SEQ, NULL, createNode(NODE_FLOAT, token, NULL, NULL), root);
+                root = createNode(SEQ, NULL, root , createNode(NODE_FLOAT, token, NULL, NULL));
                 break;
 
             case TOKEN_STRING:
-                root = createNode(SEQ, NULL, createNode(NODE_STRING, token, NULL, NULL), root);
+                root = createNode(SEQ, NULL, root,createNode(NODE_STRING, token, NULL, NULL));
                 break; // zamena poradia left a right node kvoli codegenu
 
             default:
