@@ -11,6 +11,7 @@ int runtime_err = 0;
 int value = 0;
 char *func;
 int if_s, while_s;
+bool in_while = false;
 
 //ASTstruct *ast;
 //FSTable *ftab;
@@ -34,7 +35,7 @@ int codegen()
 
 void gen_statements(ASTstruct *tree){
     //generating main body of the program
-    int ifc, whilec;
+    int ifc, whilec = 0;
     int type;
 
     switch (tree->rightNode->type) {
@@ -49,25 +50,35 @@ void gen_statements(ASTstruct *tree){
             ifc = if_s;
             if_s++;
             // podmienka if
-            gen_cond(ast->rightNode->leftNode->rightNode, ifc, 0);
+            gen_cond(tree->rightNode->leftNode->rightNode, ifc, 0);
 
-            if (ast->rightNode->rightNode->rightNode)
+            if (tree->rightNode->rightNode->rightNode)
             {
-                gen_statements(ast->rightNode->rightNode->rightNode);
+                gen_statements(tree->rightNode->rightNode->rightNode);
             }
             PRINT_CODE("JUMP %s%dtrue\n", func, ifc);
             PRINT_CODE("LABEL %s%dfalse", func, ifc);
             PRINT_NL();
 
-            if (ast->rightNode->rightNode->leftNode)
+            if (tree->rightNode->rightNode->leftNode)
             {
-                gen_statements(ast->rightNode->rightNode->leftNode);
+                gen_statements(tree->rightNode->rightNode->leftNode);
             }
             PRINT_CODE("LABEL %s%dtrue", func, ifc);
             PRINT_NL();
             break;
 
         case NODE_WHILE:
+            PRINT_CODE("LABEL %d%strue\n", whilec, func);
+            // podmienka
+            gen_cond(tree->rightNode->leftNode, whilec, 1);
+            in_while = true;
+            // telo
+            gen_statements(tree->rightNode->rightNode);
+            in_while = false;
+
+            PRINT_CODE("JUMP %d%strue\n", whilec, func);
+            PRINT_CODE("LABEL %d%sfalse\n", whilec, func);
             break;
 
         case NODE_VAR_ASSIGNMENT:{

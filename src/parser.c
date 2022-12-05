@@ -453,7 +453,7 @@ ASTstruct *stmt(Stack *stack)
 
         case TOKEN_WRITE:
             expectToken(TOKEN_L_PAR, stack);
-            built_in_func = createNode(NODE_WRITE, NULL, func_args(stack), NULL);
+            built_in_func = createNode(NODE_WRITE, NULL, NULL, func_args(stack));
             expectToken(TOKEN_R_PAR, stack);
             expectToken(TOKEN_SEMICOLON, stack);
             root = createNode(SEQ, NULL, program(stack), built_in_func);
@@ -626,39 +626,44 @@ ASTstruct *substr_args(Stack *stack)
 
 ASTstruct *func_args(Stack *stack)
 {
-    ASTstruct *root = NULL;
+    ASTstruct *arg = NULL;
     token = loadToken(stack);
-    while(token->type == TOKEN_VAR_ID || token->type == TOKEN_INT || token->type == TOKEN_FLOAT || token->type == TOKEN_STRING)
+    if (token == NULL)
+        return NULL;
+
+    switch(token->type)
     {
-        switch(token->type)
-        {
-            case TOKEN_VAR_ID:
-                root = createNode(SEQ, NULL, createNode(NODE_VAR_ID, token, NULL, NULL), root);
-                break;
+        case TOKEN_VAR_ID:
+            arg = createNode(NODE_VAR_ID, token, NULL, NULL);
+            break;
 
-            case TOKEN_INT:
-                root = createNode(SEQ, NULL, createNode(NODE_INT, token, NULL, NULL), root);
-                break;
+        case TOKEN_INT:
+            arg = createNode(NODE_INT, token, NULL, NULL);
+            break;
 
-            case TOKEN_FLOAT:
-                root = createNode(SEQ, NULL, createNode(NODE_FLOAT, token, NULL, NULL), root);
-                break;
+        case TOKEN_FLOAT:
+            arg = createNode(NODE_FLOAT, token, NULL, NULL);
+            break;
 
-            case TOKEN_STRING:
-                root = createNode(SEQ, NULL, createNode(NODE_STRING, token, NULL, NULL), root);
-                break; // zamena poradia left a right node kvoli codegenu
+        case TOKEN_STRING:
+            arg = createNode(NODE_STRING, token, NULL, NULL);
+            break;
 
-            default:
-                break;
-        }
-        token = loadToken(stack);
-        if (token->type == TOKEN_COMMA)
-        {
-            token = loadToken(stack);
-        }
+        default:
+            unloadToken(stack);
+            return NULL;
     }
-    unloadToken(stack);
-    return root;
+
+    token = loadToken(stack);
+    if (token->type == TOKEN_COMMA)
+    {
+        return createNode(SEQ, NULL, func_args(stack), arg);
+    }
+    else
+    {
+        unloadToken(stack);
+        return createNode(SEQ, NULL, NULL, arg);
+    }
 }
 
 ASTstruct *expr(Stack *stack, int preced)
