@@ -293,7 +293,7 @@ ASTstruct *params(Stack *stack)
     // viac parametrov
     if (token->type == TOKEN_COMMA)
     {
-        return createNode(SEQ, NULL, param, params(stack)); // vymena left a right node kvoli codegenu
+        return createNode(SEQ, NULL, params(stack), param);
     }
     // jeden parameter
     else
@@ -562,11 +562,11 @@ ASTstruct *substr_args(Stack *stack)
     switch (token->type)
     {
         case TOKEN_VAR_ID:
-            root = createNode(SEQ, NULL, NULL, createNode(NODE_VAR_ID, token, NULL, NULL));
+            root = createNode(SEQ, NULL, createNode(NODE_VAR_ID, token, NULL, NULL), NULL);
             break;
 
         case TOKEN_STRING:
-            root = createNode(SEQ, NULL, NULL, createNode(NODE_STRING, token, NULL, NULL));
+            root = createNode(SEQ, NULL, createNode(NODE_STRING, token, NULL, NULL), NULL);
             break;
 
         case TOKEN_INT:
@@ -583,11 +583,11 @@ ASTstruct *substr_args(Stack *stack)
     switch (token->type)
     {
         case TOKEN_VAR_ID:
-            root->leftNode = createNode(SEQ, NULL, NULL, createNode(NODE_VAR_ID, token, NULL, NULL));
+            root->leftNode = createNode(SEQ, NULL, createNode(NODE_VAR_ID, token, NULL, NULL), NULL);
             break;
 
         case TOKEN_INT:
-            root->leftNode = createNode(SEQ, NULL, NULL, createNode(NODE_INT, token, NULL, NULL));
+            root->leftNode = createNode(SEQ, NULL, createNode(NODE_INT, token, NULL, NULL), NULL);
             break;
 
         case TOKEN_STRING:
@@ -605,11 +605,11 @@ ASTstruct *substr_args(Stack *stack)
     switch (token->type)
     {
         case TOKEN_VAR_ID:
-            root->leftNode->leftNode = createNode(SEQ, NULL, NULL, createNode(NODE_VAR_ID, token, NULL, NULL));
+            root->leftNode->leftNode = createNode(SEQ, NULL, createNode(NODE_VAR_ID, token, NULL, NULL), NULL);
             break;
 
         case TOKEN_INT:
-            root->leftNode->leftNode = createNode(SEQ, NULL, NULL, createNode(NODE_INT, token, NULL, NULL));
+            root->leftNode->leftNode = createNode(SEQ, NULL, createNode(NODE_INT, token, NULL, NULL), NULL);
             break;
 
         case TOKEN_STRING:
@@ -633,20 +633,20 @@ ASTstruct *func_args(Stack *stack)
         switch(token->type)
         {
             case TOKEN_VAR_ID:
-                root = createNode(SEQ, NULL, root, createNode(NODE_VAR_ID, token, NULL, NULL));
+                root = createNode(SEQ, NULL, createNode(NODE_VAR_ID, token, NULL, NULL), root);
                 break;
 
             case TOKEN_INT:
-                root = createNode(SEQ, NULL, root, createNode(NODE_INT, token, NULL, NULL));
+                root = createNode(SEQ, NULL, createNode(NODE_INT, token, NULL, NULL), root);
                 break;
 
             case TOKEN_FLOAT:
-                root = createNode(SEQ, NULL, root, createNode(NODE_FLOAT, token, NULL, NULL));
+                root = createNode(SEQ, NULL, createNode(NODE_FLOAT, token, NULL, NULL), root);
                 break;
 
             case TOKEN_STRING:
-                root = createNode(SEQ, NULL, root, createNode(NODE_STRING, token, NULL, NULL));
-                break;
+                root = createNode(SEQ, NULL, createNode(NODE_STRING, token, NULL, NULL), root);
+                break; // zamena poradia left a right node kvoli codegenu
 
             default:
                 break;
