@@ -1,4 +1,8 @@
 <?php
 declare(strict_types=1);
-$b = 1;
-$a = reads();
+
+function foo(string $a, string $b) : int {
+    write($a, $b);
+    return 1;
+}
+$c = foo("aa", "bb");
