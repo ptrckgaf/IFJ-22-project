@@ -103,5 +103,11 @@ void processHexSequence(FILE *source, char *input, DynamicString *bufferPtr);
  * @param bufferPtr
  */
 void processOctSequence(FILE *source, char *input, DynamicString *bufferPtr);
+/**
+ * Adds int to buffer in the proper format
+ * @param buffer
+ * @param num
+ */
+void formatEscapeSequence(DynamicString *buffer, int num);
 
 Stack *scanner(FILE *source);

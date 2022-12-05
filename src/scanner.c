@@ -303,8 +303,8 @@ void processHexSequence(FILE *source, char *input, DynamicString *bufferPtr){
         //remove /x from buffer
         DynamicStringRemoveChar(bufferPtr);
         DynamicStringRemoveChar(bufferPtr);
-        //add character to buffer
-        DynamicStringAddChar(bufferPtr, hex);
+        //add number in decimal format to buffer
+        formatEscapeSequence(bufferPtr, hex);
         //set input to last read character
         *input = hexString[1];
     } else{
@@ -332,7 +332,7 @@ void processOctSequence(FILE *source, char *input, DynamicString *bufferPtr){
         DynamicStringRemoveChar(bufferPtr);
         DynamicStringRemoveChar(bufferPtr);
         //add character to buffer
-        DynamicStringAddChar(bufferPtr, oct);
+        formatEscapeSequence(bufferPtr, oct);
         //set input to last read character
         *input = octString[2];
     } else{
@@ -341,6 +341,24 @@ void processOctSequence(FILE *source, char *input, DynamicString *bufferPtr){
         ungetc(octString[1], source);
         ungetc(octString[0], source);
         DynamicStringAddChar(bufferPtr, '\\');
+    }
+}
+void formatEscapeSequence(DynamicString *buffer, int num){
+    DynamicStringAddChar(buffer, '\\');
+    char num_as_string[4];
+    itoac(num, num_as_string);
+    if (num < 100){
+        DynamicStringAddChar(buffer, '0');
+    }
+    if (num < 10){
+        DynamicStringAddChar(buffer, '0');
+    }
+
+    int i = 0;
+    char ch = num_as_string[i];
+    while(ch != '\0'){
+        DynamicStringAddChar(buffer, ch);
+        ch = num_as_string[++i];
     }
 }
 
