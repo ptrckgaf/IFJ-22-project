@@ -123,7 +123,7 @@ void fst_insert(FSTable *table, STable *symtab_ptr, tParams parameters, tKey key
     st_function *insrt = fst_search(table, key);
     if (insrt != NULL) {
         insrt->retType = retType;
-        insrt->params - params;
+        insrt->params = params;
         insrt->parameters = parameters;
         insrt->symtab_ptr = symtab_ptr;
     }
@@ -135,7 +135,7 @@ void fst_insert(FSTable *table, STable *symtab_ptr, tParams parameters, tKey key
             error_exit(INT_ERR, "Memory allocation failure.");
         }
 
-        if(tableCount != MAX_SIZE) {
+        /*if(tableCount != MAX_SIZE) {
             while ((*table)[hash] != NULL) {
                 if (hash == MAX_SIZE) {
                     hash = 0;
@@ -145,7 +145,7 @@ void fst_insert(FSTable *table, STable *symtab_ptr, tParams parameters, tKey key
             }
         }else{
             tableCount = 0;
-        }
+        }*/
 
         insrt->retType = retType;
         insrt->params = params;
@@ -168,3 +168,4 @@ void fst_remove(FSTable *table, char *key) {
 void fst_delete(FSTable *table) {
     return;
 }
+
