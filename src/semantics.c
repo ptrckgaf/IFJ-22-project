@@ -117,6 +117,30 @@ void semCheck(ASTstruct *tree,FSTable *ftab,char *name){
 void functionBody(ASTstruct *tree,FSTable *ftab,char *name){
     st_function *pointer = NULL;
     //printf("%s\n",name);
+    if(name != "0"){
+        ASTstruct *par;
+        par = ast->rightNode->leftNode->rightNode->leftNode;
+        st_function *pointer = NULL;
+        int parType;
+        while(par->leftNode != NULL){
+            switch(par->leftNode->rightNode->type){
+                case NODE_PARAM_ID_INT:
+                    parType = 1;
+                    break;
+                case NODE_PARAM_ID_FLOAT:
+                    parType = 2;
+                    break;
+                case NODE_PARAM_ID_STRING:
+                    parType = 3;
+                    break;
+            }
+            pointer = fst_search(ftab, name);
+            st_insert(pointer->symtab_ptr, parType, par->leftNode->rightNode->value->data.stringPtr->value, NULL);
+            par = par->leftNode;
+        }
+    }
+
+
     if(tree->rightNode->type == NODE_VAR_ASSIGNMENT){
         pointer = fst_search(ftab,name);
         st_insert(pointer->symtab_ptr, getVarType(tree->rightNode->rightNode->type),tree->rightNode->leftNode->value->data.stringPtr->value,NULL);
@@ -242,6 +266,8 @@ void function_params(ASTstruct *tree,FSTable *ftab){
     char paramTypeChar[2];
     int params = 0;
     ASTstruct *tmp;
+    ASTstruct *name;
+    name = tree->rightNode;
     tmp = tree->rightNode->leftNode;
 
     STable *stab = (STable *)malloc(sizeof(STable));
@@ -273,10 +299,11 @@ void function_params(ASTstruct *tree,FSTable *ftab){
         while (tmp->leftNode != NULL) {
             //typy parametru
             switch (tmp->leftNode->rightNode->type) {
-                case NODE_PARAM_ID_INT:
+                case NODE_PARAM_ID_INT: {
                     paramType = 1;
                     itoac(paramType, paramTypeChar);
                     break;
+                }
                 case NODE_PARAM_ID_FLOAT:
                     paramType = 2;
                     itoac(paramType, paramTypeChar);
@@ -293,6 +320,12 @@ void function_params(ASTstruct *tree,FSTable *ftab){
         }
     }
     fst_insert(ftab,stab,parameters,tree->rightNode->value->data.stringPtr->value,retType,params);
+    /*st_function *pointer = NULL;
+    printf("%s\n",name->value->data.stringPtr->value);
+
+    pointer = fst_search(ftab, name->value->data.stringPtr->value);
+    st_insert(pointer->symtab_ptr, 1, "b", NULL);*/
+
 }
 void insert_function(ASTstruct *tree,FSTable *ftab){
     //printf("tree->rightNode->type %d\n",tree->rightNode->type);
@@ -329,6 +362,6 @@ int semantics(){
 
         insert_function(tree, ftab);
         //semCheck(ast->rightNode->leftNode,ftab);
-        printf("#done\n");
+        //printf("\ndone");
     }
 }
