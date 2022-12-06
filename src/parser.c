@@ -843,6 +843,7 @@ void Print_tree2(ASTstruct* TempTree, char* sufix, char fromdir) {
                 printf("%s  +-[ (%d) %s \"%f\" ]\n", sufix, TempTree->type,  displayNodes[TempTree->type], TempTree->value->data.decimal);
                 break;
             case VALUE_NULL:
+                printf("%s  +-[ (%d) %s \"%d\" ]\n", sufix, TempTree->type,  displayNodes[TempTree->type], -1);
                 break;
         }
     }
