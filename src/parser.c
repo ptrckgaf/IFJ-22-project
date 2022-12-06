@@ -46,6 +46,8 @@ char *displayNodes[] = {"SEQ",
                         "READI",
                         "READF",
                         "WRITE",
+                        "FLOATVAL",
+                        "INTVAL",
                         "STRLEN",
                         "SUBSTRING",
                         "CHR",
@@ -97,6 +99,8 @@ precedence_table preced_table[] = {
         {TOKEN_READI, -1,NODE_READI},
         {TOKEN_READF, -1,NODE_READF},
         {TOKEN_WRITE, -1,NODE_WRITE},
+        {TOKEN_FLOATVAL, -1, NODE_FLOATVAL},
+        {TOKEN_INTVAL, -1, NODE_INTVAL},
         {TOKEN_STRLEN, -1,NODE_STRLEN},
         {TOKEN_SUBSTRING, -1,NODE_SUBSTRING},
         {TOKEN_CHR, -1,NODE_CHR},
@@ -491,6 +495,22 @@ ASTstruct *stmt(Stack *stack)
             root = createNode(SEQ, NULL, program(stack), built_in_func);
             break;
 
+        case TOKEN_FLOATVAL:
+            expectToken(TOKEN_L_PAR, stack);
+            built_in_func = createNode(NODE_FLOATVAL, NULL, func_args(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            expectToken(TOKEN_SEMICOLON, stack);
+            root = createNode(SEQ, NULL, program(stack), built_in_func);
+            break;
+
+        case TOKEN_INTVAL:
+            expectToken(TOKEN_L_PAR, stack);
+            built_in_func = createNode(NODE_INTVAL, NULL, func_args(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            expectToken(TOKEN_SEMICOLON, stack);
+            root = createNode(SEQ, NULL, program(stack), built_in_func);
+            break;
+
         default:
             unloadToken(stack);
             return NULL;
@@ -758,6 +778,18 @@ ASTstruct *expr(Stack *stack, int preced)
         case TOKEN_CHR:
             expectToken(TOKEN_L_PAR, stack);
             root = createNode(NODE_CHR, NULL, int_arg(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            break;
+
+        case TOKEN_FLOATVAL:
+            expectToken(TOKEN_L_PAR, stack);
+            root = createNode(NODE_FLOATVAL, NULL, func_args(stack), NULL);
+            expectToken(TOKEN_R_PAR, stack);
+            break;
+
+        case TOKEN_INTVAL:
+            expectToken(TOKEN_L_PAR, stack);
+            root = createNode(NODE_INTVAL, NULL, func_args(stack), NULL);
             expectToken(TOKEN_R_PAR, stack);
             break;
 

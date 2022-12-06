@@ -180,6 +180,8 @@ typedef enum{
     NODE_READI,
     NODE_READF,
     NODE_WRITE,
+    NODE_FLOATVAL,
+    NODE_INTVAL,
     NODE_STRLEN,
     NODE_SUBSTRING,
     NODE_CHR,

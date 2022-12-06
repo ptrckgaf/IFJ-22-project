@@ -26,6 +26,6 @@ void calculate_expr(ASTstruct *tree);
 void gen_declaration(ASTstruct *tree);
 void gen_if(ASTstruct *tree, tKey func_name, int if_number);
 void gen_write(ASTstruct *tree);
-void generate_constant(ASTstruct *node);
+void generate_constant(ASTstruct *ast);
 void gen_cond(ASTstruct *ast, int count, int type);
 void gen_expr(ASTstruct *ast);

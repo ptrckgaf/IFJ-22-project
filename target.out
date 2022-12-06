@@ -5,41 +5,94 @@
 #        |
 #     +-[ (0) SEQ ]
 #     |  |
-#     |  |        +-[ (34) WRITE ]
+#     |  |                 +-[ (34) WRITE ]
+#     |  |                 |  |
+#     |  |                 |  |  +-[ (14) STRING "Hello" ]
+#     |  |                 |  |  |
+#     |  |                 |  +-[ (0) SEQ ]
+#     |  |                 |
+#     |  |              +-[ (0) SEQ ]
+#     |  |              |
+#     |  |           +-[ (17) ELSE ]
+#     |  |           |
+#     |  |        +-[ (16) IF ]
 #     |  |        |  |
-#     |  |        |  |  +-[ (14) STRING "A" ]
+#     |  |        |  |     +-[ (15) VAR_ID "a" ]
+#     |  |        |  |     |
+#     |  |        |  |  +-[ (24) GREATER ]
+#     |  |        |  |  |  |
+#     |  |        |  |  |  +-[ (15) VAR_ID "b" ]
 #     |  |        |  |  |
 #     |  |        |  +-[ (0) SEQ ]
 #     |  |        |
 #     |  |     +-[ (0) SEQ ]
+#     |  |     |  |
+#     |  |     |  |  +-[ (11) RETURN ]
+#     |  |     |  |  |  |
+#     |  |     |  |  |  +-[ (12) INT "2" ]
+#     |  |     |  |  |
+#     |  |     |  +-[ (0) SEQ ]
 #     |  |     |
-#     |  |  +-[ (2) FUNC_DEF "a" ]
+#     |  |  +-[ (2) FUNC_DEF "f" ]
 #     |  |  |  |
-#     |  |  |  |  +-[ (7) RETURN_TYPE_VOID ]
+#     |  |  |  |  +-[ (4) RETURN_TYPE_INT ]
 #     |  |  |  |  |
 #     |  |  |  +-[ (3) PARAMS_RETURNTYPE ]
 #     |  |  |     |
-#     |  |  |     |  +-[ (8) PARAM_ID_INT "a" ]
+#     |  |  |     |  +-[ (8) PARAM_ID_INT "b" ]
 #     |  |  |     |  |
 #     |  |  |     +-[ (0) SEQ ]
+#     |  |  |        |
+#     |  |  |        |  +-[ (8) PARAM_ID_INT "a" ]
+#     |  |  |        |  |
+#     |  |  |        +-[ (0) SEQ ]
 #     |  |  |
 #     |  +-[ (0) SEQ ]
+#     |     |
+#     |     |  +-[ (40) FUNC_ID "f" ]
+#     |     |  |  |
+#     |     |  |  |  +-[ (12) INT "1" ]
+#     |     |  |  |  |
+#     |     |  |  +-[ (0) SEQ ]
+#     |     |  |     |
+#     |     |  |     |  +-[ (12) INT "0" ]
+#     |     |  |     |  |
+#     |     |  |     +-[ (0) SEQ ]
+#     |     |  |
+#     |     +-[ (0) SEQ ]
 #     |
 #  +-[ (0) SEQ ]
 #
 #===========================================
-global global2 .IFJcode22
+.IFJcode22
 
 JUMP $$main
 
-LABEL a
+LABEL f
 PUSHFRAME
+DEFVAR LF@%retval
+MOVE LF@%retval nil@nil
+DEFVAR LF@b
+MOVE LF@b LF@%1
 DEFVAR LF@a
-MOVE LF@a LF@1
-WRITE string@A
+MOVE LF@a LF@%2
+DEFVAR LF@b
+PUSHS LF@b
+PUSHS LF@a
+GTS
+DEFVAR LF@a
+JUMPIFNEQ nill@nill
+WRITE string@Hello
+MOVE LF@%retval int@2
 POPFRAME
 RETURN
 
 LABEL $$main
 CREATEFRAME
 PUSHFRAME
+CREATEFRAME
+DEFVAR TF@%1
+MOVE TF@%1 int@1
+DEFVAR TF@%2
+MOVE TF@%2 int@0
+CALL f
