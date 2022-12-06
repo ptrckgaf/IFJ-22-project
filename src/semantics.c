@@ -51,13 +51,15 @@ void semCheck(ASTstruct *tree,FSTable *ftab,char *name){
             st_function *pointer = NULL;
             tmp = tree->rightNode;
             while(tmp->leftNode != NULL) {
-            if(tmp->leftNode->rightNode->type == NODE_VAR_ID){
-                    pointer = fst_search(ftab, name);
-                    if (st_search(pointer->symtab_ptr,tmp->leftNode->rightNode->value->data.stringPtr->value) == NULL) {
-                        error_exit(UNDEF_VAR_ERR, "Semantic error! Undefined variable. ");
-                    }
-                    tmp = tmp->leftNode;
+                if(tmp->leftNode->rightNode->type == NODE_VAR_ID){
+                        pointer = fst_search(ftab, name);
+                        if (st_search(pointer->symtab_ptr,tmp->leftNode->rightNode->value->data.stringPtr->value) == NULL) {
+                            error_exit(UNDEF_VAR_ERR, "Semantic error! Undefined variable. ");
+                        }
+
                 }
+
+                tmp = tmp->leftNode;
             }
             break;
         }
@@ -115,7 +117,7 @@ void semCheck(ASTstruct *tree,FSTable *ftab,char *name){
 void functionBody(ASTstruct *tree,FSTable *ftab,char *name){
     st_function *pointer = NULL;
     //printf("%s\n",name);
-    if(name != "0"){
+    if(strcmp(name, "0") != 0){
         ASTstruct *par;
         par = ast->rightNode->leftNode->rightNode->leftNode;
         st_function *pointer = NULL;
@@ -360,6 +362,6 @@ int semantics(){
 
         insert_function(tree, ftab);
         //semCheck(ast->rightNode->leftNode,ftab);
-        //printf("\ndone");
+        printf("\ndone");
     }
 }
