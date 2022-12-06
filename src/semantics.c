@@ -56,13 +56,36 @@ void semCheck(ASTstruct *tree,FSTable *ftab,char *name){
                         if (st_search(pointer->symtab_ptr,tmp->leftNode->rightNode->value->data.stringPtr->value) == NULL) {
                             error_exit(UNDEF_VAR_ERR, "Semantic error! Undefined variable. ");
                         }
-
                 }
-
                 tmp = tmp->leftNode;
             }
             break;
         }
+        /*case NODE_STRLEN:{
+            printf("strlen\n");
+            st_function *pointer = NULL;
+            tmp = tree->rightNode;
+            while(tmp->leftNode != NULL) {
+                if(tmp->leftNode->rightNode->type == NODE_VAR_ID){
+                    pointer = fst_search(ftab, name);
+                    if (st_search(pointer->symtab_ptr,tmp->leftNode->rightNode->value->data.stringPtr->value) == NULL) {
+                        error_exit(UNDEF_VAR_ERR, "Semantic error! Undefined variable. ");
+                    }
+                }
+                tmp = tmp->leftNode;
+            }
+            break;
+        }*/
+        case NODE_SUBSTRING:{
+
+        }
+        case NODE_CHR:{
+
+        }
+        case NODE_ORD:{
+
+        }
+
         case NODE_FUNC_ID: {
             if (fst_search(ftab, tree->rightNode->value->data.stringPtr->value) == NULL) {
                 error_exit(UNDEF_FUNC_ERR, "Semantic error! Call of undefined function. ");
@@ -105,18 +128,19 @@ void semCheck(ASTstruct *tree,FSTable *ftab,char *name){
             count = 0;
             break;
         }
+        case NODE_VAR_ASSIGNMENT:{
+
+        }
         default:
             break;
 
 
     }
-    /*if(tree->leftNode != NULL){
-        semCheck(tree->leftNode,ftab);
-    }*/
 }
 void functionBody(ASTstruct *tree,FSTable *ftab,char *name){
     st_function *pointer = NULL;
     //printf("%s\n",name);
+    //printf("%d\n",tree->rightNode->type);
     if(strcmp(name, "0") != 0){
         ASTstruct *par;
         par = ast->rightNode->leftNode->rightNode->leftNode;
@@ -134,12 +158,12 @@ void functionBody(ASTstruct *tree,FSTable *ftab,char *name){
                     parType = 3;
                     break;
             }
+            printf("opa\n");
             pointer = fst_search(ftab, name);
             st_insert(pointer->symtab_ptr, parType, par->leftNode->rightNode->value->data.stringPtr->value, NULL);
             par = par->leftNode;
         }
     }
-
 
     if(tree->rightNode->type == NODE_VAR_ASSIGNMENT){
         pointer = fst_search(ftab,name);
@@ -147,102 +171,112 @@ void functionBody(ASTstruct *tree,FSTable *ftab,char *name){
     }
 
     if(tree->rightNode->type == NODE_IF){
+        //printf("if");
         int x;
         ASTstruct *tmp = tree->rightNode->leftNode->rightNode;
-        switch(tmp->type){
+        //ASTstruct *back = tree;
+        //if((tmp->rightNode != NODE_VAR_ID) &&(tmp->leftNode != NODE_VAR_ID)) {
+            switch (tmp->type) {
 
-            case NODE_GREATER:{
-                break;
-            }
-            case NODE_GREATER_EQ:{
-                break;
-            }
-            case NODE_LESS:{
-                break;
-            }
-            case NODE_LESS_EQ:{
-                break;
-            }
-            case NODE_COMPARE:{
-                if(tmp->leftNode->type != tmp->rightNode->type){
-                    x = false;
-                }else {
-                    switch (tree->rightNode->leftNode->rightNode->leftNode->type) {
-                        case NODE_INT: {
-                            if (tmp->leftNode->value->data.integer != tmp->rightNode->value->data.integer) {
-                                x = false;
-                            } else {
-                                x = true;
+                case NODE_GREATER: {
+                    break;
+                }
+                case NODE_GREATER_EQ: {
+                    break;
+                }
+                case NODE_LESS: {
+                    break;
+                }
+                case NODE_LESS_EQ: {
+                    break;
+                }
+                case NODE_COMPARE: {
+                    if (tmp->leftNode->type != tmp->rightNode->type) {
+                        x = false;
+                    } else {
+                        switch (tree->rightNode->leftNode->rightNode->leftNode->type) {
+                            case NODE_INT: {
+                                if (tmp->leftNode->value->data.integer != tmp->rightNode->value->data.integer) {
+                                    x = false;
+                                } else {
+                                    x = true;
+                                }
+                                break;
                             }
-                            break;
-                        }
-                        case NODE_FLOAT: {
-                            if (tmp->leftNode->value->data.decimal != tmp->rightNode->value->data.decimal) {
-                                x = false;
-                            } else {
-                                x = true;
+                            case NODE_FLOAT: {
+                                if (tmp->leftNode->value->data.decimal != tmp->rightNode->value->data.decimal) {
+                                    x = false;
+                                } else {
+                                    x = true;
+                                }
+                                break;
                             }
-                            break;
-                        }
-                        case NODE_STRING: {
-                            if (strcmp(tmp->leftNode->value->data.stringPtr->value,
-                                       tmp->rightNode->value->data.stringPtr->value) != 0) {
-                                x = false;
-                            } else {
-                                x = true;
+                            case NODE_STRING: {
+                                if (strcmp(tmp->leftNode->value->data.stringPtr->value,
+                                           tmp->rightNode->value->data.stringPtr->value) != 0) {
+                                    x = false;
+                                } else {
+                                    x = true;
+                                }
+                                break;
                             }
-                            break;
                         }
                     }
-                }
-                if(x){
-                    functionBody(tree->rightNode->rightNode->rightNode,ftab,name);
-                }else{
-                    functionBody(tree->rightNode->rightNode->leftNode,ftab,name);
-                }
-                break;
-            }
-            case NODE_NEG_COMPARE:{
-                if(tmp->leftNode->type != tmp->rightNode->type){
-                    x = true;
-                }else {
-                    switch (tree->rightNode->leftNode->rightNode->leftNode->type) {
-                        case NODE_INT: {
-                            if (tmp->leftNode->value->data.integer != tmp->rightNode->value->data.integer) {
-                                x = true;
-                            } else {
-                                x = false;
-                            }
-                            break;
+                    //printf("opa1 %d\n",x);
+                    if (x) {
+                        if (tree->rightNode->rightNode->rightNode != NULL) {
+                            functionBody(tree->rightNode->rightNode->rightNode, ftab, name);
                         }
-                        case NODE_FLOAT: {
-                            if (tmp->leftNode->value->data.decimal != tmp->rightNode->value->data.decimal) {
-                                x = true;
-                            } else {
-                                x = false;
-                            }
-                            break;
-                        }
-                        case NODE_STRING: {
-                            if (strcmp(tmp->leftNode->value->data.stringPtr->value,
-                                       tmp->rightNode->value->data.stringPtr->value) != 0) {
-                                x = true;
-                            } else {
-                                x = false;
-                            }
-                            break;
+                    } else {
+                        if (tree->rightNode->rightNode->leftNode != NULL) {
+                            functionBody(tree->rightNode->rightNode->leftNode, ftab, name);
                         }
                     }
+                    break;
                 }
-                break;
+                case NODE_NEG_COMPARE: {
+                    if (tmp->leftNode->type != tmp->rightNode->type) {
+                        x = true;
+                    } else {
+                        switch (tree->rightNode->leftNode->rightNode->leftNode->type) {
+                            case NODE_INT: {
+                                if (tmp->leftNode->value->data.integer != tmp->rightNode->value->data.integer) {
+                                    x = true;
+                                } else {
+                                    x = false;
+                                }
+                                break;
+                            }
+                            case NODE_FLOAT: {
+                                if (tmp->leftNode->value->data.decimal != tmp->rightNode->value->data.decimal) {
+                                    x = true;
+                                } else {
+                                    x = false;
+                                }
+                                break;
+                            }
+                            case NODE_STRING: {
+                                if (strcmp(tmp->leftNode->value->data.stringPtr->value,
+                                           tmp->rightNode->value->data.stringPtr->value) != 0) {
+                                    x = true;
+                                } else {
+                                    x = false;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+                default:
+                    break;
             }
-            default:
-                break;
-        }
+        //}
         //printf("%d\n",x);
     }
     semCheck(tree,ftab,name);
     if(tree->leftNode != NULL){
+        //printf("next");
         functionBody(tree->leftNode,ftab,name);
     }
 }
@@ -343,7 +377,7 @@ void insert_function(ASTstruct *tree,FSTable *ftab){
         insert_function(tree->leftNode,ftab);
     }
     if(count == 0){
-        insert_global(ast, ftab);
+        insert_global(tree, ftab);
         count++;
     }
 }
@@ -359,9 +393,12 @@ int semantics(){
             error_exit(INT_ERR, "Memory allocation error. ");
         }
         fst_init(ftab);
-
         insert_function(tree, ftab);
         //semCheck(ast->rightNode->leftNode,ftab);
+<<<<<<< HEAD
+        //printf("\n# done");
+=======
         printf("#done\n");
+>>>>>>> 414875563cd052904896c408bc88c0de59844f32
     }
 }
