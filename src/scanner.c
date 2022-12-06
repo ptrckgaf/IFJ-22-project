@@ -276,6 +276,8 @@ TokenType processIdentifier(DynamicString *identifier){
     if (DynamicStringCompare(identifier, "reads")){return TOKEN_READS;}
     if (DynamicStringCompare(identifier, "readi")){return TOKEN_READI;}
     if (DynamicStringCompare(identifier, "readf")){return TOKEN_READF;}
+    if (DynamicStringCompare(identifier, "floatval")){return TOKEN_FLOATVAL;}
+    if (DynamicStringCompare(identifier, "intval")){return TOKEN_INTVAL;}
     if (DynamicStringCompare(identifier, "write")){return TOKEN_WRITE;}
     if (DynamicStringCompare(identifier, "strlen")){return TOKEN_STRLEN;}
     if (DynamicStringCompare(identifier, "substring")){return TOKEN_SUBSTRING;}
