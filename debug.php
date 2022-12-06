@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
-if(1 < 0){
-    write("true\n");
-}else{
-    if(1 > 0){
-        write("trueINS\n");
-    }else{
 
+function f(?float $v): void {
+    if ($v === null) {
+        write("(null)\n");
+    } else {
+        write($v, "!\n");
     }
 }
+f(null);

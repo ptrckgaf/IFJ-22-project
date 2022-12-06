@@ -54,7 +54,7 @@ char *displayNodes[] = {"SEQ",
                         "ORD",
                         "END",
                         "FUNC_ID",
-                        "NODE_NULL"};
+                        "NULL"};
 
 
 precedence_table preced_table[] = {
@@ -667,6 +667,10 @@ ASTstruct *func_args(Stack *stack)
 
         case TOKEN_STRING:
             arg = createNode(NODE_STRING, token, NULL, NULL);
+            break;
+
+        case TOKEN_KEYWORD_NULL:
+            arg = createNode(NODE_NULL, token, NULL, NULL);
             break;
 
         default:
