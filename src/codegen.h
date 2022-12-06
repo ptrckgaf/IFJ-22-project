@@ -8,8 +8,13 @@
 #define PRINT_NL() \
     fprintf(stdout, "\n")
 
-void gen_statements(ASTstruct *tree, tKey func_name);
-void gen_func_def(ASTstruct *tree, tKey func_name);
+#define PRINT_ERR() \
+    PRINT_CODE("JUMP $$runerr\n");
+
+
+
+void gen_statements(ASTstruct *tree, tKey func_name, int if_number);
+void gen_func_def(ASTstruct *tree, tKey func_name, int if_number);
 void gen_functions(ASTstruct *tree);
 void gen_var_assignment(ASTstruct *ast);
 void gen_func_call(ASTstruct *ast);
@@ -19,7 +24,7 @@ void gen_func_body (ASTstruct *tree);
 void gen_write(ASTstruct *ast);
 void calculate_expr(ASTstruct *tree);
 void gen_declaration(ASTstruct *tree);
-void gen_if(ASTstruct *tree);
+void gen_if(ASTstruct *tree, tKey func_name, int if_number);
 void gen_write(ASTstruct *tree);
 void generate_constant(ASTstruct *node);
 void gen_cond(ASTstruct *ast, int count, int type);

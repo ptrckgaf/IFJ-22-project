@@ -6,10 +6,11 @@
 #include "utils.h"
 #include "codegen.h"
 
+
 int runtime_err = 0;
 int value = 0;
 char *func;
-int if_s, while_s;
+int input_cnt = 0; //counter for read
 bool in_while = false;
 
 bool neg = 0;
@@ -18,67 +19,43 @@ FSTable *fsTable;
 
 int codegen()
 {
-    PRINT_CODE(".IFJcode22\n\n");
+
+    PRINT_CODE(".IFJcode22\n");
+
+    //variable for string concatenation
+    PRINT_CODE("DEFVAR GF@%%con\n");
+
     PRINT_CODE("JUMP $$main\n");
 
-    gen_func_def(ast->rightNode, NULL);
+    //runtime error
+    PRINT_CODE("LABEL $$runerr\n");
+    PRINT_CODE("EXIT int@7\n");
+
+    gen_func_def(ast->rightNode, NULL, 0);
 
     PRINT_CODE("LABEL $$main\n");
     PRINT_CODE("CREATEFRAME\n");
     PRINT_CODE("PUSHFRAME\n");
-    gen_statements(ast->rightNode, "0");
+    gen_statements(ast->rightNode, "0", 0);
 //    gen_func_def(ast->rightNode);
 //    gen_statements(ast->rightNode);
 
     return 0;
 }
 
-void gen_statements(ASTstruct *tree, tKey func_name) {
+void gen_statements(ASTstruct *tree, tKey func_name, int if_number) {
     //generating main body of the program
     int ifc, whilec = 0;
     int type;
-
+    if (!tree){
+        return;
+    }
     switch (tree->rightNode->type) {
-        case NODE_FUNC_DEF:
-
-            break;
-
-        case NODE_VAR_ID:
-            break;
-
         case NODE_IF:
-            ifc = if_s;
-            if_s++;
-            // podmienka if
-            gen_cond(tree->rightNode->leftNode->rightNode, ifc, 0);
-
-            if (tree->rightNode->rightNode->rightNode)
-            {
-                gen_statements(tree->rightNode->rightNode->rightNode, func_name);
-            }
-            PRINT_CODE("JUMP %s%dtrue\n", func, ifc);
-            PRINT_CODE("LABEL %s%dfalse", func, ifc);
-            PRINT_NL();
-
-            if (tree->rightNode->rightNode->leftNode)
-            {
-                gen_statements(tree->rightNode->rightNode->leftNode, func_name);
-            }
-            PRINT_CODE("LABEL %s%dtrue", func, ifc);
-            PRINT_NL();
+            gen_if(tree->rightNode, func_name, if_number);
             break;
 
         case NODE_WHILE:
-            PRINT_CODE("LABEL %d%strue\n", whilec, func);
-            // podmienka
-            gen_cond(tree->rightNode->leftNode, whilec, 1);
-            in_while = true;
-            // telo
-            gen_statements(tree->rightNode->rightNode, func_name);
-            in_while = false;
-
-            PRINT_CODE("JUMP %d%strue\n", whilec, func);
-            PRINT_CODE("LABEL %d%sfalse\n", whilec, func);
             break;
 
         case NODE_VAR_ASSIGNMENT:{
@@ -91,13 +68,16 @@ void gen_statements(ASTstruct *tree, tKey func_name) {
             }
             if (tree->rightNode->rightNode->type == NODE_READS){
                 //built-in reads call
-                PRINT_CODE("READ LF@%s string", tree->rightNode->leftNode->value->data.stringPtr->value);
-            } else if (tree->rightNode->leftNode->type == NODE_READF) {
+                PRINT_CODE("READ LF@%s string\n", tree->rightNode->leftNode->value->data.stringPtr->value);
+            } else if (tree->rightNode->rightNode->type == NODE_READF) {
                 //built-in readf call
-                PRINT_CODE("READ LF@%s flaot", tree->rightNode->leftNode->value->data.stringPtr->value);
-            } else if (tree->rightNode->leftNode->type == NODE_READI){
+                PRINT_CODE("READ LF@%s float\n", tree->rightNode->leftNode->value->data.stringPtr->value);
+            } else if (tree->rightNode->rightNode->type == NODE_READI){
                 //built-in readi call
-                PRINT_CODE("READ LF@%s int", tree->rightNode->leftNode->value->data.stringPtr->value);
+//                PRINT_CODE("DEFVAR LF@%%type\n");
+                PRINT_CODE("READ LF@%s int\n", tree->rightNode->leftNode->value->data.stringPtr->value);
+//                PRINT_CODE("TYPE LF@%%type LF@%s\n", tree->rightNode->leftNode->value->data.stringPtr->value);
+//                PRINT_CODE("DPRINT LF@%%type\n");
             } else if (tree->rightNode->rightNode->type == NODE_FUNC_ID){
                 //user defined function call
                 gen_func_call(tree->rightNode);
@@ -137,11 +117,11 @@ void gen_statements(ASTstruct *tree, tKey func_name) {
 
     }
     if (tree->leftNode){
-        gen_statements(tree->leftNode, func_name);
+        gen_statements(tree->leftNode, func_name, if_number);
     }
 }
 
-void gen_func_def(ASTstruct *tree, tKey func_name)
+void gen_func_def(ASTstruct *tree, tKey func_name, int if_number)
 {
     if (tree->rightNode->type == NODE_FUNC_DEF)
     {
@@ -157,14 +137,14 @@ void gen_func_def(ASTstruct *tree, tKey func_name)
         }
         if (tree->rightNode->rightNode)
         {
-            gen_statements(tree->rightNode->rightNode, func_name);
+            gen_statements(tree->rightNode->rightNode, func_name, if_number);
         }
     }
     if (!tree->leftNode)
     {
         return;
     }
-    gen_func_def(tree->leftNode, NULL);
+    gen_func_def(tree->leftNode, NULL, if_number);
 
 }
 
@@ -312,131 +292,34 @@ void calculate_expr(ASTstruct *tree)
             PRINT_CODE("EQS\n");
             PRINT_CODE("NOTS\n");
             break;
+//        case NODE_CONCATENATE:
+//            calculate_expr(tree->leftNode);
+//            calculate_expr(tree->rightNode);
+//            PRINT_CODE("DEFVAR GF%%con\n");
+//            PRINT_CODE("POPS GF%%con\n");
+//            PRINT_CODE("CONCAT GF%%con\n");
         case NODE_INT:
         case NODE_FLOAT:
         case NODE_VAR_ID:
+        case NODE_NULL:
             PRINT_CODE("PUSHS");
             generate_constant(tree);
             PRINT_NL();
     }
 }
 
-void gen_cond(ASTstruct *ast, int count, int type)
-{
-    PRINT_CODE("MOVE LF@!condvar1");
-    generate_constant(ast->leftNode->type);
-    PRINT_NL();
-    gen_expr(ast->leftNode);
-    PRINT_CODE("POPS LF@!condvar1\n");
+void gen_if(ASTstruct *tree, tKey func_name, int if_number) {
+    if_number++;
+    calculate_expr(tree->leftNode->rightNode);
+    PRINT_CODE("PUSHS bool@false\n");
 
-    PRINT_CODE("MOVE LF@!condvar2");
-    generate_constant(ast->rightNode->type);
-    PRINT_NL();
-    gen_expr(ast->rightNode);
-    PRINT_CODE("POPS LF@!condvar2\n");
+    PRINT_CODE("JUMPIFEQS $$else$%d$%s\n", if_number, func_name);
 
-    switch(ast->type)
-    {
-        case NODE_GREATER:
-            PRINT_CODE("GT LF@!compvar LF@!condvar1 LF@!condvar2\n");
-            if (type == 0)
-            {
-                PRINT_CODE("JUMPIFNEQ %s%dfalse LF@!compvar bool@true\n", func, count);
-            }
-            else
-            {
-                PRINT_CODE("JUMPIFNEQ %d%sfalse LF@!compvar bool@true\n", count, func);
-            }
-            break;
-
-        case NODE_LESS:
-            PRINT_CODE("LT LF@!compvar LF@!condvar1 LF@!condvar2\n");
-            if (type == 0)
-            {
-                PRINT_CODE("JUMPIFNEQ %s%dfalse LF@!compvar bool@true\n", func, count);
-            }
-            else
-            {
-                PRINT_CODE("JUMPIFNEQ %d%sfalse LF@!compvar bool@true\n", count, func);
-            }
-            break;
-
-        case NODE_COMPARE:
-            PRINT_CODE("EQ LF@!compvar LF@!condvar1 LF@!condvar2\n");
-            if (type == 0)
-            {
-                PRINT_CODE("JUMPIFNEQ %s%dfalse LF@!compvar bool@true\n", func, count);
-            }
-            else
-            {
-                PRINT_CODE("JUMPIFNEQ %d%sfalse LF@!compvar bool@true\n", count, func);
-            }
-            break;
-
-        case NODE_NEG_COMPARE:
-            PRINT_CODE("EQ LF@!compvar LF@!condvar1 LF@!condvar2\n");
-            if (type == 0)
-            {
-                PRINT_CODE("JUMPIFEQ %s%dfalse LF@!compvar bool@true\n", func, count);
-            }
-            else
-            {
-                PRINT_CODE("JUMPIFEQ %d%sfalse LF@!compvar bool@true\n", count, func);
-            }
-            break;
-
-        case NODE_GREATER_EQ:
-            PRINT_CODE("GT LF@!compvar LF@!condvar1 LF@!condvar2\n");
-            if (type == 0)
-            {
-                PRINT_CODE("JUMPIFEQ %s%dfalse LF@!compvar bool@true\n", func, count);
-            }
-            else
-            {
-                PRINT_CODE("JUMPIFEQ %d%sfalse LF@!compvar bool@true\n", count, func);
-            }
-            PRINT_CODE("EQ LF@!compvar LF@!condvar1 LF@!condvar2\n");
-            if (type == 0)
-            {
-                PRINT_CODE("JUMPIFNEQ %s%dfalse GF@!compvar bool@true\n", func, count);
-            }
-            else
-            {
-                PRINT_CODE("JUMPIFNEQ %d%sfalse GF@!compvar bool@true\n", count, func);
-            }
-            if (type == 0)
-            {
-                PRINT_CODE("LABEL %s%dfalse\n", func, count);
-            }
-            else
-            {
-                PRINT_CODE("LABEL %d%sfalse\n", count, func);
-            }
-            break;
-
-        default:
-            break;
-    }
-
-}
-
-void gen_expr(ASTstruct *ast)
-{
-    switch(ast->type)
-    {
-        case NODE_INT:
-        case NODE_STRING:
-        case NODE_FLOAT:
-        case NODE_VAR_ID:
-            generate_constant(ast->type);
-            PRINT_NL();
-            break;
-
-        case NODE_PLUS:
-        case NODE_MINUS:
-        case NODE_MUL:
-        case NODE_DIV:
-            calculate_expr(ast);
-            break;
-    }
+    //if body
+    gen_statements(tree->rightNode->rightNode, func_name, if_number);
+    PRINT_CODE("JUMP $$elseend$%d$%s\n", if_number, func_name);
+    PRINT_CODE("LABEL $$else$%d$%s\n", if_number, func_name);
+    //else body
+    gen_statements(tree->rightNode->leftNode, func_name, if_number);
+    PRINT_CODE("LABEL $$elseend$%d$%s\n", if_number, func_name);
 }

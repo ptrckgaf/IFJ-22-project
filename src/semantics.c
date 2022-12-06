@@ -362,6 +362,6 @@ int semantics(){
 
         insert_function(tree, ftab);
         //semCheck(ast->rightNode->leftNode,ftab);
-        printf("\ndone");
+        printf("#done\n");
     }
 }
