@@ -2,8 +2,6 @@
 #include "semantics.h"
 #include "utils.h"
 
-ASTstruct *ast;
-FSTable *fsTable;
 
 int count = 0;
 

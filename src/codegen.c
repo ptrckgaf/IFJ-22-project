@@ -14,7 +14,6 @@ bool in_while = false;
 
 bool neg = 0;
 
-ASTstruct *ast;
 FSTable *fsTable;
 
 int codegen()
@@ -256,6 +255,7 @@ void generate_constant(ASTstruct *node){
 
         case NODE_VAR_ID:
             PRINT_CODE(" LF@%s", node->value->data.stringPtr->value);
+            break;
         default:
             break;
     }

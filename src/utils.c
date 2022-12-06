@@ -377,6 +377,8 @@ void itoac(int n, char s[])
     s[i] = '\0';
     reverse(s);
 }
+
+
 char *string_concatenate(char *s1,char *s2){
     int s1_length = strlen(s1);
     int s2_length = strlen(s2);
