@@ -158,7 +158,7 @@ void functionBody(ASTstruct *tree,FSTable *ftab,char *name){
                     parType = 3;
                     break;
             }
-            printf("opa\n");
+            printf("#opa\n");
             pointer = fst_search(ftab, name);
             st_insert(pointer->symtab_ptr, parType, par->leftNode->rightNode->value->data.stringPtr->value, NULL);
             par = par->leftNode;
@@ -395,10 +395,7 @@ int semantics(){
         fst_init(ftab);
         insert_function(tree, ftab);
         //semCheck(ast->rightNode->leftNode,ftab);
-<<<<<<< HEAD
         //printf("\n# done");
-=======
         printf("#done\n");
->>>>>>> 414875563cd052904896c408bc88c0de59844f32
     }
 }
