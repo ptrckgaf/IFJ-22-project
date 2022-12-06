@@ -379,6 +379,8 @@ void unloadToken(Stack *stack);
 
 void itoac(int n, char s[]);
 void reverse(char s[]);
+char *string_concatenate(char *s1,char *s2);
+
 
 extern ASTstruct *ast;
 
