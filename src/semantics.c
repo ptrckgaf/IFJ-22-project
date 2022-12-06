@@ -2,7 +2,11 @@
 #include "semantics.h"
 #include "utils.h"
 
+ASTstruct *ast;
+FSTable *fsTable;
+
 int count = 0;
+
 //zjisti datovy typ promenne
 int getVarType(int type){
     switch(type){
@@ -315,6 +319,7 @@ void insert_function(ASTstruct *tree,FSTable *ftab){
 int semantics(){
     if(ast->rightNode->leftNode != NULL) {
         FSTable *ftab = (FSTable *) malloc(sizeof(FSTable));
+        fsTable = ftab;
         ASTstruct *tree;
         tree = ast->rightNode->leftNode;
         if (ftab == NULL) {
@@ -324,6 +329,6 @@ int semantics(){
 
         insert_function(tree, ftab);
         //semCheck(ast->rightNode->leftNode,ftab);
-       printf("\ndone");
+        printf("#done\n");
     }
 }

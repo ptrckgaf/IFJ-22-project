@@ -8,11 +8,13 @@
 #define PRINT_NL() \
     fprintf(stdout, "\n")
 
-void gen_statements(ASTstruct *tree);
-void gen_func_def(ASTstruct *tree);
+void gen_statements(ASTstruct *tree, tKey func_name);
+void gen_func_def(ASTstruct *tree, tKey func_name);
+void gen_functions(ASTstruct *tree);
 void gen_var_assignment(ASTstruct *ast);
 void gen_func_call(ASTstruct *ast);
-void gen_func_params(ASTstruct *ast, int param_id);
+void gen_void_func_call(ASTstruct *tree);
+void gen_func_params(ASTstruct *tree, int param_id, tKey func_name);
 void gen_func_body (ASTstruct *tree);
 void gen_write(ASTstruct *ast);
 void calculate_expr(ASTstruct *tree);

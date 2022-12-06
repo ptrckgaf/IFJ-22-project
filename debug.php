@@ -1,3 +1,8 @@
 <?php
 declare(strict_types=1);
-write("\020");
+function f(int $b) : int {
+    $a = 2;
+    write($a);
+    return 2;
+}
+f(1);

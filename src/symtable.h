@@ -7,6 +7,7 @@ typedef struct st_item {
     int key_type; //Typ kluca, kde 1..integer
     tKey key;                   // 2..double
     char *value;                // 3..string
+    bool is_defined;            // 1 - variable is deinfed in function scope, 0 - isn't
     struct st_item *next;
     struct st_item *nextScope;
 } st_item;
@@ -48,4 +49,11 @@ void fst_insert(FSTable *table, STable *symtab_ptr, tParams parameters, tKey key
 void fst_remove(FSTable *table, tKey key);
 void fst_delete(FSTable *table);
 st_function getSymPtr(tKey key);
-extern FSTable *ftab;
+/**
+ * Function returns symtable item from given function scope
+ * @param funcName
+ * @param varName
+ * @return
+ */
+st_item *getStItem(tKey funcName, tKey varName, FSTable (*fsTable));
+extern FSTable *fsTable;

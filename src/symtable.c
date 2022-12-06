@@ -169,3 +169,8 @@ void fst_delete(FSTable *table) {
     return;
 }
 
+st_item *getStItem(tKey funcName, tKey varName, FSTable *fsTable) {
+    st_function *function = fst_search(fsTable,funcName);
+    return st_search(function->symtab_ptr, varName);
+}
+
