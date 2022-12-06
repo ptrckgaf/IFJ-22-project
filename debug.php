@@ -1,4 +1,11 @@
 <?php
 declare(strict_types=1);
 
-f(NULL);
+function f(?float $v): void {
+    if ($v === null) {
+        write("(null)\n");
+    } else {
+        write($v, "!\n");
+    }
+}
+f(null);
