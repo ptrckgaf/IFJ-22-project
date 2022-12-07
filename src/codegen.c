@@ -364,7 +364,7 @@ void gen_while(ASTstruct *tree, tKey func_name, int if_number, int while_number)
     gen_statements(tree->rightNode, func_name, if_number, while_number);
     CODE("LABEL $$loop$%d$%s\n", while_number, func_name);
     calculate_expr(tree->leftNode->rightNode);
-    CODE("PUSHS bool@false\n");
+    CODE("PUSHS bool@true\n");
 
     CODE("JUMPIFEQS $$cloop$%d$%s\n", while_number, func_name);
 }
