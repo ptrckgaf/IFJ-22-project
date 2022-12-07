@@ -40,13 +40,11 @@ void st_init(STable *table);
 st_item *st_search(STable *table, tKey key);
 void st_insert(STable *table, int key_type, tKey key, char *value);
 //void st_insert(STable *table, int key_type, tKey key, char *value,bool isParam);
-void st_remove(STable *table, char *key);
 void st_delete(STable *table);
 
 void fst_init(FSTable *table);
 st_function *fst_search(FSTable *table, tKey key);
 void fst_insert(FSTable *table, STable *symtab_ptr, tParams parameters, tKey key, int retType, int params);
-void fst_remove(FSTable *table, tKey key);
 void fst_delete(FSTable *table);
 st_function getSymPtr(tKey key);
 /**

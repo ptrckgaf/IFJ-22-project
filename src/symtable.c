@@ -83,14 +83,21 @@ void st_insert(STable *table, int key_type, tKey key, char *value) {
     }
 }*/
 
-//Odstranenie prvku z tabulky, uvolni alokovane zdroje
-void st_remove(STable *table, char *key) {
-    return;
-}
-
 //Zmazanie celej tabulky, odstrani vsetky prvky
 void st_delete(STable *table) {
-    return;
+    st_item *tmp;
+    st_item *next;
+
+    for (int i = 0; i < ST_SIZE; i++) {
+        tmp = (*table)[i];
+        (*table)[i] = NULL;
+
+        while (tmp != NULL) {
+            next = tmp->next;
+            free(tmp);
+            tmp = next;
+        }
+    }
 }
 
 
@@ -159,14 +166,21 @@ void fst_insert(FSTable *table, STable *symtab_ptr, tParams parameters, tKey key
     }
 }
 
-//Odstranenie funkcie z tabulky, uvolni alokovane zdroje
-void fst_remove(FSTable *table, char *key) {
-    return;
-}
-
 //Zmazanie celej tabulky, odstrani vsetky funkcie
 void fst_delete(FSTable *table) {
-    return;
+    st_function *tmp;
+    st_function *next;
+
+    for (int i = 0; i < ST_SIZE; i++) {
+        tmp = (*table)[i];
+        (*table)[i] = NULL;
+
+        while (tmp != NULL) {
+            next = tmp->next;
+            free(tmp);
+            tmp = next;
+        }
+    }
 }
 
 st_item *getStItem(tKey funcName, tKey varName, FSTable *fsTable) {
