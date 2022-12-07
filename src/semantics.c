@@ -14,7 +14,6 @@ int getVarType(int type){
             return 3;
     }
 }
-
 //funkce, ktera zjisti typ parametru a prevede ho z celeho cisla na znak
 void *getParamTypes(int type,char paramTypeChar[2]){
     int paramType;
