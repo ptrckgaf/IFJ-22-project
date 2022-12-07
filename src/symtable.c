@@ -14,7 +14,7 @@ int get_hash(tKey key) {
 }
 
 
-//Inicializacia tabulky
+//Inicializacia tabulky 
 void st_init(STable *table) {
     if (table != NULL) {
         for (int i = 0; i < ST_SIZE; i++) {
