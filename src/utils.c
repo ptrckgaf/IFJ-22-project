@@ -396,10 +396,6 @@ void processString(DynamicString *string){
     for (int i = 0; (ch = string->value[i]) != '\0'; ++i) {
         if (ch == ' '){
             printf("\\032");
-        } else if (ch == '\\'){
-            printf("\\092");
-        } else if (ch == '`'){
-            printf("\\");
         } else if (ch == '#'){
             printf("\\035");
         } else{

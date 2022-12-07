@@ -348,7 +348,7 @@ void processOctSequence(FILE *source, char *input, DynamicString *bufferPtr){
     }
 }
 void formatEscapeSequence(DynamicString *buffer, int num){
-    DynamicStringAddChar(buffer, '`');
+    DynamicStringAddChar(buffer, '\\');
     char num_as_string[4];
     itoac(num, num_as_string);
     if (num < 100){
