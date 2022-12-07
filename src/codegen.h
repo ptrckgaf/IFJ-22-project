@@ -13,8 +13,8 @@
 
 
 
-void gen_statements(ASTstruct *tree, tKey func_name, int if_number);
-void gen_func_def(ASTstruct *tree, tKey func_name, int if_number);
+void gen_statements(ASTstruct *tree, tKey func_name, int if_number, int while_number);
+void gen_func_def(ASTstruct *tree, tKey func_name, int if_number, int while_number);
 void gen_functions(ASTstruct *tree);
 void gen_var_assignment(ASTstruct *ast);
 void gen_func_call(ASTstruct *ast);
@@ -24,9 +24,10 @@ void gen_func_body (ASTstruct *tree);
 void gen_write(ASTstruct *ast);
 void calculate_expr(ASTstruct *tree);
 void gen_declaration(ASTstruct *tree);
-void gen_if(ASTstruct *tree, tKey func_name, int if_number);
+void gen_if(ASTstruct *tree, tKey func_name, int if_number, int while_number);
 void gen_write(ASTstruct *tree);
 void generate_constant(ASTstruct *ast);
 void gen_cond(ASTstruct *ast, int count, int type);
 void gen_expr(ASTstruct *ast);
 void expect_type(char *type);
+void gen_while(ASTstruct *tree, tKey func_name, int if_number, int while_number);

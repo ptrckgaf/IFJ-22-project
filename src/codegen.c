@@ -35,19 +35,19 @@ int codegen()
     CODE("LABEL $$runerr\n");
     CODE("EXIT int@7\n");
 
-    gen_func_def(ast->rightNode, NULL, 0);
+    gen_func_def(ast->rightNode, NULL, 0, 0);
 
     CODE("LABEL $$main\n");
     CODE("CREATEFRAME\n");
     CODE("PUSHFRAME\n");
-    gen_statements(ast->rightNode, "0", 0);
+    gen_statements(ast->rightNode, "0", 0, 0);
 //    gen_func_def(ast->rightNode);
 //    gen_statements(ast->rightNode);
 
     return 0;
 }
 
-void gen_statements(ASTstruct *tree, tKey func_name, int if_number) {
+void gen_statements(ASTstruct *tree, tKey func_name, int if_number, int while_number) {
     //generating main body of the program
     int ifc, whilec = 0;
     int type;
@@ -56,10 +56,11 @@ void gen_statements(ASTstruct *tree, tKey func_name, int if_number) {
     }
     switch (tree->rightNode->type) {
         case NODE_IF:
-            gen_if(tree->rightNode, func_name, if_number);
+            gen_if(tree->rightNode, func_name, if_number, while_number);
             break;
 
         case NODE_WHILE:
+            gen_while(tree->rightNode, func_name, if_number, while_number);
             break;
 
         case NODE_VAR_ASSIGNMENT:{
@@ -123,11 +124,11 @@ void gen_statements(ASTstruct *tree, tKey func_name, int if_number) {
 
     }
     if (tree->leftNode){
-        gen_statements(tree->leftNode, func_name, if_number);
+        gen_statements(tree->leftNode, func_name, if_number, while_number);
     }
 }
 
-void gen_func_def(ASTstruct *tree, tKey func_name, int if_number)
+void gen_func_def(ASTstruct *tree, tKey func_name, int if_number, int while_number)
 {
     if (tree->rightNode->type == NODE_FUNC_DEF)
     {
@@ -143,14 +144,14 @@ void gen_func_def(ASTstruct *tree, tKey func_name, int if_number)
         }
         if (tree->rightNode->rightNode)
         {
-            gen_statements(tree->rightNode->rightNode, func_name, if_number);
+            gen_statements(tree->rightNode->rightNode, func_name, if_number, while_number);
         }
     }
     if (!tree->leftNode)
     {
         return;
     }
-    gen_func_def(tree->leftNode, NULL, if_number);
+    gen_func_def(tree->leftNode, NULL, if_number, while_number);
 
 }
 
@@ -337,7 +338,7 @@ void calculate_expr(ASTstruct *tree)
     }
 }
 
-void gen_if(ASTstruct *tree, tKey func_name, int if_number) {
+void gen_if(ASTstruct *tree, tKey func_name, int if_number, int while_number) {
     if_number++;
     calculate_expr(tree->leftNode->rightNode);
     CODE("PUSHS bool@false\n");
@@ -345,12 +346,27 @@ void gen_if(ASTstruct *tree, tKey func_name, int if_number) {
     CODE("JUMPIFEQS $$else$%d$%s\n", if_number, func_name);
 
     //if body
-    gen_statements(tree->rightNode->rightNode, func_name, if_number);
+    gen_statements(tree->rightNode->rightNode, func_name, if_number, while_number);
     CODE("JUMP $$elseend$%d$%s\n", if_number, func_name);
     CODE("LABEL $$else$%d$%s\n", if_number, func_name);
     //else body
-    gen_statements(tree->rightNode->leftNode, func_name, if_number);
+    gen_statements(tree->rightNode->leftNode, func_name, if_number, while_number);
     CODE("LABEL $$elseend$%d$%s\n", if_number, func_name);
+}
+
+void gen_while(ASTstruct *tree, tKey func_name, int if_number, int while_number) {
+    PRINT_NL();
+    while_number++;
+
+    CODE("JUMP $$loop$%d$%s\n", while_number, func_name);
+
+    CODE("LABEL $$cloop$%d$%s\n", while_number, func_name);
+    gen_statements(tree->rightNode, func_name, if_number, while_number);
+    CODE("LABEL $$loop$%d$%s\n", while_number, func_name);
+    calculate_expr(tree->leftNode->rightNode);
+    CODE("PUSHS bool@false\n");
+
+    CODE("JUMPIFEQS $$cloop$%d$%s\n", while_number, func_name);
 }
 
 

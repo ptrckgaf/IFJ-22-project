@@ -1,5 +1,5 @@
 <?php
 declare(strict_types=1);
-$b = 1;
-$a = $b."b";
-write($a);
+while( 1 > 2){
+    write("a");
+}
