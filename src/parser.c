@@ -54,7 +54,10 @@ char *displayNodes[] = {"SEQ",
                         "ORD",
                         "END",
                         "FUNC_ID",
-                        "NULL"};
+                        "NULL",
+                        "OPT_INT",
+                        "OPT_FLOAT",
+                        "OPT_STRING"};
 
 
 precedence_table preced_table[] = {
@@ -71,6 +74,9 @@ precedence_table preced_table[] = {
         {TOKEN_KEYWORD_STRING, -1, RETURN_TYPE_STRING},
         {TOKEN_KEYWORD_VOID, -1, RETURN_TYPE_VOID},
         {TOKEN_KEYWORD_WHILE, -1,NODE_WHILE},
+        {TOKEN_KEYWORD_OPT_INT, -1, NODE_OPT_INT},
+        {TOKEN_KEYWORD_OPT_FLOAT, -1, NODE_OPT_FLOAT},
+        {TOKEN_KEYWORD_OPT_STRING, -1, NODE_OPT_STRING},
         {TOKEN_DECLARE, -1,-1},
         {TOKEN_STRICT_TYPES, -1,-1},
         {TOKEN_L_PAR, -1,-1},
@@ -109,9 +115,6 @@ precedence_table preced_table[] = {
         {TOKEN_END, -1,-1}
 
 };
-
-// TODO literaly mozu byt typu NULL
-// TODO term moze byt int, float, string, var_id alebo null
 
 
 // funkcia vykona syntakticku analyzu tokenov a vytvori AST
@@ -287,6 +290,33 @@ ASTstruct *params(Stack *stack)
             }
             error_exit(SYN_ERR, "Syntax error! Variable identifier expected!");
 
+        case TOKEN_KEYWORD_OPT_INT:
+            token = loadToken(stack);
+            if (token->type == TOKEN_VAR_ID)
+            {
+                param = createNode(NODE_OPT_INT, token, NULL, NULL);
+                break;
+            }
+            error_exit(SYN_ERR, "Syntax error!" "Variable identifier expected!");
+
+        case TOKEN_KEYWORD_OPT_FLOAT:
+            token = loadToken(stack);
+            if (token->type == TOKEN_VAR_ID)
+            {
+                param = createNode(NODE_OPT_FLOAT, token, NULL, NULL);
+                break;
+            }
+            error_exit(SYN_ERR, "Syntax error!" "Variable identifier expected!");
+
+        case TOKEN_KEYWORD_OPT_STRING:
+            token = loadToken(stack);
+            if (token->type == TOKEN_VAR_ID)
+            {
+                param = createNode(NODE_OPT_STRING, token, NULL, NULL);
+                break;
+            }
+            error_exit(SYN_ERR, "Syntax error!" "Variable identifier expected!");
+
         default:
             unloadToken(stack);
             return NULL;
@@ -327,6 +357,15 @@ ASTstruct *rt(Stack *stack)
 
         case TOKEN_KEYWORD_VOID:
             return createNode(RETURN_TYPE_VOID, NULL, NULL, NULL);
+
+        case TOKEN_KEYWORD_OPT_INT:
+            return createNode(NODE_OPT_INT, NULL, NULL, NULL);
+
+        case TOKEN_KEYWORD_OPT_FLOAT:
+            return createNode(NODE_OPT_FLOAT, NULL, NULL, NULL);
+
+        case TOKEN_KEYWORD_OPT_STRING:
+            return createNode(NODE_OPT_STRING, NULL, NULL, NULL);
 
         default:
             error_exit(SYN_ERR, "Syntax error! Invalid returntype.");
@@ -539,12 +578,22 @@ ASTstruct *str_arg(Stack *stack)
         case TOKEN_FLOAT:
             error_exit(PARAMS_ERR, "Semantic error! Function must have string as parameter.");
 
-
         default:
-            error_exit(SYN_ERR, "Syntax error! Invalid argument(s) in built-in function call.");
+            unloadToken(stack);
+            return NULL;
     }
 
-    return root;
+    token = loadToken(stack);
+    if (token->type == TOKEN_COMMA)
+    {
+        return createNode(SEQ, NULL, str_arg(stack), root);
+    }
+    else
+    {
+        unloadToken(stack);
+        return createNode(SEQ, NULL, NULL, root);
+    }
+
 }
 
 ASTstruct *int_arg(Stack *stack)
@@ -568,10 +617,20 @@ ASTstruct *int_arg(Stack *stack)
 
 
         default:
-        error_exit(SYN_ERR, "Syntax error! Invalid argument(s) in built-in function call.");
+            unloadToken(stack);
+            return NULL;
     }
 
-    return root;
+    token = loadToken(stack);
+    if (token->type == TOKEN_COMMA)
+    {
+        return createNode(SEQ, NULL, int_arg(stack), root);
+    }
+    else
+    {
+        unloadToken(stack);
+        return createNode(SEQ, NULL, NULL, root);
+    }
 }
 
 ASTstruct *substr_args(Stack *stack)
@@ -800,9 +859,6 @@ ASTstruct *expr(Stack *stack, int preced)
         default:
             unloadToken(stack);
     }
-
-
-    // TODO kontrola dvoch po sebe iducich operatorov
 
     // kontrola precedencie, cyklus while prevzaty z internetu
     while (token && preced_table[token->type].preced_value >= preced)

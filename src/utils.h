@@ -195,7 +195,10 @@ typedef enum{
     NODE_ORD,
     NODE_END,
     NODE_FUNC_ID,
-    NODE_NULL
+    NODE_NULL,
+    NODE_OPT_INT,
+    NODE_OPT_FLOAT,
+    NODE_OPT_STRING,
 
 } Nodes;
 

@@ -1,6 +1,8 @@
 #include "symtable.h"
 int ST_SIZE = MAX_SIZE;
 int tableCount = 0;
+
+
 //Rozptylovacia funkcia, prideli index zadanemu klucu
 int get_hash(tKey key) {
     int result = 1;
@@ -11,7 +13,8 @@ int get_hash(tKey key) {
     return (result % ST_SIZE);
 }
 
-//Inicializacia tabulky
+
+//Inicializacia tabulky 
 void st_init(STable *table) {
     if (table != NULL) {
         for (int i = 0; i < ST_SIZE; i++) {
@@ -20,6 +23,7 @@ void st_init(STable *table) {
     }
     else return;
 }
+
 
 //Vyhladanie prvku v tabulke, vracia NULL ak prvok nebol najdeny
 st_item *st_search(STable *table, tKey key) {
@@ -34,11 +38,11 @@ st_item *st_search(STable *table, tKey key) {
     else return NULL;
 }
 
+
 //Vlozenie noveho prvku do tabulky
-void st_insert(STable *table, int key_type, tKey key, char *value) {
+void st_insert(STable *table, int key_type, tKey key) {
     st_item *insrt = st_search(table, key);
     if (insrt != NULL) {
-        insrt->value = value;
         insrt->key_type = key_type;
     }
     else {
@@ -49,48 +53,30 @@ void st_insert(STable *table, int key_type, tKey key, char *value) {
             error_exit(INT_ERR, "Memory allocation failure.");
         }
 
-        insrt->value = value;
         insrt->key = key;
         insrt->key_type = key_type;
         insrt->next = (*table)[hash];
-        insrt->nextScope = NULL;
 
         (*table)[hash] = insrt;
     }
 }
-/*void st_insert(STable *table, int key_type, tKey key, char *value,bool isParam) {
-    st_item *insrt = st_search(table, key);
-    if (insrt != NULL) {
-        insrt->value = value;
-        insrt->key_type = key_type;
-    }
-    else {
-        int hash = get_hash(key);
 
-        insrt = malloc(sizeof(st_item));
-        if (insrt == NULL) {
-            error_exit(INT_ERR, "Memory allocation failure.");
-        }
-
-        insrt->value = value;
-        insrt->key = key;
-        insrt->key_type = key_type;
-        insrt->next = (*table)[hash];
-        insrt->nextScope = NULL;
-        insrt->isParam = isParam;
-
-        (*table)[hash] = insrt;
-    }
-}*/
-
-//Odstranenie prvku z tabulky, uvolni alokovane zdroje
-void st_remove(STable *table, char *key) {
-    return;
-}
 
 //Zmazanie celej tabulky, odstrani vsetky prvky
 void st_delete(STable *table) {
-    return;
+    st_item *tmp;
+    st_item *next;
+
+    for (int i = 0; i < ST_SIZE; i++) {
+        tmp = (*table)[i];
+        (*table)[i] = NULL;
+
+        while (tmp != NULL) {
+            next = tmp->next;
+            free(tmp);
+            tmp = next;
+        }
+    }
 }
 
 
@@ -105,6 +91,7 @@ void fst_init(FSTable *table) {
     else return;
 }
 
+
 //Vyhladanie funkcie v tabulke, vracia NULL ak funkcia nebola najdena
 st_function *fst_search(FSTable *table, tKey key) {
     int hash = get_hash(key);
@@ -117,6 +104,7 @@ st_function *fst_search(FSTable *table, tKey key) {
     }
     else return NULL;
 }
+
 
 //Vlozenie novej funckie do tabulky
 void fst_insert(FSTable *table, STable *symtab_ptr, tParams parameters, tKey key, int retType, int params) {
@@ -135,18 +123,6 @@ void fst_insert(FSTable *table, STable *symtab_ptr, tParams parameters, tKey key
             error_exit(INT_ERR, "Memory allocation failure.");
         }
 
-        /*if(tableCount != MAX_SIZE) {
-            while ((*table)[hash] != NULL) {
-                if (hash == MAX_SIZE) {
-                    hash = 0;
-                } else {
-                    hash++;
-                }
-            }
-        }else{
-            tableCount = 0;
-        }*/
-
         insrt->retType = retType;
         insrt->params = params;
         insrt->key = key;
@@ -159,18 +135,26 @@ void fst_insert(FSTable *table, STable *symtab_ptr, tParams parameters, tKey key
     }
 }
 
-//Odstranenie funkcie z tabulky, uvolni alokovane zdroje
-void fst_remove(FSTable *table, char *key) {
-    return;
-}
 
 //Zmazanie celej tabulky, odstrani vsetky funkcie
 void fst_delete(FSTable *table) {
-    return;
+    st_function *tmp;
+    st_function *next;
+
+    for (int i = 0; i < ST_SIZE; i++) {
+        tmp = (*table)[i];
+        (*table)[i] = NULL;
+
+        while (tmp != NULL) {
+            next = tmp->next;
+            free(tmp);
+            tmp = next;
+        }
+    }
 }
+
 
 st_item *getStItem(tKey funcName, tKey varName, FSTable *fsTable) {
     st_function *function = fst_search(fsTable,funcName);
     return st_search(function->symtab_ptr, varName);
 }
-
