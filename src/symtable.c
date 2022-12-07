@@ -58,7 +58,6 @@ void st_insert(STable *table, int key_type, tKey key, char *value) {
         insrt->key = key;
         insrt->key_type = key_type;
         insrt->next = (*table)[hash];
-        insrt->nextScope = NULL;
 
         (*table)[hash] = insrt;
     }
