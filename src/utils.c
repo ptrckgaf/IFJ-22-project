@@ -1,3 +1,8 @@
+/*
+    - Definition of interface functions for ifj22 compiler
+    - Author: Anton Miklis(xmikli05)
+*/
+
 #include "utils.h"
 
 int ERROR_CODE = 0;

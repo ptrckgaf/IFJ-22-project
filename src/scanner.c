@@ -1,7 +1,10 @@
+/*
+    - Scanner implementation for ifj22 compiler
+    - Author: Anton Miklis(xmikli05)
+*/
+
 #include "scanner.h"
 #include "ctype.h"
-
-void processEscSequence(FILE *source, DynamicString *bufferPtr, char *input);
 
 FsmState FsmNext(FsmState current, char input){
     switch (current) {
@@ -256,9 +259,7 @@ TokenType getTokenType(FsmState state){
         case PROLOG_3:          return TOKEN_PROLOG;
         case END:               return TOKEN_END;
         default:
-            //todo remove debug print
             return 0;
-            printf("something went wrong"); 
     }
 }
 
@@ -327,7 +328,6 @@ void processOctSequence(FILE *source, char *input, DynamicString *bufferPtr){
     octString[2] = fgetc(source);
     octString[3] = '\0';
 
-    //1 if octString is between 001 and 377
     char *endPtr;
     int oct = strtol(octString, &endPtr, 8);
 
@@ -381,6 +381,8 @@ Stack *scanner(FILE *source){
 
     char input = fgetc(source);
     ungetc(input, source);
+
+    //checking source file to start with <
     if (input != '<'){
         fprintf(stderr, "File should start with <?php");
         return NULL;
@@ -389,6 +391,7 @@ Stack *scanner(FILE *source){
     //scanner main loop
     while (true){
         input = fgetc(source);
+
         if (isEnd && input != EOF){
             //return error when there are symbols after end token >?
             fprintf(stderr, "No symbols are allowed after ?>");
@@ -413,7 +416,7 @@ Stack *scanner(FILE *source){
 
         if (next == ERROR){
             if (isStateFinal(current)){
-                //remove last symbol from
+                //remove last symbol from buffer
                 ungetc(input, source);
                 DynamicStringRemoveChar(bufferPtr);
                 tokenType = getTokenType(current);
@@ -430,7 +433,7 @@ Stack *scanner(FILE *source){
                     tokenType = processOptionalType(bufferPtr);
                 }
 
-                //Initialize dynamic string in new memory location and copies bufferPtr content
+                //initialize dynamic string in new memory location and copy bufferPtr content
                 tokenValuePtr = DynamicStringInit();
                 DynamicStringCopy(bufferPtr, tokenValuePtr);
 

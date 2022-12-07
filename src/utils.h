@@ -1,3 +1,7 @@
+/*
+    - Declaration of interface functions for ifj22 compiler
+    - Author: Anton Miklis(xmikli05)
+*/
 #ifndef IFJ_22_PROJEKT_UTILS_H
 #define IFJ_22_PROJEKT_UTILS_H
 

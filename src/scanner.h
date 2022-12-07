@@ -1,14 +1,20 @@
+/*
+    - Scanner implementation for ifj22 compiler
+    - Author: Anton Miklis(xmikli05)
+*/
+
 #include "utils.h"
 
 /*
- * automaton states
+ * Automaton states
  */
-
 typedef enum{
     START,
     IDENTIFIER,
     TYPE_IDENTIFIER,
     QUESTION_MARK,
+
+    //States for processing separators
     LEFT_PARENTHESE,
     RIGHT_PARENTHESE,
     LEFT_BRACKET,
@@ -61,7 +67,7 @@ typedef enum{
     NEG_COMPARE1,
     NEG_COMPARE2,
 
-    //prolog states
+    //States for processing prolog
     PROLOG_START,
     PROLOG_1,
     PROLOG_2,
@@ -69,13 +75,22 @@ typedef enum{
 
     END
 }FsmState;
-
+/**
+ * Returns next automaton state
+ * @param current
+ * @param input
+ * @return
+ */
 FsmState FsmNext(FsmState current, char input);
-
+/**
+ * Returns 1 if state is final, 0 if not
+ * @param state
+ * @return
+ */
 bool isStateFinal(FsmState state);
 
 /**
- * Returns 1 if we should read chars in state, 0 if shouldn't
+ * Returns 1 if scanner should add chars in state, 0 if shouldn't
  * @param state
  * @return
  */
@@ -86,8 +101,26 @@ bool isRead(FsmState state);
  * @param state
  * @return
  */
-TokenType getToken(FsmState state);
-
+TokenType getTokenType(FsmState state);
+/**
+ * Identifies built-in functions and keywords
+ * @param identifier
+ * @return
+ */
+TokenType processIdentifier(DynamicString *identifier);
+/**
+ * Returns type identifier from string
+ * @param id
+ * @return
+ */
+TokenType processOptionalType(DynamicString *id);
+/**
+ * Converts escape sequences to ascii values
+ * @param source
+ * @param bufferPtr
+ * @param input
+ */
+void processEscSequence(FILE *source, DynamicString *bufferPtr, char *input);
 /**
  * Function to process /x00 -/xFF sequence
  * @param source
@@ -109,5 +142,10 @@ void processOctSequence(FILE *source, char *input, DynamicString *bufferPtr);
  * @param num
  */
 void formatEscapeSequence(DynamicString *buffer, int num);
-
+/**
+ * Main scanner function.
+ * Returns pointer on tokens stack
+ * @param source
+ * @return
+ */
 Stack *scanner(FILE *source);

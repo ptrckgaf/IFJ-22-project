@@ -2,145 +2,110 @@ digraph G {
 node [shape=circle, width=1, height=1]
 {
 node [shape=doublecircle]
-VARIABLE_ID
-STRING_END
+VAR_ID
+STR_END
 IDENTIFIER
-LEFT_PARENTHESE
-RIGHT_PARENTHESE
-NUMBER_DECIMAL
-NUMBER_EXPONENTIAL
-MULTIPLICATION,
-DIVISION,
+L_PAR
+R_PAR
+NUM_DEC
+NUM_EXP
+MUL,
+DIV,
 PLUS,
 MINUS,
-GREATER,
-LESS,
-GREATER_EQUAL,
-LESS_EQUAL,
+GT,
+LS,
+GT_EQ,
+LS_EQ,
 ASSIGN,
-COMPARE2,
-NEG_COMPARE2,
-NUMBER,
+CMP2,
+NEG_CMP2,
+NUM,
 DOT,
 END,
 PROLOG_3
-LEFT_BRACKET,
-RIGHT_BRACKET,
+L_BR,
+R_BR,
 COMMA,
-SEMICOLON,
-COLON
+S_COL,
+COL
 }
 
 {
-node[width = 3, height = 3];
-START
+node[width = 6, height = 6];
+START;
 }
 
-subgraph{
-SLASH,
-COMMENT,
-COMMENT_TEXT,
-COMMENT_BLOCK,
-COMMENT_BLOCK_END,
-COMMENT_BLOCK_TEXT
-}
-subgraph{
-LEFT_PARENTHESE,
-RIGHT_PARENTHESE,
-STRING_START,
-NUMBER,
-NUMBER_DOT,
-NUMBER_DECIMAL,
-NUMBER_E,
-NUMBER_E_SIGN,
-NUMBER_EXPONENTIAL
-VARIABLE_DOLLAR,
-VARIABLE_ID
-}
-subgraph{
-MULTIPLICATION,
-DIVISION,
-PLUS,
-MINUS,
-DOT,
-GREATER,
-LESS,
-GREATER_EQUAL,
-LESS_EQUAL,
-ASSIGN,
-COMPARE1,
-COMPARE2,
-EXCLAMATION_MARK,
-NEG_COMPARE1,
-NEG_COMPARE2
-}
 START -> IDENTIFIER[label="a-z\nA-Z\n_"];
-START -> QUESTION_MARK[label="?"]
-START -> LEFT_PARENTHESE[label="("];
-START -> RIGHT_PARENTHESE[label=")"];
-START -> STRING_START[label="\""];
-    START -> NUMBER[label="0-9"];
+START -> Q_MARK[label="?"];
+START -> L_PAR[label="("];
+START -> R_PAR[label=")"];
+START -> STR_START[label="\""];
+    START -> NUM[label="0-9"];
     START -> COMMA[label=","];
-    START -> COLON[label=":"];
-    START -> SEMICOLON[label=";"]
-    START -> START[label="whitespace \t"]
+    START -> COL[label=":"];
+    START -> S_COL[label=";"];
+    START -> START[label="\\n, \\t, \\s, EOF"];
+    START -> MUL[label="*"];
+    START -> PLUS[label="+"];
+    START -> MINUS[label="-"];
+    START -> GT[label=">"];
+    START -> LS[label="<"];
+    START -> DOT[label="."];
+    START -> L_BR[label="{"];
+    START -> R_BR[label="}"];
+
     IDENTIFIER -> IDENTIFIER[label="a-z\nA-Z\n0-9\n_"];
-    QUESTION_MARK -> IDENTIFIER[label="a-z\nA-Z\n_"];
-    NUMBER -> NUMBER_DOT[label="."];
-    NUMBER_DOT -> NUMBER_DECIMAL[label="0-9"];
-    NUMBER -> NUMBER_E[label="Ee"];
-    NUMBER_DECIMAL -> NUMBER_E[label="eE"];
-    NUMBER_E -> NUMBER_E_SIGN[label="+-"];
-    NUMBER_E -> NUMBER_EXPONENTIAL[label="0-9"]
-    NUMBER_E_SIGN -> NUMBER_EXPONENTIAL[label="0-9"];
-    NUMBER_EXPONENTIAL -> NUMBER_EXPONENTIAL[label="0-9"];
-    NUMBER -> NUMBER[label="0-9"];
-    NUMBER_DECIMAL -> NUMBER_DECIMAL[label="0-9"];
+    Q_MARK -> IDENTIFIER[label="a-z\nA-Z\n_"];
+    NUM -> NUM_DOT[label="."];
+    NUM_DOT -> NUM_DEC[label="0-9"];
+    NUM -> NUM_E[label="Ee"];
+    NUM_DEC -> NUM_E[label="eE"];
+    NUM_E -> NUM_E_SIGN[label="+-"];
+    NUM_E -> NUM_EXP[label="0-9"]
+    NUM_E_SIGN -> NUM_EXP[label="0-9"];
+    NUM_EXP -> NUM_EXP[label="0-9"];
+    NUM -> NUM[label="0-9"];
+    NUM_DEC -> NUM_DEC[label="0-9"];
 
-    STRING_START -> STRING[label=">31 - {\"}"];
-STRING_START -> STRING_END[label="\""];
-    STRING -> STRING_ESC[label="/"];
-    STRING -> STRING_END[label="\""];
-STRING -> STRING[label=">31 - {\"}"];
+    STR_START -> STR[label=">31 - {\", $}"];
+STR_START -> STR_END[label="\""];
+    STR -> STR_ESC[label=" \\"];
+    STR -> STR_END[label="\""];
+STR -> STR[label=">31 - {\", $}"];
+    STR_ESC -> STR;
+    STR_START -> STR_ESC[label=" \\"]
 
-    START -> VARIABLE_DOLLAR[label="$"];
-    VARIABLE_DOLLAR -> VARIABLE_ID[label="a-z\nA-Z\n_"];
-    VARIABLE_ID -> VARIABLE_ID[label="a-z\nA-Z\n0-9\n_"];
-    START -> SLASH[label="  /"];
-    SLASH -> COMMENT[label="  /"];
-    COMMENT -> COMMENT_TEXT[label="&#931;"];
-    COMMENT_TEXT -> COMMENT_TEXT[label="&#931; - EOL"];
-COMMENT_TEXT -> START[label="EOL"];
-SLASH -> COMMENT_BLOCK[label="*"];
-COMMENT_BLOCK -> COMMENT_BLOCK_TEXT[label="&#931; - {*}"];
-COMMENT_BLOCK -> COMMENT_BLOCK_END[label="*"];
-COMMENT_BLOCK_TEXT -> COMMENT_BLOCK_TEXT[label="&#931; - {*}"];
-COMMENT_BLOCK_TEXT -> COMMENT_BLOCK_END[label=" *"];
-COMMENT_BLOCK_END -> COMMENT_BLOCK_TEXT[label="&#931; - /"];
-COMMENT_BLOCK_END -> START[label=" /"];
-SLASH -> DIVISION[label= "&#931; - {/, *}"];
-START -> MULTIPLICATION[label="*"];
-START -> PLUS[label="+"];
-START -> MINUS[label="-"];
-START -> GREATER[label=">"];
-START -> LESS[label="<"];
-START -> DOT[label="."];
-GREATER -> GREATER_EQUAL[label="="];
-LESS -> LESS_EQUAL[label="="];
-LESS -> PROLOG_START[label="?"];
-PROLOG_START -> PROLOG_1[label="p"];
+    START -> VAR_DOL[label="$"];
+    VAR_DOL -> VAR_ID[label="a-z\nA-Z\n_"];
+    VAR_ID -> VAR_ID[label="a-z\nA-Z\n0-9\n_"];
+    START -> DIV[label="  /"];
+    DIV -> COMM[label="  /"];
+    COMM -> COMM_TXT[label="&#931;"];
+    COMM_TXT -> COMM_TXT[label="&#931; - {\\n}"];
+COMM_TXT -> START[label="\\n"];
+DIV -> COMM_BL[label="*"];
+COMM_BL -> COMM_BL_TXT[label="&#931; - {*}"];
+COMM_BL -> COMM_BL_END[label="*"];
+COMM_BL_TXT -> COMM_BL_TXT[label="&#931; - {*}"];
+COMM_BL_TXT -> COMM_BL_END[label=" *"];
+COMM_BL_END -> COMM_BL_TXT[label="&#931; - /"];
+COMM_BL_END -> START[label=" /"];
+
+GT -> GT_EQ[label="="];
+LS -> LS_EQ[label="="];
+LS -> PROLOG_0[label="?"];
+PROLOG_0 -> PROLOG_1[label="p"];
 PROLOG_1 -> PROLOG_2[label="h"];
 PROLOG_2 -> PROLOG_3[label="p"];
 
-QUESTION_MARK -> END[label=">"];
+Q_MARK -> END[label=">"];
 
 START -> ASSIGN[label="="];
-ASSIGN -> COMPARE1[label="="];
-COMPARE1 -> COMPARE2[label="="];
-START ->EXCLAMATION_MARK[label="!"];
-EXCLAMATION_MARK -> NEG_COMPARE1[label="="];
-NEG_COMPARE1 -> NEG_COMPARE2[label="="];
+ASSIGN -> CMP1[label="="];
+CMP1 -> CMP2[label="="];
+START ->E_MARK[label="!"];
+E_MARK -> NEG_CMP1[label="="];
+NEG_CMP1 -> NEG_CMP2[label="="];
 
-START -> LEFT_BRACKET[label="{"];
-START -> RIGHT_BRACKET[label="}"]
 }
