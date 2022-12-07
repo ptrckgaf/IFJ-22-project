@@ -155,6 +155,9 @@ char *displayTokenType[] = {
         "TOKEN_KEYWORD_STRING",
         "TOKEN_KEYWORD_VOID",
         "TOKEN_KEYWORD_WHILE",
+        "TOKEN_KEYWORD_OPT_INT",
+        "TOKEN_KEYWORD_OPT_FLOAT",
+        "TOKEN_KEYWORD_OPT_STRING",
 
         "TOKEN_DECLARE",
         "TOKEN_STRICT_TYPES",

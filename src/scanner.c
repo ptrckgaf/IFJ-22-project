@@ -287,10 +287,10 @@ TokenType processIdentifier(DynamicString *identifier){
     return TOKEN_ID;
 }
 
-TokenType processTypeIdentifier(DynamicString *id){
-    if (DynamicStringCompare(id, "int")){return TOKEN_KEYWORD_INT;}
-    if (DynamicStringCompare(id, "float")){return TOKEN_KEYWORD_FLOAT;}
-    if (DynamicStringCompare(id, "string")){return TOKEN_KEYWORD_STRING;}
+TokenType processOptionalType(DynamicString *id){
+    if (DynamicStringCompare(id, "int")){return TOKEN_KEYWORD_OPT_INT;}
+    if (DynamicStringCompare(id, "float")){return TOKEN_KEYWORD_OPT_FLOAT;}
+    if (DynamicStringCompare(id, "string")){return TOKEN_KEYWORD_OPT_STRING;}
     error_exit(LEX_ERR, "Only int,float and string keywords are allowed after \"?\"")
 }
 
@@ -467,7 +467,7 @@ Stack *scanner(FILE *source){
                 }
                 //process ?int, ?float, ?string
                 if (tokenType == TOKEN_TYPE_ID){
-                    tokenType = processTypeIdentifier(bufferPtr);
+                    tokenType = processOptionalType(bufferPtr);
                 }
 
                 //Initialize dynamic string in new memory location and copies bufferPtr content
