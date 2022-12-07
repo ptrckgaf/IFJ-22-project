@@ -1,3 +1,8 @@
+/*
+    - ifj22 compiler main
+    - Author: Anton Miklis(xmikli05)
+*/
+
 #include "utils.h"
 #include "scanner.h"
 #include "semantics.h"
@@ -14,8 +19,8 @@ int main(){
     StackPrint(stack);
 
     parser(stack);
-//    semantics();
-//    codegen();
+    semantics();
+    codegen();
 
 
     StackFree(stack);

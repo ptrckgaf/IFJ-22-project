@@ -388,6 +388,26 @@ void itoac(int n, char s[])
     reverse(s);
 }
 
+void processString(DynamicString *string){
+    if (string->length == 0){
+        return;
+    }
+    char ch;
+    for (int i = 0; (ch = string->value[i]) != '\0'; ++i) {
+        if (ch == ' '){
+            printf("\\032");
+        } else if (ch == '\\'){
+            printf("\\092");
+        } else if (ch == '`'){
+            printf("\\");
+        } else if (ch == '#'){
+            printf("\\035");
+        } else{
+            printf("%c", ch);
+        }
+
+    }
+}
 
 char *string_concatenate(char *s1,char *s2){
     int s1_length = strlen(s1);

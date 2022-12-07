@@ -373,12 +373,11 @@ Value *ValueInit();
  * @return
  */
 Value *TokenToValue(Token *token);
-
 /**
- * DEBUG FUNCTION converts value to string, max string length is 256
- * @param value
+ * converts spcae, /, # to esc sequence
+ * @param string
  */
-char* ValueToString(Value *value);
+void processString(DynamicString *string);
 
 int parser();
 int codegen();

@@ -222,7 +222,8 @@ void generate_constant(ASTstruct *node){
             break;
 
         case NODE_STRING:
-            PRINT_CODE(" string@%s", node->value->data.stringPtr->value);
+            PRINT_CODE(" string@");
+            processString(node->value->data.stringPtr);
             break;
 
         case NODE_FLOAT:
