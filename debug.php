@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-function f(?float $v): void {
+function f(?int $v): void {
     if ($v === null) {
         write("(null)\n");
     } else {

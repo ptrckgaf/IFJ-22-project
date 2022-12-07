@@ -1,7 +1,9 @@
 #include "scanner.h"
 #include "ctype.h"
 
-AutomatonState AutomatonNext(AutomatonState current, char input){
+void processEscSequence(FILE *source, DynamicString *bufferPtr, char *input);
+
+FsmState FsmNext(FsmState current, char input){
     switch (current) {
         case START:
             if (input == ' ' || input == '\t' || input == '\n' || input == EOF){return START;}
@@ -169,7 +171,7 @@ AutomatonState AutomatonNext(AutomatonState current, char input){
 
 }
 
-bool isStateFinal(AutomatonState state){
+bool isStateFinal(FsmState state){
     switch (state) {
         case VARIABLE_ID:
         case STRING_END:
@@ -205,7 +207,7 @@ bool isStateFinal(AutomatonState state){
     }
 }
 
-bool isRead(AutomatonState state){
+bool isRead(FsmState state){
     switch (state) {
         case STRING:
         case IDENTIFIER:
@@ -223,7 +225,7 @@ bool isRead(AutomatonState state){
     }
 }
 
-TokenType getTokenType(AutomatonState state){
+TokenType getTokenType(FsmState state){
     switch (state) {
         case IDENTIFIER:        return TOKEN_ID;
         case TYPE_IDENTIFIER:   return TOKEN_TYPE_ID;
@@ -370,8 +372,8 @@ Stack *scanner(FILE *source){
 
     DynamicString *bufferPtr = DynamicStringInit();
 
-    AutomatonState current = START;
-    AutomatonState next;
+    FsmState current = START;
+    FsmState next;
 
     DynamicString *tokenValuePtr;
     TokenType tokenType;
@@ -393,54 +395,12 @@ Stack *scanner(FILE *source){
             return NULL;
         }
 
-        next = AutomatonNext(current, input);
+        next = FsmNext(current, input);
 
         //process escape sequence
         if (next == STRING_BACKSLASH){
             input = fgetc(source);
-            switch (input) {
-                case 'n':
-                    DynamicStringAddChar(bufferPtr, '\\');
-                    DynamicStringAddChar(bufferPtr, '0');
-                    DynamicStringAddChar(bufferPtr, '1');
-                    DynamicStringAddChar(bufferPtr, '0');
-                    break;
-                case 't':
-                    DynamicStringAddChar(bufferPtr, '\\');
-                    DynamicStringAddChar(bufferPtr, '0');
-                    DynamicStringAddChar(bufferPtr, '0');
-                    DynamicStringAddChar(bufferPtr, '9');
-                    break;
-                case '\\':
-                    DynamicStringAddChar(bufferPtr, '\\');
-                    DynamicStringAddChar(bufferPtr, '0');
-                    DynamicStringAddChar(bufferPtr, '9');
-                    DynamicStringAddChar(bufferPtr, '2');
-                    break;
-                case '"':
-                    DynamicStringAddChar(bufferPtr, '\\');
-                    DynamicStringAddChar(bufferPtr, '0');
-                    DynamicStringAddChar(bufferPtr, '3');
-                    DynamicStringAddChar(bufferPtr, '4');
-                    break;
-                case '$':
-                    DynamicStringAddChar(bufferPtr, '\\');
-                    DynamicStringAddChar(bufferPtr, '0');
-                    DynamicStringAddChar(bufferPtr, '3');
-                    DynamicStringAddChar(bufferPtr, '6');
-                    break;
-                case 'x':
-                    processHexSequence(source, &input, bufferPtr);
-                    break;
-                case '0':case '1':case '2':case '3':
-                    processOctSequence(source, &input, bufferPtr);
-                    break;
-                default:
-                    //given sequence is not valid escape sequence, that's why we should put backslash to buffer
-                    DynamicStringAddChar(bufferPtr, '\\');
-                    ungetc(input, source);
-                    break;
-            }
+            processEscSequence(source, bufferPtr, &input);
             //change current state to state before STRING_BACKSLASH
             current = STRING;
             continue;
@@ -457,7 +417,7 @@ Stack *scanner(FILE *source){
                 ungetc(input, source);
                 DynamicStringRemoveChar(bufferPtr);
                 tokenType = getTokenType(current);
-                //token ?> was met
+                //token ?> was met,
                 if (tokenType == TOKEN_END){
                     isEnd = 1;
                 }
@@ -507,4 +467,50 @@ Stack *scanner(FILE *source){
 
     DynamicStringFree(bufferPtr);
     return stackPtr;
+}
+
+void processEscSequence(FILE *source, DynamicString *bufferPtr, char *input) {
+    switch ((*input)) {
+        case 'n':
+            DynamicStringAddChar(bufferPtr, '\\');
+            DynamicStringAddChar(bufferPtr, '0');
+            DynamicStringAddChar(bufferPtr, '1');
+            DynamicStringAddChar(bufferPtr, '0');
+            break;
+        case 't':
+            DynamicStringAddChar(bufferPtr, '\\');
+            DynamicStringAddChar(bufferPtr, '0');
+            DynamicStringAddChar(bufferPtr, '0');
+            DynamicStringAddChar(bufferPtr, '9');
+            break;
+        case '\\':
+            DynamicStringAddChar(bufferPtr, '\\');
+            DynamicStringAddChar(bufferPtr, '0');
+            DynamicStringAddChar(bufferPtr, '9');
+            DynamicStringAddChar(bufferPtr, '2');
+            break;
+        case '"':
+            DynamicStringAddChar(bufferPtr, '\\');
+            DynamicStringAddChar(bufferPtr, '0');
+            DynamicStringAddChar(bufferPtr, '3');
+            DynamicStringAddChar(bufferPtr, '4');
+            break;
+        case '$':
+            DynamicStringAddChar(bufferPtr, '\\');
+            DynamicStringAddChar(bufferPtr, '0');
+            DynamicStringAddChar(bufferPtr, '3');
+            DynamicStringAddChar(bufferPtr, '6');
+            break;
+        case 'x':
+            processHexSequence(source, input, bufferPtr);
+            break;
+        case '0':case '1':case '2':case '3':
+            processOctSequence(source, input, bufferPtr);
+            break;
+        default:
+            //given sequence is not valid escape sequence, that's why we should put backslash to buffer
+            DynamicStringAddChar(bufferPtr, '\\');
+            ungetc((*input), source);
+            break;
+    }
 }

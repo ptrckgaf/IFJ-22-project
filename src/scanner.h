@@ -68,25 +68,25 @@ typedef enum{
     PROLOG_3,
 
     END
-}AutomatonState;
+}FsmState;
 
-AutomatonState AutomatonNext(AutomatonState current, char input);
+FsmState FsmNext(FsmState current, char input);
 
-bool isStateFinal(AutomatonState state);
+bool isStateFinal(FsmState state);
 
 /**
  * Returns 1 if we should read chars in state, 0 if shouldn't
  * @param state
  * @return
  */
-bool isRead(AutomatonState state);
+bool isRead(FsmState state);
 
 /**
  * Function gets token type from corresponding automaton state
  * @param state
  * @return
  */
-TokenType getToken(AutomatonState state);
+TokenType getToken(FsmState state);
 
 /**
  * Function to process /x00 -/xFF sequence
