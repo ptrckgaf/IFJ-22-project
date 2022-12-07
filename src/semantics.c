@@ -87,41 +87,84 @@ void semCheck(ASTstruct *tree,FSTable *ftab,char *name){
 
         }
         case NODE_ORD:{
-            if(tree->rightNode->leftNode->type == NODE_VAR_ID){
-                pointer = fst_search(ftab, name);
-                if (st_search(pointer->symtab_ptr,tree->rightNode->leftNode->value->data.stringPtr->value) == NULL) {
-                    error_exit(UNDEF_VAR_ERR, "Semantic error! Undefined variable. ");
+            tmp = tree->rightNode;
+            while(tmp->leftNode != NULL) {
+                if (tree->rightNode->leftNode->rightNode->type == NODE_VAR_ID) {
+                    pointer = fst_search(ftab, name);
+                    if (st_search(pointer->symtab_ptr, tree->rightNode->leftNode->rightNode->value->data.stringPtr->value) ==
+                        NULL) {
+                        error_exit(UNDEF_VAR_ERR, "Semantic error! Undefined variable. ");
+                    }
+                    st_item *var;
+                    var = st_search(pointer->symtab_ptr, tree->rightNode->leftNode->rightNode->value->data.stringPtr->value);
+                    if (var->key_type != 3) {
+                        error_exit(PARAMS_ERR, "Semantic error! Function must have string as parameter. ");
+                    }
                 }
-                st_item *var;
-                var = st_search(pointer->symtab_ptr,tree->rightNode->leftNode->value->data.stringPtr->value);
-                if(var->key_type != 3) {
-                    error_exit(PARAMS_ERR, "Semantic error! Function must have string as parameter. ");
-                }
+                count++;
+                tmp = tmp->leftNode;
+            }
+            if(count != 1){
+                error_exit(PARAMS_ERR, "Semantic error! Wrong number of parameters. ");
             }
             break;
         }
         case NODE_CHR:{
-            st_function *pointer = NULL;
-            if(tree->rightNode->leftNode->type == NODE_VAR_ID){
-                pointer = fst_search(ftab, name);
-                if (st_search(pointer->symtab_ptr,tree->rightNode->leftNode->value->data.stringPtr->value) == NULL) {
-                    error_exit(UNDEF_VAR_ERR, "Semantic error! Undefined variable. ");
+            tmp = tree->rightNode;
+            while(tmp->leftNode != NULL) {
+                if (tree->rightNode->leftNode->rightNode->type == NODE_VAR_ID) {
+                    pointer = fst_search(ftab, name);
+                    if (st_search(pointer->symtab_ptr, tree->rightNode->leftNode->rightNode->value->data.stringPtr->value) ==
+                        NULL) {
+                        error_exit(UNDEF_VAR_ERR, "Semantic error! Undefined variable. ");
+                    }
+                    st_item *var;
+                    var = st_search(pointer->symtab_ptr, tree->rightNode->leftNode->rightNode->value->data.stringPtr->value);
+                    if (var->key_type != 1) {
+                        error_exit(PARAMS_ERR, "Semantic error! Function must have integer as parameter. ");
+                    }
                 }
-                st_item *var;
-                var = st_search(pointer->symtab_ptr,tree->rightNode->leftNode->value->data.stringPtr->value);
-                if(var->key_type != 1) {
-                    error_exit(PARAMS_ERR, "Semantic error! Function must have integer as parameter. ");
-                }
+                count++;
+                tmp = tmp->leftNode;
+            }
+            if(count != 1){
+                error_exit(PARAMS_ERR, "Semantic error! Wrong number of parameters. ");
             }
             break;
         }
         case NODE_FLOATVAL:{
-            st_function *pointer = NULL;
-            if(tree->rightNode->leftNode->type == NODE_VAR_ID){
-                pointer = fst_search(ftab, name);
-                if (st_search(pointer->symtab_ptr,tree->rightNode->leftNode->value->data.stringPtr->value) == NULL) {
-                    error_exit(UNDEF_VAR_ERR, "Semantic error! Undefined variable. ");
+            tmp = tree->rightNode;
+            while(tmp->leftNode != NULL) {
+                if (tree->rightNode->leftNode->rightNode->type == NODE_VAR_ID) {
+                    pointer = fst_search(ftab, name);
+                    if (st_search(pointer->symtab_ptr, tree->rightNode->leftNode->rightNode->value->data.stringPtr->value) ==
+                        NULL) {
+                        error_exit(UNDEF_VAR_ERR, "Semantic error! Undefined variable. ");
+                    }
                 }
+                count++;
+                tmp = tmp->leftNode;
+            }
+            if(count != 1){
+                error_exit(PARAMS_ERR, "Semantic error! Wrong number of parameters. ");
+            }
+            break;
+        }
+        case NODE_INTVAL:{
+            tmp = tree->rightNode;
+            while(tmp->leftNode != NULL) {
+                if (tree->rightNode->leftNode->rightNode->type == NODE_VAR_ID) {
+                    pointer = fst_search(ftab, name);
+                    if (st_search(pointer->symtab_ptr, tree->rightNode->leftNode->rightNode->value->data.stringPtr->value) ==
+                        NULL) {
+                        error_exit(UNDEF_VAR_ERR, "Semantic error! Undefined variable. ");
+                    }
+                }
+                count++;
+                tmp = tmp->leftNode;
+            }
+            if(count != 1){
+                error_exit(PARAMS_ERR, "Semantic error! Wrong number of parameters. ");
             }
             break;
         }
@@ -129,7 +172,6 @@ void semCheck(ASTstruct *tree,FSTable *ftab,char *name){
             if (fst_search(ftab, tree->rightNode->value->data.stringPtr->value) == NULL) {
                 error_exit(UNDEF_FUNC_ERR, "Semantic error! Call of undefined function. ");
             }
-
             tmp = tree->rightNode;
             if(tmp->leftNode != NULL) {
                 while (tmp->leftNode != NULL) {
