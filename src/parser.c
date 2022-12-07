@@ -358,6 +358,15 @@ ASTstruct *rt(Stack *stack)
         case TOKEN_KEYWORD_VOID:
             return createNode(RETURN_TYPE_VOID, NULL, NULL, NULL);
 
+        case TOKEN_KEYWORD_OPT_INT:
+            return createNode(NODE_OPT_INT, NULL, NULL, NULL);
+
+        case TOKEN_KEYWORD_OPT_FLOAT:
+            return createNode(NODE_OPT_FLOAT, NULL, NULL, NULL);
+
+        case TOKEN_KEYWORD_OPT_STRING:
+            return createNode(NODE_OPT_STRING, NULL, NULL, NULL);
+
         default:
             error_exit(SYN_ERR, "Syntax error! Invalid returntype.");
     }
