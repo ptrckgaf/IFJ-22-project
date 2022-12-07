@@ -1,7 +1,13 @@
 <?php
 declare(strict_types=1);
-$a = 1;
-while( $a !== 10){
-    $a = $a + 1;
-    write();
+$x = "B";
+if($x === "A") {
+    $x = 5;
+} else {
+
+}
+if($x === "A") {
+    $x = 5;
+} else {
+
 }
