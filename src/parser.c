@@ -401,7 +401,7 @@ ASTstruct *stmt(Stack *stack)
             // fix pre $var;
             if (loadToken(stack)->type == TOKEN_SEMICOLON)
             {
-                error_exit(UNDEF_VAR_ERR, "Semantic error! Undefined variable!");
+                error_exit(UNDEF_VAR_ERR, "Syntax error! Undefined variable!");
             }
             unloadToken(stack);
 

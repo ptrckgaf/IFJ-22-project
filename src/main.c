@@ -3,7 +3,7 @@
 #include "semantics.h"
 
 int main(){
-    FILE *source = fopen("../debug.php", "r");//set source to stdin
+    FILE *source = stdin;//fopen("../debug.php", "r");//set source to stdin
     if (source == NULL){
         error_exit(INT_ERR, "Can't open file");
     }

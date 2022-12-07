@@ -395,10 +395,7 @@ int semantics(){
         fst_init(ftab);
         insert_function(tree, ftab);
         //semCheck(ast->rightNode->leftNode,ftab);
-<<<<<<< HEAD
         //printf("\n# done");
-=======
         printf("#done\n");
->>>>>>> 414875563cd052904896c408bc88c0de59844f32
     }
 }
