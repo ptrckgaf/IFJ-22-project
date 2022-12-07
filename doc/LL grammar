@@ -1,9 +1,9 @@
 <prolog> -> TOKEN_PROLOG TOKEN_DECLARE TOKEN_L_PAR TOKEN_STRICT_TYPES TOKEN_ASSIGN TOKEN_INT TOKEN_R_PAR TOKEN_SEMICOLON <prog>
 
-<prog> -> <function_define> <stmt> <prog>
+<prog> -> <function_define> <statement> <prog>
 <prog> -> eps
 
-<func_def> -> TOKEN_KEYWORD_FUNCTION TOKEN_FUNC_ID TOKEN_L_PAR <params> TOKEN_R_PAR TOKEN_COLON <returntype> TOKEN_L_BRACKET <stmt> TOKEN_R_BRACKET <prog>
+<func_def> -> TOKEN_KEYWORD_FUNCTION TOKEN_FUNC_ID TOKEN_L_PAR <params> TOKEN_R_PAR TOKEN_COLON <returntype> TOKEN_L_BRACKET <statement> TOKEN_R_BRACKET <prog>
 <func_def> -> eps
 
 <params> -> <type> TOKEN_VAR_ID <params2>
@@ -15,8 +15,8 @@
 <type> -> TOKEN_KEYWORD_FLOAT
 <type> -> TOKEN_KEYWORD_STRING
 
-arg_comma -> TOKEN_COMMA term arg_comma
-arg_comma -> eps
+<arg_comma> -> TOKEN_COMMA term <arg_comma>
+<arg_comma>  -> eps
 
 <returntype> -> <type>
 <returntype> -> TOKEN_KEYWORD_VOID
@@ -29,12 +29,12 @@ arg_comma -> eps
 <func_args> -> <term> <arg_comma>
 <func_args> -> eps
 
-<stmt> -> TOKEN_KEYWORD_IF TOKEN_L_PAR <expr> TOKEN_R_PAR TOKEN_L_BRACKET <stmt> TOKEN_R_BRACKET ELSE TOKEN_L_BRACKET <stmt> TOKEN_R_BRACKET <stmt>
-<stmt> -> TOKEN_KEYWORD_WHILE TOKEN_L_PAR <expr> TOKEN_R_PAR TOKEN_L_BRACKET <stmt> TOKEN_R_BRACKET <stmt>
-<stmt> -> TOKEN_VAR_ID TOKEN_ASSIGN <expr> TOKEN_SEMICOLON <stmt>
-<stmt> -> TOKEN_ID TOKEN_L_PAR <func_args> TOKEN_R_PAR TOKEN_SEMICOLON <stmt>
-<stmt> -> TOKEN_KEYWORD_RETURN <expr> TOKEN_SEMICOLON
-<stmt> -> eps
+<statement> -> TOKEN_KEYWORD_IF TOKEN_L_PAR <expression> TOKEN_R_PAR TOKEN_L_BRACKET <statement> TOKEN_R_BRACKET ELSE TOKEN_L_BRACKET <statement> TOKEN_R_BRACKET <statement>
+<statement> -> TOKEN_KEYWORD_WHILE TOKEN_L_PAR <expression> TOKEN_R_PAR TOKEN_L_BRACKET <statement> TOKEN_R_BRACKET <statement>
+<statement> -> TOKEN_VAR_ID TOKEN_ASSIGN <expression> TOKEN_SEMICOLON <statement>
+<statement> -> TOKEN_ID TOKEN_L_PAR <func_args> TOKEN_R_PAR TOKEN_SEMICOLON <statement>
+<statement> -> TOKEN_KEYWORD_RETURN <expression> TOKEN_SEMICOLON
+<statement> -> eps
 
 <str_arg> -> TOKEN_STRING
 <str_arg> -> TOKEN_VAR_ID
@@ -44,26 +44,26 @@ arg_comma -> eps
 
 <substr_args> -> <str_arg> <int_arg> <int_arg>
 
-<expr> -> TOKEN_ID TOKEN_L_PAR <func_args> TOKEN_R_PAR
-<expr> -> <term> <expr2>
-<expr> -> TOKEN_L_PAR <expr> TOKEN_R_PAR
-<expr> -> TOKEN_READS TOKEN_L_PAR TOKEN_R_PAR
-<expr> -> TOKEN_READI TOKEN_L_PAR TOKEN_R_PAR
-<expr> -> TOKEN_READF TOKEN_L_PAR TOKEN_R_PAR
-<expr> -> TOKEN_WRITE TOKEN_L_PAR <func_args> TOKEN_R_PAR
-<expr> -> TOKEN_STRLEN TOKEN_L_PAR <str_arg> TOKEN_R_PAR
-<expr> -> TOKEN_SUBSTRING TOKEN_L_PAR <substr_args> TOKEN_R_PAR
-<expr> -> TOKEN_ORD TOKEN_L_PAR <str_arg> TOKEN_R_PAR
-<expr> -> TOKEN_CHR TOKEN_L_PAR <int_arg> TOKEN_R_PAR
+<expression> -> TOKEN_ID TOKEN_L_PAR <func_args> TOKEN_R_PAR
+<expression> -> <term> <expression2>
+<expression> -> TOKEN_L_PAR <expression> TOKEN_R_PAR
+<expression> -> TOKEN_READS TOKEN_L_PAR TOKEN_R_PAR
+<expression> -> TOKEN_READI TOKEN_L_PAR TOKEN_R_PAR
+<expression> -> TOKEN_READF TOKEN_L_PAR TOKEN_R_PAR
+<expression> -> TOKEN_WRITE TOKEN_L_PAR <func_args> TOKEN_R_PAR
+<expression> -> TOKEN_STRLEN TOKEN_L_PAR <str_arg> TOKEN_R_PAR
+<expression> -> TOKEN_SUBSTRING TOKEN_L_PAR <substr_args> TOKEN_R_PAR
+<expression> -> TOKEN_ORD TOKEN_L_PAR <str_arg> TOKEN_R_PAR
+<expression> -> TOKEN_CHR TOKEN_L_PAR <int_arg> TOKEN_R_PAR
 
-expr2 -> TOKEN_PLUS expr
-expr2 -> TOKEN_MINUS expr
-expr2 -> TOKEN_MUL expr
-expr2 -> TOKEN_DIV expr
-expr2 -> TOKEN_GREATER expr
-expr2 -> TOKEN_GREATER_EQ expr
-expr2 -> TOKEN_LESS expr
-expr2 -> TOKEN_LESS_EQ expr
-expr2 -> TOKEN_COMPARE expr
-expr2 -> TOKEN_NEG_COMPARE expr
-expr2 -> eps
+<expression2> -> TOKEN_PLUS <expression>
+<expression2> -> TOKEN_MINUS <expression>
+<expression2> -> TOKEN_MUL <expression>
+<expression2> -> TOKEN_DIV <expression>
+<expression2> -> TOKEN_GREATER <expression>
+<expression2> -> TOKEN_GREATER_EQ <expression>
+<expression2> -> TOKEN_LESS <expression>
+<expression2> -> TOKEN_LESS_EQ <expression>
+<expression2> -> TOKEN_COMPARE <expression>
+<expression2> -> TOKEN_NEG_COMPARE <expression>
+<expression2> -> eps
