@@ -20,22 +20,26 @@ FSTable *fsTable;
 int codegen()
 {
 
-    PRINT_CODE(".IFJcode22\n");
+    CODE(".IFJcode22\n");
 
-    //variable for string concatenation
-    PRINT_CODE("DEFVAR GF@%%con\n");
+    //temporary variables
+    CODE("DEFVAR GF@%%tmp\n");
+    CODE("DEFVAR GF@%%type\n");
+    //variable for string operations
+    CODE("DEFVAR GF@%%str1\n");
+    CODE("DEFVAR GF@%%str2\n");
 
-    PRINT_CODE("JUMP $$main\n");
+    CODE("JUMP $$main\n");
 
     //runtime error
-    PRINT_CODE("LABEL $$runerr\n");
-    PRINT_CODE("EXIT int@7\n");
+    CODE("LABEL $$runerr\n");
+    CODE("EXIT int@7\n");
 
     gen_func_def(ast->rightNode, NULL, 0);
 
-    PRINT_CODE("LABEL $$main\n");
-    PRINT_CODE("CREATEFRAME\n");
-    PRINT_CODE("PUSHFRAME\n");
+    CODE("LABEL $$main\n");
+    CODE("CREATEFRAME\n");
+    CODE("PUSHFRAME\n");
     gen_statements(ast->rightNode, "0", 0);
 //    gen_func_def(ast->rightNode);
 //    gen_statements(ast->rightNode);
@@ -63,36 +67,38 @@ void gen_statements(ASTstruct *tree, tKey func_name, int if_number) {
             st_item *stItem = getStItem(func_name, variable_id, fsTable);
             //define variable if wasn't defined before
             if (!stItem->is_defined){
-                PRINT_CODE("DEFVAR LF@%s\n", variable_id);
+                CODE("DEFVAR LF@%s\n", variable_id);
                 stItem->is_defined = 1;
             }
             if (tree->rightNode->rightNode->type == NODE_READS){
                 //built-in reads call
-                PRINT_CODE("READ LF@%s string\n", tree->rightNode->leftNode->value->data.stringPtr->value);
+                CODE("READ LF@%s string\n", tree->rightNode->leftNode->value->data.stringPtr->value);
             } else if (tree->rightNode->rightNode->type == NODE_READF) {
                 //built-in readf call
-                PRINT_CODE("READ LF@%s float\n", tree->rightNode->leftNode->value->data.stringPtr->value);
+                CODE("READ LF@%s float\n", tree->rightNode->leftNode->value->data.stringPtr->value);
             } else if (tree->rightNode->rightNode->type == NODE_READI){
                 //built-in readi call
 //                PRINT_CODE("DEFVAR LF@%%type\n");
-                PRINT_CODE("READ LF@%s int\n", tree->rightNode->leftNode->value->data.stringPtr->value);
+                CODE("READ LF@%s int\n", tree->rightNode->leftNode->value->data.stringPtr->value);
 //                PRINT_CODE("TYPE LF@%%type LF@%s\n", tree->rightNode->leftNode->value->data.stringPtr->value);
 //                PRINT_CODE("DPRINT LF@%%type\n");
             } else if (tree->rightNode->rightNode->type == NODE_FUNC_ID){
                 //user defined function call
                 gen_func_call(tree->rightNode);
+            } else if(tree->rightNode->rightNode->type == NODE_STRLEN){
+                //built-in strlen
+                CODE("STRLEN LF@%s", tree->rightNode->leftNode->value->data.stringPtr->value);
+                generate_constant(tree->rightNode->rightNode->leftNode->rightNode);
             }
             else{
                 calculate_expr(tree->rightNode->rightNode);
-                PRINT_CODE("POPS LF@%s\n", variable_id);
+                CODE("POPS LF@%s\n", variable_id);
             }
             break;
         }
         case NODE_WRITE:
             gen_write(tree->rightNode);
             generate_constant(tree);
-            break;
-        case NODE_STRLEN:
             break;
         case NODE_SUBSTRING:
             break;
@@ -104,12 +110,12 @@ void gen_statements(ASTstruct *tree, tKey func_name, int if_number) {
             gen_void_func_call(tree->rightNode);
             break;
         case NODE_RETURN:
-            PRINT_CODE("MOVE LF@%%retval");
+            CODE("MOVE LF@%%retval");
             generate_constant(tree->rightNode->leftNode);
             PRINT_NL();
 
-            PRINT_CODE("POPFRAME\n");
-            PRINT_CODE("RETURN\n");
+            CODE("POPFRAME\n");
+            CODE("RETURN\n");
             PRINT_NL();
             break;
         case NODE_PROLOG:
@@ -128,8 +134,8 @@ void gen_func_def(ASTstruct *tree, tKey func_name, int if_number)
         tKey func_name = tree->rightNode->value->data.stringPtr->value;
         fprintf(stdout, "\nLABEL %s\n", func_name);
         fprintf(stdout, "PUSHFRAME\n");
-        PRINT_CODE("DEFVAR LF@%%retval\n");
-        PRINT_CODE("MOVE LF@%%retval nil@nil\n");
+        CODE("DEFVAR LF@%%retval\n");
+        CODE("MOVE LF@%%retval nil@nil\n");
 
         if (tree->rightNode->leftNode)
         {
@@ -160,7 +166,7 @@ void gen_func_params(ASTstruct *tree, int param_id, tKey func_name)
     if (stItem){
         stItem->is_defined = 1;
     }
-    PRINT_CODE("DEFVAR LF@%s\n", variable_id);
+    CODE("DEFVAR LF@%s\n", variable_id);
 
     fprintf(stdout, "MOVE LF@%s LF@%%%d\n", tree->rightNode->value->data.stringPtr->value, param_id);
 
@@ -172,8 +178,8 @@ void gen_func_params(ASTstruct *tree, int param_id, tKey func_name)
 }
 
 void gen_func_call_params(ASTstruct *tree, int param_id){
-    PRINT_CODE("DEFVAR TF@%%%d\n", param_id);
-    PRINT_CODE("MOVE TF@%%%d", param_id);
+    CODE("DEFVAR TF@%%%d\n", param_id);
+    CODE("MOVE TF@%%%d", param_id);
     generate_constant(tree->rightNode);
     PRINT_NL();
 
@@ -185,29 +191,28 @@ void gen_func_call_params(ASTstruct *tree, int param_id){
 }
 
 void gen_func_call(ASTstruct *tree){
-    PRINT_CODE("CREATEFRAME\n");
+    CODE("CREATEFRAME\n");
     if (tree->rightNode->leftNode){
         gen_func_call_params(tree->rightNode->leftNode, 1);
     }
 
-    PRINT_CODE("CALL %s\n", tree->rightNode->value->data.stringPtr->value);
-    PRINT_CODE("MOVE LF@%s TF@%%retval\n", tree->leftNode->value->data.stringPtr->value);
+    CODE("CALL %s\n", tree->rightNode->value->data.stringPtr->value);
+    CODE("MOVE LF@%s TF@%%retval\n", tree->leftNode->value->data.stringPtr->value);
 }
 
 void gen_void_func_call(ASTstruct *tree){
-    PRINT_CODE("CREATEFRAME\n");
+    CODE("CREATEFRAME\n");
     if (tree->leftNode){
         gen_func_call_params(tree->leftNode, 1);
     }
 
-    PRINT_CODE("CALL %s\n", tree->value->data.stringPtr->value);
+    CODE("CALL %s\n", tree->value->data.stringPtr->value);
 }
 
 void gen_write(ASTstruct *tree){
     tree = tree->leftNode;
     while (tree){
-        PRINT_CODE("WRITE");
-        //todo change to generate expression
+        CODE("WRITE");
         generate_constant(tree->rightNode);
         PRINT_NL();
         tree = tree->leftNode;
@@ -218,24 +223,24 @@ void generate_constant(ASTstruct *node){
 
     switch (node->type){
         case NODE_INT:
-            PRINT_CODE(" int@%d", node->value->data.integer);
+            CODE(" int@%d", node->value->data.integer);
             break;
 
         case NODE_STRING:
-            PRINT_CODE(" string@");
+            CODE(" string@");
             processString(node->value->data.stringPtr);
             break;
 
         case NODE_FLOAT:
-            PRINT_CODE(" float@%a", node->value->data.decimal);
+            CODE(" float@%a", node->value->data.decimal);
             break;
 
         case NODE_NULL:
-            PRINT_CODE(" nil@nil");
+            CODE(" nil@nil");
             break;
 
         case NODE_VAR_ID:
-            PRINT_CODE(" LF@%s", node->value->data.stringPtr->value);
+            CODE(" LF@%s", node->value->data.stringPtr->value);
             break;
         default:
             break;
@@ -249,61 +254,84 @@ void calculate_expr(ASTstruct *tree)
         case NODE_PLUS:
             calculate_expr(tree->leftNode);
             calculate_expr(tree->rightNode);
-            PRINT_CODE("ADDS\n");
+            CODE("ADDS\n");
             break;
 
         case NODE_MINUS:
             calculate_expr(tree->leftNode);
             calculate_expr(tree->rightNode);
-            PRINT_CODE("SUBS\n");
+            CODE("SUBS\n");
             break;
 
         case NODE_MUL:
             calculate_expr(tree->leftNode);
             calculate_expr(tree->rightNode);
-            PRINT_CODE("MULS\n");
+            CODE("MULS\n");
             break;
 
         case NODE_DIV:
-            //todo zero division
-            //todo type conversion
             calculate_expr(tree->leftNode);
             calculate_expr(tree->rightNode);
-            PRINT_CODE("DIVS\n");
+            CODE("DIVS\n");
+
             break;
         case NODE_LESS:
             //todo >= <=
             calculate_expr(tree->leftNode);
             calculate_expr(tree->rightNode);
-            PRINT_CODE("LTS\n");
+            CODE("LTS\n");
             break;
+        case NODE_LESS_EQ:
+            calculate_expr(tree->leftNode);
+            calculate_expr(tree->rightNode);
+            CODE("LTS\n");
+            calculate_expr(tree->leftNode);
+            calculate_expr(tree->rightNode);
+            CODE("EQS\n");
+            CODE("ORS\n");
+            break;
+        case NODE_GREATER_EQ:
+            calculate_expr(tree->leftNode);
+            calculate_expr(tree->rightNode);
+            CODE("GTS\n");
+            calculate_expr(tree->leftNode);
+            calculate_expr(tree->rightNode);
+            CODE("EQS\n");
+            CODE("ORS\n");
+            break;
+
         case NODE_GREATER:
             calculate_expr(tree->leftNode);
             calculate_expr(tree->rightNode);
-            PRINT_CODE("GTS\n");
+            CODE("GTS\n");
             break;
         case NODE_COMPARE:
             calculate_expr(tree->leftNode);
             calculate_expr(tree->rightNode);
-            PRINT_CODE("EQS\n");
+            CODE("EQS\n");
             break;
         case NODE_NEG_COMPARE:
             calculate_expr(tree->leftNode);
             calculate_expr(tree->rightNode);
-            PRINT_CODE("EQS\n");
-            PRINT_CODE("NOTS\n");
+            CODE("EQS\n");
+            CODE("NOTS\n");
             break;
-//        case NODE_CONCATENATE:
-//            calculate_expr(tree->leftNode);
-//            calculate_expr(tree->rightNode);
-//            PRINT_CODE("DEFVAR GF%%con\n");
-//            PRINT_CODE("POPS GF%%con\n");
-//            PRINT_CODE("CONCAT GF%%con\n");
+        case NODE_CONCATENATE:
+            calculate_expr(tree->leftNode);
+            calculate_expr(tree->rightNode);
+            expect_type("string");
+            CODE("POPS GF@%%str2\n");
+            expect_type("string");
+            CODE("POPS GF@%%str1\n");
+            CODE("CONCAT GF@%%tmp GF@%%str1 GF@%%str2\n");
+            CODE("PUSHS GF@%%tmp\n");
+            break;
         case NODE_INT:
         case NODE_FLOAT:
         case NODE_VAR_ID:
         case NODE_NULL:
-            PRINT_CODE("PUSHS");
+        case NODE_STRING:
+            CODE("PUSHS");
             generate_constant(tree);
             PRINT_NL();
     }
@@ -312,15 +340,23 @@ void calculate_expr(ASTstruct *tree)
 void gen_if(ASTstruct *tree, tKey func_name, int if_number) {
     if_number++;
     calculate_expr(tree->leftNode->rightNode);
-    PRINT_CODE("PUSHS bool@false\n");
+    CODE("PUSHS bool@false\n");
 
-    PRINT_CODE("JUMPIFEQS $$else$%d$%s\n", if_number, func_name);
+    CODE("JUMPIFEQS $$else$%d$%s\n", if_number, func_name);
 
     //if body
     gen_statements(tree->rightNode->rightNode, func_name, if_number);
-    PRINT_CODE("JUMP $$elseend$%d$%s\n", if_number, func_name);
-    PRINT_CODE("LABEL $$else$%d$%s\n", if_number, func_name);
+    CODE("JUMP $$elseend$%d$%s\n", if_number, func_name);
+    CODE("LABEL $$else$%d$%s\n", if_number, func_name);
     //else body
     gen_statements(tree->rightNode->leftNode, func_name, if_number);
-    PRINT_CODE("LABEL $$elseend$%d$%s\n", if_number, func_name);
+    CODE("LABEL $$elseend$%d$%s\n", if_number, func_name);
+}
+
+
+void expect_type(char *type){
+    CODE("POPS GF@%%tmp\n");
+    CODE("TYPE GF@%%type GF@%%tmp\n");
+    CODE("JUMPIFNEQ $$runerr GF@%%type string@%s\n", type);
+    CODE("PUSHS GF@%%tmp\n");
 }

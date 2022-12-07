@@ -2,14 +2,14 @@
 #include "utils.h"
 #include "symtable.h"
 
-#define PRINT_CODE(M, ...)               \
+#define CODE(M, ...)               \
     fprintf(stdout, "" M "", ##__VA_ARGS__)
 
 #define PRINT_NL() \
     fprintf(stdout, "\n")
 
 #define PRINT_ERR() \
-    PRINT_CODE("JUMP $$runerr\n");
+    CODE("JUMP $$runerr\n");
 
 
 
@@ -29,3 +29,4 @@ void gen_write(ASTstruct *tree);
 void generate_constant(ASTstruct *ast);
 void gen_cond(ASTstruct *ast, int count, int type);
 void gen_expr(ASTstruct *ast);
+void expect_type(char *type);
