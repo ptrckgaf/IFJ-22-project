@@ -89,7 +89,7 @@ void semCheck(ASTstruct *tree,FSTable *ftab,char *name){
             break;
         }
         case NODE_SUBSTRING:{
-
+            break;
         }
         case NODE_ORD:{
             tmp = tree->rightNode;
