@@ -179,15 +179,131 @@ void functionBody(ASTstruct *tree,FSTable *ftab,char *name){
             switch (tmp->type) {
 
                 case NODE_GREATER: {
+                    if (tmp->leftNode->type != tmp->rightNode->type) {
+                        x = false;
+                    } 
+                    else {
+                        switch (tree->rightNode->leftNode->rightNode->leftNode->type) {
+                            case NODE_INT: {
+                                if (tmp->leftNode->value->data.integer > tmp->rightNode->value->data.integer) {
+                                    x = true;
+                                }
+                                else x = false;
+                                break;
+                            }
+                            case NODE_FLOAT: {
+                                if (tmp->leftNode->value->data.decimal > tmp->rightNode->value->data.decimal) {
+                                    x = true;
+                                }
+                                else x = false;
+                                break;
+                            }
+                            case NODE_STRING: {
+                                if (strcmp(tmp->leftNode->value->data.stringPtr->value,
+                                           tmp->rightNode->value->data.stringPtr->value) < 0) {
+                                    x = true;
+                                }
+                                else x = false;
+                                break;
+                            }
+                        }
+                    }
                     break;
                 }
                 case NODE_GREATER_EQ: {
+                    if (tmp->leftNode->type != tmp->rightNode->type) {
+                        x = false;
+                    } 
+                    else {
+                        switch (tree->rightNode->leftNode->rightNode->leftNode->type) {
+                            case NODE_INT: {
+                                if (tmp->leftNode->value->data.integer >= tmp->rightNode->value->data.integer) {
+                                    x = true;
+                                }
+                                else x = false;
+                                break;
+                            }
+                            case NODE_FLOAT: {
+                                if (tmp->leftNode->value->data.decimal >= tmp->rightNode->value->data.decimal) {
+                                    x = true;
+                                }
+                                else x = false;
+                                break;
+                            }
+                            case NODE_STRING: {
+                                if (strcmp(tmp->leftNode->value->data.stringPtr->value,
+                                           tmp->rightNode->value->data.stringPtr->value) <= 0) {
+                                    x = true;
+                                }
+                                else x = false;
+                                break;
+                            }
+                        }
+                    }
                     break;
                 }
                 case NODE_LESS: {
+                    if (tmp->leftNode->type != tmp->rightNode->type) {
+                        x = false;
+                    } 
+                    else {
+                        switch (tree->rightNode->leftNode->rightNode->leftNode->type) {
+                            case NODE_INT: {
+                                if (tmp->leftNode->value->data.integer < tmp->rightNode->value->data.integer) {
+                                    x = true;
+                                }
+                                else x = false;
+                                break;
+                            }
+                            case NODE_FLOAT: {
+                                if (tmp->leftNode->value->data.decimal < tmp->rightNode->value->data.decimal) {
+                                    x = true;
+                                }
+                                else x = false;
+                                break;
+                            }
+                            case NODE_STRING: {
+                                if (strcmp(tmp->leftNode->value->data.stringPtr->value,
+                                           tmp->rightNode->value->data.stringPtr->value) > 0) {
+                                    x = true;
+                                }
+                                else x = false;
+                                break;
+                            }
+                        }
+                    }
                     break;
                 }
                 case NODE_LESS_EQ: {
+                    if (tmp->leftNode->type != tmp->rightNode->type) {
+                        x = false;
+                    } 
+                    else {
+                        switch (tree->rightNode->leftNode->rightNode->leftNode->type) {
+                            case NODE_INT: {
+                                if (tmp->leftNode->value->data.integer <= tmp->rightNode->value->data.integer) {
+                                    x = true;
+                                }
+                                else x = false;
+                                break;
+                            }
+                            case NODE_FLOAT: {
+                                if (tmp->leftNode->value->data.decimal <= tmp->rightNode->value->data.decimal) {
+                                    x = true;
+                                }
+                                else x = false;
+                                break;
+                            }
+                            case NODE_STRING: {
+                                if (strcmp(tmp->leftNode->value->data.stringPtr->value,
+                                           tmp->rightNode->value->data.stringPtr->value) >= 0) {
+                                    x = true;
+                                }
+                                else x = false;
+                                break;
+                            }
+                        }
+                    }
                     break;
                 }
                 case NODE_COMPARE: {
