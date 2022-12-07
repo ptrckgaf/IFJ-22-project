@@ -207,7 +207,7 @@ void gen_write(ASTstruct *tree){
     tree = tree->leftNode;
     while (tree){
         PRINT_CODE("WRITE");
-        //todo change to generate expr
+        //todo change to generate expression
         generate_constant(tree->rightNode);
         PRINT_NL();
         tree = tree->leftNode;
