@@ -3,7 +3,7 @@
 #include "semantics.h"
 
 int main(){
-    FILE *source = fopen("../debug.php", "r");//set source to stdin
+    FILE *source = fopen("debug.php", "r");//set source to stdin
     if (source == NULL){
         error_exit(INT_ERR, "Can't open file");
     }
@@ -11,10 +11,10 @@ int main(){
     if (stack == NULL){
         return LEX_ERR;
     }
-    StackPrint(stack);
+    //StackPrint(stack);
 
-//    parser(stack);
-    //semantics();
+    parser(stack);
+    semantics();
     //codegen();
 
 

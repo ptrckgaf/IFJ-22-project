@@ -569,12 +569,22 @@ ASTstruct *str_arg(Stack *stack)
         case TOKEN_FLOAT:
             error_exit(PARAMS_ERR, "Semantic error! Function must have string as parameter.");
 
-
         default:
-            error_exit(SYN_ERR, "Syntax error! Invalid argument(s) in built-in function call.");
+            unloadToken(stack);
+            return NULL;
     }
 
-    return root;
+    token = loadToken(stack);
+    if (token->type == TOKEN_COMMA)
+    {
+        return createNode(SEQ, NULL, str_arg(stack), root);
+    }
+    else
+    {
+        unloadToken(stack);
+        return createNode(SEQ, NULL, NULL, root);
+    }
+
 }
 
 ASTstruct *int_arg(Stack *stack)
@@ -598,10 +608,20 @@ ASTstruct *int_arg(Stack *stack)
 
 
         default:
-        error_exit(SYN_ERR, "Syntax error! Invalid argument(s) in built-in function call.");
+            unloadToken(stack);
+            return NULL;
     }
 
-    return root;
+    token = loadToken(stack);
+    if (token->type == TOKEN_COMMA)
+    {
+        return createNode(SEQ, NULL, int_arg(stack), root);
+    }
+    else
+    {
+        unloadToken(stack);
+        return createNode(SEQ, NULL, NULL, root);
+    }
 }
 
 ASTstruct *substr_args(Stack *stack)
