@@ -1,8 +1,12 @@
+/*
+    - Implementace sémantické analýzy v rámci projektu z IFJ
+    - Autor: Matěj Honzek(xhonze01)
+*/
 #include "semantics.h"
 #include "utils.h"
 
 int count = 0; //pomocna promenna, aby nedochazelo k opakovanemu vkladani globalniho ramce do tabulky symbolu
-int done = 0;
+
 //funkce, ktera zjisti datovy typ promenne
 int getVarType(int type){
     switch(type){
@@ -14,6 +18,7 @@ int getVarType(int type){
             return 3;
     }
 }
+
 //funkce, ktera zjisti typ parametru a prevede ho z celeho cisla na znak
 void *getParamTypes(int type,char paramTypeChar[2]){
     int paramType;
@@ -574,6 +579,7 @@ void function_params(ASTstruct *tree,FSTable *ftab){
     fst_insert(ftab,stab,parameters,tree->rightNode->value->data.stringPtr->value,retType,params);
 }
 
+
 void insert_function(ASTstruct *tree,FSTable *ftab){
     if(tree->rightNode->type == NODE_FUNC_DEF){
 
@@ -598,6 +604,7 @@ void insert_function(ASTstruct *tree,FSTable *ftab){
         count++;
     }
 }
+
 //funkce, kde se provede inicializace tabulky symbolu, nastavi se ukazatel do syntaktickeho stromu
 void semantics(){
     if(ast->rightNode->leftNode != NULL) {
@@ -610,5 +617,6 @@ void semantics(){
         }
         fst_init(ftab);
         insert_function(tree, ftab);
+        printf("#d\n");
     }
 }
