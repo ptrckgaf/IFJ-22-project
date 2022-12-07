@@ -40,10 +40,9 @@ st_item *st_search(STable *table, tKey key) {
 
 
 //Vlozenie noveho prvku do tabulky
-void st_insert(STable *table, int key_type, tKey key, char *value) {
+void st_insert(STable *table, int key_type, tKey key) {
     st_item *insrt = st_search(table, key);
     if (insrt != NULL) {
-        insrt->value = value;
         insrt->key_type = key_type;
     }
     else {
@@ -54,7 +53,6 @@ void st_insert(STable *table, int key_type, tKey key, char *value) {
             error_exit(INT_ERR, "Memory allocation failure.");
         }
 
-        insrt->value = value;
         insrt->key = key;
         insrt->key_type = key_type;
         insrt->next = (*table)[hash];
