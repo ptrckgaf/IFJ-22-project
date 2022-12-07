@@ -229,7 +229,7 @@ void functionBody(ASTstruct *tree,FSTable *ftab,char *name,ASTstruct *back){
                     break;
             }
             pointer = fst_search(ftab, tree->rightNode->value->data.stringPtr->value);
-            st_insert(pointer->symtab_ptr, parType, par->leftNode->rightNode->value->data.stringPtr->value, NULL);
+            st_insert(pointer->symtab_ptr, parType, par->leftNode->rightNode->value->data.stringPtr->value);
             par = par->leftNode;
         }
     }*/
@@ -251,7 +251,7 @@ void functionBody(ASTstruct *tree,FSTable *ftab,char *name,ASTstruct *back){
     }
     if(tree->rightNode->type == NODE_VAR_ASSIGNMENT){
         pointer = fst_search(ftab,name);
-        st_insert(pointer->symtab_ptr, getVarType(tree->rightNode->rightNode->type),tree->rightNode->leftNode->value->data.stringPtr->value,NULL);
+        st_insert(pointer->symtab_ptr, getVarType(tree->rightNode->rightNode->type),tree->rightNode->leftNode->value->data.stringPtr->value);
     }
 
     if(tree->rightNode->type == NODE_IF){
@@ -490,7 +490,7 @@ void insert_global(ASTstruct *tree,FSTable *ftab){
         error_exit(INT_ERR,"Memory allocation error. ");
     }
     st_init(stab);
-    fst_insert(ftab,stab,NULL,"0",NULL,NULL);
+    fst_insert(ftab,stab,NULL,"0",NULL, NULL);
     functionBody(tree,ftab,"0",NULL);
 }
 void paramsToTable(ASTstruct *tree,FSTable *ftab){
@@ -514,8 +514,7 @@ void paramsToTable(ASTstruct *tree,FSTable *ftab){
                 }
                 pointer = fst_search(ftab, tree->rightNode->value->data.stringPtr->value);
                 if (st_search(pointer->symtab_ptr, tmp->leftNode->rightNode->value->data.stringPtr->value) == NULL) {
-                    st_insert(pointer->symtab_ptr, parType, tmp->leftNode->rightNode->value->data.stringPtr->value,
-                              NULL);
+                    st_insert(pointer->symtab_ptr, parType, tmp->leftNode->rightNode->value->data.stringPtr->value);
                     tmp = tmp->leftNode;
                 } else {
                     error_exit(PARAMS_ERR, "Semantic error! Redefinion of parameters in function. ");
@@ -590,7 +589,7 @@ void function_params(ASTstruct *tree,FSTable *ftab){
     /*st_function *pointer = NULL;
     printf("%s\n",name->value->data.stringPtr->value);
     pointer = fst_search(ftab, name->value->data.stringPtr->value);
-    st_insert(pointer->symtab_ptr, 1, "b", NULL);*/
+    st_insert(pointer->symtab_ptr, 1, "b");*/
 
 }
 void insert_function(ASTstruct *tree,FSTable *ftab){
