@@ -247,7 +247,6 @@ void semCheck(ASTstruct *tree,FSTable *ftab,char *name){
                     error_exit(EXPR_ERR, "Semantic error! Return in void function. ");
                 }
             }else {
-                printf("%d %d",type,pointer->retType);
                 if (pointer->retType != type) {
                     error_exit(PARAMS_ERR, "Semantic error! Wrong return type. ");
                 }
