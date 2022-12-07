@@ -473,7 +473,7 @@ void functionBody(ASTstruct *tree,FSTable *ftab,char *name,ASTstruct *back){
 
             }
         }
-        printf("%d\n",x);
+        printf("#%d\n",x);
         //}
 
     }
