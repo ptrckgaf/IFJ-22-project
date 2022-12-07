@@ -1,4 +1,7 @@
-
+/*
+    - Code generator implementation
+    - Autor: Anton Miklis(xmikli05)
+*/
 #include "utils.h"
 #include "symtable.h"
 
@@ -8,26 +11,18 @@
 #define PRINT_NL() \
     fprintf(stdout, "\n")
 
-#define PRINT_ERR() \
-    CODE("JUMP $$runerr\n");
 
 
 
 void gen_statements(ASTstruct *tree, tKey func_name, int if_number, int while_number);
 void gen_func_def(ASTstruct *tree, tKey func_name, int if_number, int while_number);
-void gen_functions(ASTstruct *tree);
-void gen_var_assignment(ASTstruct *ast);
 void gen_func_call(ASTstruct *ast);
 void gen_void_func_call(ASTstruct *tree);
 void gen_func_params(ASTstruct *tree, int param_id, tKey func_name);
-void gen_func_body (ASTstruct *tree);
 void gen_write(ASTstruct *ast);
 void calculate_expr(ASTstruct *tree);
-void gen_declaration(ASTstruct *tree);
 void gen_if(ASTstruct *tree, tKey func_name, int if_number, int while_number);
 void gen_write(ASTstruct *tree);
-void generate_constant(ASTstruct *ast);
-void gen_cond(ASTstruct *ast, int count, int type);
-void gen_expr(ASTstruct *ast);
+void gen_constant(ASTstruct *node);
 void expect_type(char *type);
 void gen_while(ASTstruct *tree, tKey func_name, int if_number, int while_number);

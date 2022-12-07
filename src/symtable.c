@@ -156,5 +156,12 @@ void fst_delete(FSTable *table) {
 
 st_item *getStItem(tKey funcName, tKey varName, FSTable *fsTable) {
     st_function *function = fst_search(fsTable,funcName);
-    return st_search(function->symtab_ptr, varName);
+    if (function == NULL){
+        error_exit(3, "Function not defined");
+    }
+    st_item *st = st_search(function->symtab_ptr, varName);
+    if (st == NULL){
+        error_exit(5, "Variable undefined");
+    }
+    return st;
 }

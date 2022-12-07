@@ -1,19 +1,11 @@
 /*
-    - Implementácia generátoru kódu v rámci projektu z IFJ
-    - Autor: Patrik Gáfrik (xgafri00)
+    - Code generator implementation
+    - Autor: Anton Miklis(xmikli05)
 */
 
 #include "utils.h"
 #include "codegen.h"
 
-
-int runtime_err = 0;
-int value = 0;
-char *func;
-int input_cnt = 0; //counter for read
-bool in_while = false;
-
-bool neg = 0;
 
 FSTable *fsTable;
 
@@ -37,20 +29,18 @@ int codegen()
 
     gen_func_def(ast->rightNode, NULL, 0, 0);
 
+    //generating main body
     CODE("LABEL $$main\n");
     CODE("CREATEFRAME\n");
     CODE("PUSHFRAME\n");
     gen_statements(ast->rightNode, "0", 0, 0);
-//    gen_func_def(ast->rightNode);
-//    gen_statements(ast->rightNode);
 
     return 0;
 }
 
 void gen_statements(ASTstruct *tree, tKey func_name, int if_number, int while_number) {
-    //generating main body of the program
-    int ifc, whilec = 0;
-    int type;
+    //generating statements
+
     if (!tree){
         return;
     }
@@ -79,17 +69,15 @@ void gen_statements(ASTstruct *tree, tKey func_name, int if_number, int while_nu
                 CODE("READ LF@%s float\n", tree->rightNode->leftNode->value->data.stringPtr->value);
             } else if (tree->rightNode->rightNode->type == NODE_READI){
                 //built-in readi call
-//                PRINT_CODE("DEFVAR LF@%%type\n");
                 CODE("READ LF@%s int\n", tree->rightNode->leftNode->value->data.stringPtr->value);
-//                PRINT_CODE("TYPE LF@%%type LF@%s\n", tree->rightNode->leftNode->value->data.stringPtr->value);
-//                PRINT_CODE("DPRINT LF@%%type\n");
+
             } else if (tree->rightNode->rightNode->type == NODE_FUNC_ID){
                 //user defined function call
                 gen_func_call(tree->rightNode);
             } else if(tree->rightNode->rightNode->type == NODE_STRLEN){
                 //built-in strlen
                 CODE("STRLEN LF@%s", tree->rightNode->leftNode->value->data.stringPtr->value);
-                generate_constant(tree->rightNode->rightNode->leftNode->rightNode);
+                gen_constant(tree->rightNode->rightNode->leftNode->rightNode);
             }
             else{
                 calculate_expr(tree->rightNode->rightNode);
@@ -99,7 +87,7 @@ void gen_statements(ASTstruct *tree, tKey func_name, int if_number, int while_nu
         }
         case NODE_WRITE:
             gen_write(tree->rightNode);
-            generate_constant(tree);
+            gen_constant(tree);
             break;
         case NODE_SUBSTRING:
             break;
@@ -112,7 +100,7 @@ void gen_statements(ASTstruct *tree, tKey func_name, int if_number, int while_nu
             break;
         case NODE_RETURN:
             CODE("MOVE LF@%%retval");
-            generate_constant(tree->rightNode->leftNode);
+            gen_constant(tree->rightNode->leftNode);
             PRINT_NL();
 
             CODE("POPFRAME\n");
@@ -132,7 +120,7 @@ void gen_func_def(ASTstruct *tree, tKey func_name, int if_number, int while_numb
 {
     if (tree->rightNode->type == NODE_FUNC_DEF)
     {
-        tKey func_name = tree->rightNode->value->data.stringPtr->value;
+        func_name = tree->rightNode->value->data.stringPtr->value;
         fprintf(stdout, "\nLABEL %s\n", func_name);
         fprintf(stdout, "PUSHFRAME\n");
         CODE("DEFVAR LF@%%retval\n");
@@ -181,7 +169,7 @@ void gen_func_params(ASTstruct *tree, int param_id, tKey func_name)
 void gen_func_call_params(ASTstruct *tree, int param_id){
     CODE("DEFVAR TF@%%%d\n", param_id);
     CODE("MOVE TF@%%%d", param_id);
-    generate_constant(tree->rightNode);
+    gen_constant(tree->rightNode);
     PRINT_NL();
 
     if (!tree->leftNode)
@@ -214,13 +202,13 @@ void gen_write(ASTstruct *tree){
     tree = tree->leftNode;
     while (tree){
         CODE("WRITE");
-        generate_constant(tree->rightNode);
+        gen_constant(tree->rightNode);
         PRINT_NL();
         tree = tree->leftNode;
     }
 }
 
-void generate_constant(ASTstruct *node){
+void gen_constant(ASTstruct *node){
 
     switch (node->type){
         case NODE_INT:
@@ -273,11 +261,11 @@ void calculate_expr(ASTstruct *tree)
         case NODE_DIV:
             calculate_expr(tree->leftNode);
             calculate_expr(tree->rightNode);
+            CODE("POPS GF@%%tmp");
             CODE("DIVS\n");
 
             break;
         case NODE_LESS:
-            //todo >= <=
             calculate_expr(tree->leftNode);
             calculate_expr(tree->rightNode);
             CODE("LTS\n");
@@ -333,7 +321,7 @@ void calculate_expr(ASTstruct *tree)
         case NODE_NULL:
         case NODE_STRING:
             CODE("PUSHS");
-            generate_constant(tree);
+            gen_constant(tree);
             PRINT_NL();
     }
 }
@@ -346,12 +334,17 @@ void gen_if(ASTstruct *tree, tKey func_name, int if_number, int while_number) {
     CODE("JUMPIFEQS $$else$%d$%s\n", if_number, func_name);
 
     //if body
-    gen_statements(tree->rightNode->rightNode, func_name, if_number, while_number);
+    if (tree->rightNode->rightNode){
+        gen_statements(tree->rightNode->rightNode, func_name, if_number, while_number);
+    }
     CODE("JUMP $$elseend$%d$%s\n", if_number, func_name);
     CODE("LABEL $$else$%d$%s\n", if_number, func_name);
     //else body
-    gen_statements(tree->rightNode->leftNode, func_name, if_number, while_number);
+    if (tree->rightNode->leftNode){
+        gen_statements(tree->rightNode->leftNode, func_name, if_number, while_number);
+    }
     CODE("LABEL $$elseend$%d$%s\n", if_number, func_name);
+    PRINT_NL();
 }
 
 void gen_while(ASTstruct *tree, tKey func_name, int if_number, int while_number) {
@@ -361,7 +354,9 @@ void gen_while(ASTstruct *tree, tKey func_name, int if_number, int while_number)
     CODE("JUMP $$loop$%d$%s\n", while_number, func_name);
 
     CODE("LABEL $$cloop$%d$%s\n", while_number, func_name);
-    gen_statements(tree->rightNode, func_name, if_number, while_number);
+    if (tree->rightNode){
+        gen_statements(tree->rightNode, func_name, if_number, while_number);
+    }
     CODE("LABEL $$loop$%d$%s\n", while_number, func_name);
     calculate_expr(tree->leftNode->rightNode);
     CODE("PUSHS bool@true\n");
